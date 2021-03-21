@@ -1,0 +1,124 @@
+import project "backend"
+
+package de.btu.swt.backend {
+	class DataInitializer {
+	}
+
+	class DedocBackend {
+	}
+}
+
+package de.btu.swt.backend.file {
+	class File {
+	}
+
+	class FileController {
+	}
+}
+
+package de.btu.swt.backend.lsp {
+	enum CommandSupplements {
+	}
+
+	class LanguageServer {
+	}
+
+	class LspController {
+	}
+
+	class LspInstance {
+	}
+
+	class LspUtil {
+	}
+}
+
+package de.btu.swt.backend.^project {
+	enum VisibilityLevel {
+	}
+
+	enum Permission {
+	}
+
+	class Project {
+	}
+
+	class ProjectController {
+
+	}
+	class ProjectLevel {
+	}
+
+	class VersionMemberships {
+	}
+}
+//
+//package de.btu.swt.backend.security {
+//	class DataJpaConfig {
+//	}
+//
+//	class InvalidJwtAuthenticationException {
+//	}
+//
+//	class JwtConfigurer {
+//	}
+//
+//	class JwtTokenProvider {
+//	}
+//
+//	class JwtTokenFilter {
+//	}
+//
+//	class SecurityConfig {
+//	}
+//}
+
+package de.btu.swt.backend.storage {
+	interface FileRepresentation {
+	}
+
+	class FileSystemStorageService {
+	}
+
+	interface StorageService {
+	}
+
+	interface Storage {
+	}
+}
+
+package de.btu.swt.backend.user {
+	class AuthController {
+	}
+
+	class CustomUserDetailsService {
+	}
+
+	enum Role {
+	}
+
+	class User {
+	}
+
+	class UserController {
+	}
+}
+
+package de.btu.swt.backend.util {
+	class Port {
+	}
+
+	class ScriptRunner {
+	}
+}
+
+package de.btu.swt.backend.version {
+	class Version {
+	}
+
+	class VersionController {
+	}
+
+	class VersionState {
+	}
+}
