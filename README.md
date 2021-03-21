@@ -25,3 +25,7 @@ For successful compilation and execution, the following software is required:
   * JDK 11 and JDK 13 have been tested
 * npm
   * Used to compile the ReactJS front-end
+
+## License
+
+ * CCO
