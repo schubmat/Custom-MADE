@@ -28,4 +28,4 @@ For successful compilation and execution, the following software is required:
 
 ## License
 
- * CCO
+ * CC0
