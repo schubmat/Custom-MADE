@@ -1,0 +1,14 @@
+.action-button {
+}
+
+.activated-settings {
+    background-color: #D5E8D4;
+}
+
+.non-activated-settings {
+    background-color: #F8CECC;
+}
+
+.full-line-field {
+    width: 100%;
+}

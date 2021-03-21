@@ -1,0 +1,13 @@
+.header {
+    background-color: rgba(108, 106, 103, 1);
+    color: rgba(255, 255, 255, 1);
+    font-size: 20px;
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.24);
+    font-family: "Microsoft Sans Serif", sans-serif;
+    border: 1px solid rgba(255, 255, 255, 0);
+    height: 70px;
+}
+
+.go-back-icon {
+    color: white;
+}
