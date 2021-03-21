@@ -7,3 +7,21 @@ Documenting decisions helps to preserve knowledge over a long time to diminish s
 
 * Support modelling a decision capture DSL on the basis of which decision will be recorded by the end-user (software developers most likely).
 * Provide the end-user with a full fledged web-based editor that complies to the defined decision DSL (providing a full language infrastructure) Instead of ordinary _Markdown Templates_ this editor should be used to capture decisions. Additionally, the editor should be augmented with a software supporting the export of recorded decisions to standard formats as well as self-defined formats (e.g., PDF, MD, etc.)
+
+
+## Usage
+
+#### Preconditions
+
+For successful compilation and execution, the following software is required:
+
+* Screen
+  * the start-up scripts use `screen` to start the separate processes
+  * Screen version 4.08 has been tested and is working
+* Maven 
+  * for compiling the _Xtext_ grammars
+  * validating and transforming _DSLs_
+* Java JDK
+  * JDK 11 and JDK 13 have been tested
+* npm
+  * Used to compile the ReactJS front-end
