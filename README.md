@@ -13,7 +13,7 @@ Documenting decisions helps to preserve knowledge over a long time to diminish s
 
 ### System requirements
  
-* A not too ancient Linux or OSX 10.8 or later.
+* A not too ancient Linux or MacOS. Windows is currently not supported.
 * A somewhat capable CPU. For any language available (default in 04/2021 are two languages) Custom-MADE is going to compile an entire Xtext project including LSP-Binding. 
 
 ### Dependencies
