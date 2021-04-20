@@ -15,15 +15,15 @@ Documenting decisions helps to preserve knowledge over a long time to diminish s
 
 For successful compilation and execution, the following software is required:
 
-* Screen
+* `screen` -- **GNU Screen**
   * the start-up scripts use `screen` to start the separate processes
   * Screen version 4.08 has been tested and is working
-* Maven 
+* `maven` -- **Apache Maven**
   * for compiling the _Xtext_ grammars
   * validating and transforming _DSLs_
-* Java JDK
+* `java` -- **Java Programming Language**
   * JDK 11 and JDK 13 have been tested
-* npm
+* `npm` -- **Node Package Manager**
   * Used to compile the ReactJS front-end
 
 ## Issues
