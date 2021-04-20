@@ -9,9 +9,14 @@ Documenting decisions helps to preserve knowledge over a long time to diminish s
 * Provide the end-user with a full fledged web-based editor that complies to the defined decision DSL (providing a full language infrastructure) Instead of ordinary _Markdown Templates_ this editor should be used to capture decisions. Additionally, the editor should be augmented with a software supporting the export of recorded decisions to standard formats as well as self-defined formats (e.g., PDF, MD, etc.)
 
 
-## Usage
+## Compilation and Usage
 
-#### Preconditions
+### System requirements
+ 
+* A not too ancient Linux or OSX 10.8 or later.
+* A somewhat capable CPU. For any language available (default in 04/2021 are two languages) Custom-MADE is going to compile an entire Xtext project including LSP-Binding. 
+
+### Dependencies
 
 For successful compilation and execution, the following software is required:
 
@@ -26,7 +31,7 @@ For successful compilation and execution, the following software is required:
 * `npm` -- **Node Package Manager**
   * Used to compile the ReactJS front-end
 
-## Issues
+## Issues and Bug Reports
 
 Feel free to submit issues and enhancement requests.
 
@@ -50,3 +55,8 @@ NOTE:
 ## License
 
  * MIT
+
+## Contact
+
+* GitHub issue tracker: [issue tracker](https://github.com/schubmat/Custom-MADE/issues)
+* Project owner: [schubmat](https://github.com/schubmat)
