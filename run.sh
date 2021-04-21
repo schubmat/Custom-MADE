@@ -53,7 +53,7 @@ cd ..
 
 # start dedoc-web (react app)
 cd dedoc-web
- screen -dmS dedoc-react-web bash -c "npm install && npm install vscode-languageserver-protocol@3.15.3 && npm run start"
+ screen -dmS dedoc-react-web bash -c "npm install && npm run start"
 cd ..
 
 
@@ -72,5 +72,5 @@ cd ..
 
 # start dedoc-editor (language client)
 cd dedoc-editor
-screen -dmS dedoc-monaco-editor bash -c "npm install && npm run start"
+screen -dmS dedoc-monaco-editor bash -c "npm install && npm install vscode-languageserver-protocol@3.15.3 && npm run start"
 cd ..
