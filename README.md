@@ -8,6 +8,15 @@ Documenting decisions helps to preserve knowledge over a long time to diminish s
 * Support modelling a decision capture DSL on the basis of which decision will be recorded by the end-user (software developers most likely).
 * Provide the end-user with a full fledged web-based editor that complies to the defined decision DSL (providing a full language infrastructure) Instead of ordinary _Markdown Templates_ this editor should be used to capture decisions. Additionally, the editor should be augmented with a software supporting the export of recorded decisions to standard formats as well as self-defined formats (e.g., PDF, MD, etc.)
 
+## Get Started
+
+* Clone the project
+* Enter the project
+* Run `bash run.sh` and it will start the application in three screens. 
+  * You can view more information about the currently running screens with `screen -x`. Enter one of them with `screen -x NNNN` where `NNNN` is the listed pid of the desired screen. 
+  * Over time more screens should pop up which run an instance of a language server each. 
+* Stop the project and close everything with `bash stop.sh`.
+
 
 ## Compilation and Usage
 
@@ -30,6 +39,8 @@ For successful compilation and execution, the following software is required:
   * JDK 11 and JDK 13 have been tested
 * `npm` -- **Node Package Manager**
   * Used to compile the ReactJS front-end
+* `node.js` -- **Node Package Manager**
+  * Used to compile the ReactJS front-end
 
 ## Issues and Bug Reports
 
@@ -50,6 +61,11 @@ Please refer to each project's style and contribution guidelines for submitting 
 NOTE: 
   * Be sure to merge the latest from "upstream" before making a pull request!
   * Besides, feel free to submit issues as described above.
+
+## Known Issues
+
+* `org.gradle.api.UncheckedIOException: Could not add entry org.gradle.api.UncheckedIOException: Could not add entry ...`
+   * The DSL languages fail to build in the server-backend. Try deleting your local `.gradle` folder in your home directory. The first build will take forever. However, it will most likely solve the issue.
 
 
 ## License
