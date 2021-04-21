@@ -10,12 +10,12 @@ Documenting decisions helps to preserve knowledge over a long time to diminish s
 
 ## Get Started
 
-* Clone the project
-* Enter the project
-* Run `bash run.sh` and it will start the application in three screens. 
+* **Clone** the project
+* **Enter** the project
+* **Run** `bash run.sh` and it will start the application in three screens. 
   * You can view more information about the currently running screens with `screen -x`. Enter one of them with `screen -x NNNN` where `NNNN` is the listed pid of the desired screen. 
   * Over time more screens should pop up which run an instance of a language server each. 
-* Stop the project and close everything with `bash stop.sh`.
+* **Stop** the project and close everything with `bash stop.sh`.
 
 
 ## Compilation and Usage
@@ -66,7 +66,7 @@ NOTE:
 
 * `org.gradle.api.UncheckedIOException: Could not add entry org.gradle.api.UncheckedIOException: Could not add entry ...`
    * The DSL languages fail to build in the server-backend. Try deleting your local `.gradle` folder in your home directory. The first build will take forever. However, it will most likely solve the issue.
-
+* Cloning the repo into a folder with a path containing blanks will cause trouble. During compilation some file permissions need to be changed, which will fail if the full path contains blanks. 
 
 ## License
 
