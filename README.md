@@ -10,6 +10,7 @@ Documenting decisions helps to preserve knowledge over a long time to diminish s
 
 ## Get Started
 
+* **Install** the [dependencies](#Dependencies)
 * **Clone** the project
 * **Enter** the project
 * **Run** `bash run.sh` and it will start the application in three screens. 
@@ -17,8 +18,6 @@ Documenting decisions helps to preserve knowledge over a long time to diminish s
   * Over time more screens should pop up which run an instance of a language server each. 
 * **Stop** the project and close everything with `bash stop.sh`.
 
-
-## Compilation and Usage
 
 ### System requirements
  
