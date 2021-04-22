@@ -38,9 +38,9 @@ For successful compilation and execution, the following software is required:
   * JDK 11 and JDK 13 have been tested
 * `npm` -- **Node Package Manager**
   * Used to compile the ReactJS front-end
-* `node.js` -- **Node Package Manager**
+<!-- * `node.js` -- **Node Package Manager**
   * Used to compile the ReactJS front-end
-
+ -->
 ## Issues and Bug Reports
 
 Feel free to submit issues and enhancement requests.
