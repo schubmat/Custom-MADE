@@ -57,5 +57,5 @@ cd ..
 
 # start dedoc-editor (language client)
 cd dedoc-editor
-	screen -dmS dedoc-monaco-editor bash -c "npm install && npm run start"
+	screen -dmS dedoc-monaco-editor bash -c "yarn && cd browser-app && yarn start"
 cd ..

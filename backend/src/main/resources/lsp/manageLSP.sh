@@ -15,7 +15,7 @@ if [ ! -d "xtext-lsp" ] && [ ! command == "killAll" ]; then
 		if [ ! -d "xtext-lsp" ]; then
 			echo "# cloning LSP environment"
 
-			if [[ `git clone git@git.informatik.tu-cottbus.de:schubmat/xtext-languageserver.git xtext-lsp` ]]; then
+			if [[ `git clone git@git.informatik.tu-cottbus.de:richtro3/xtext-languageserver.git xtext-lsp` ]]; then
 				echo "ERR: Cloning git repository failed. Exiting!"
 				exit 1;
 			fi
