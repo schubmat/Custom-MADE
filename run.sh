@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ `screen -ls | grep -e dedoc -e backend` ]]; then
-	screen -ls | grep -e dedoc -e backend | cut -d. -f1 | awk '{print $1}' | xargs kill;
+if [[ `screen -ls | grep -e Custom-MADE ` ]]; then
+	screen -ls | grep -e Custom-MADE | cut -d. -f1 | awk '{print $1}' | xargs kill;
 fi
 
 # ------------------------------------------------------------
@@ -19,7 +19,7 @@ fi
 # start spring backend 
 
 cd backend
-	screen -dmS spring-backend bash -c "mvn clean compile process-classes exec:java"
+	screen -dmS Custom-MADE-Backend bash -c "mvn clean compile process-classes exec:java"
 cd ..
 
 # ------------------------------------------------------------
@@ -36,9 +36,9 @@ cd ..
 #
 
 
-# start dedoc-web (react app)
+# start the web front-end of Custom-MADE (react app)
 cd dedoc-web
-	screen -dmS dedoc-react-web bash -c "npm install && npm run start"
+	screen -dmS Custom-MADE-Web-UI bash -c "npm install && npm run start"
 cd ..
 
 
@@ -55,7 +55,7 @@ cd ..
 # ------------------------------------------------------------
 #
 
-# start dedoc-editor (language client)
+# start monaco editor employed as LSP Client (language client)
 cd dedoc-editor
-	screen -dmS dedoc-monaco-editor bash -c "npm install && npm run start"
+	screen -dmS Custom-MADE-Editor bash -c "npm install && npm run start"
 cd ..
