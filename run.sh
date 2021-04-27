@@ -16,25 +16,10 @@ fi
 # ------------------------------------------------------------
 # ------------------------------------------------------------
 #
-# start spring backend and set JAVA_HOME if needed#
+# start spring backend 
 
 cd backend
-
-if [[ $1 == "noclean" ]]; then
- 	if [[ $2 == "server" ]]; then
-		screen -dmS spring-backend bash -c "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.1.13-3.el7_6.x86_64; mvn compile process-classes exec:java"
-	elif [[ $2 == "deb" ]]; then
-		screen -dmS spring-backend bash -c "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64; mvn compile process-classes exec:java"
-	else
-		screen -dmS spring-backend bash -c "mvn compile process-classes exec:java"
-	fi	
-elif [[ $1 == "server" ]]; then
-	screen -dmS spring-backend bash -c "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.1.13-3.el7_6.x86_64; mvn clean compile process-classes exec:java"
-elif [[ $1 == "deb" ]]; then
-	screen -dmS spring-backend bash -c "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64; mvn clean compile process-classes exec:java"
-else
 	screen -dmS spring-backend bash -c "mvn clean compile process-classes exec:java"
-fi
 cd ..
 
 # ------------------------------------------------------------
@@ -53,7 +38,7 @@ cd ..
 
 # start dedoc-web (react app)
 cd dedoc-web
- screen -dmS dedoc-react-web bash -c "npm install && npm run start"
+	screen -dmS dedoc-react-web bash -c "npm install && npm run start"
 cd ..
 
 
@@ -72,5 +57,5 @@ cd ..
 
 # start dedoc-editor (language client)
 cd dedoc-editor
-screen -dmS dedoc-monaco-editor bash -c "npm install && npm run start"
+	screen -dmS dedoc-monaco-editor bash -c "npm install && npm run start"
 cd ..
