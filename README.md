@@ -33,11 +33,15 @@ For successful compilation and execution, the following software is required:
   * Screen version 4.08 has been tested and is working
 * `maven` -- **Apache Maven**
   * for compiling the _Xtext_ grammars
-  * validating and transforming _DSLs_
+  * for validating and transforming _DSLs_
+* `gradle` -- **Gradle build tool**
+  * for compiling the _Xtext_ grammars and the connected _Language Server_
 * `java` -- **Java Programming Language**
   * JDK 11 and JDK 13 have been tested
 * `npm` -- **Node Package Manager**
   * Used to compile the ReactJS front-end
+* `git` -- **Git -- distributed version control system**
+  * Custom-MADE employs git to manage the available languages and allows for connecting projects to existing git repositories
 <!-- * `node.js` -- **Node Package Manager**
   * Used to compile the ReactJS front-end
  -->
