@@ -1,0 +1,1 @@
+{"version":3,"file":"custom-edge-router.d.ts","sourceRoot":"","sources":["../src/custom-edge-router.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,mBAAmB,EAAE,gBAAgB,EAAE,sBAAsB,EAAoB,MAAM,SAAS,CAAC;AAE1G,qBAAa,YAAa,SAAQ,mBAAmB;IACjD,UAAU,CAAC,IAAI,EAAE,gBAAgB,GAAG,sBAAsB;CAM7D"}

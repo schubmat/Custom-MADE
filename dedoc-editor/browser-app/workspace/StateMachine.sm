@@ -1,0 +1,26 @@
+statemachine MrsGrantsSecretCompartment
+
+event doorClosed
+event drawOpened
+event lightOn
+event panelClosed
+
+state active
+    lightOn	=> waitingForDraw
+    drawOpened => waitingForLight
+
+state idle
+    doorClosed => active
+
+state waitingForLight
+    lightOn => idle
+
+state waitingForDraw
+    drawOpened => unlockedPanel
+
+state unlockedPanel
+    panelClosed => idle
+event event0
+state state0
+	doorClosed => active
+	event0 => waitingForLight

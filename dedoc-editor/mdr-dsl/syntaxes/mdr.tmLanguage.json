@@ -1,0 +1,36 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "MDR-DSL",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#comments"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"name": "constant.language.mdr",
+			"patterns": [{
+				"name": "constant.language.mdr",
+				"match": "\\b(Title:|User story:|Summary:|Considered alternatives:|We chose:|Because:)\\b"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.mdr",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.mdr",
+					"match": "\\\\."
+				}
+			]
+		}
+	},
+	"scopeName": "source.mdr"
+}
