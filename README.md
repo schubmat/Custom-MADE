@@ -37,7 +37,7 @@ For successful compilation and execution, the following software is required:
 * `gradle` -- **Gradle build tool**
   * for compiling the _Xtext_ grammars and the connected _Language Server_
 * `java` -- **Java Programming Language**
-  * JDK 11 and JDK 13 have been tested
+  * The current project version will work with **JDK 11**! 
 * `npm` -- **Node Package Manager**
   * Used to compile the ReactJS front-end
 * `git` -- **Git -- distributed version control system**
