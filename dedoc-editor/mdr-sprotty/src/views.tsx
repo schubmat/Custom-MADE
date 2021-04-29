@@ -92,27 +92,93 @@ export class DecisionOptionView implements IView {
 
 // Connection Elements
 @injectable()
-export class GenericRelationshipView extends PolylineArrowEdgeView {
-
+export class GenericRelationshipView extends PolylineEdgeView {
+    protected renderLine(edge: SEdge, segments: Point[], context: RenderingContext): VNode {
+        const firstPoint = segments[0];
+        let path = `M ${firstPoint.x},${firstPoint.y}`;
+        for (let i = 1; i < segments.length; i++) {
+            const p = segments[i];
+            path += ` L ${p.x},${p.y}`;
+        }
+        return <path d={path} stroke={"green"} />;
+    }
 }
 
 @injectable()
-export class ArgumentativeRelationshipView extends PolylineArrowEdgeView {
-
+export class ArgumentativeRelationshipView extends PolylineEdgeView {
+    // Correctly defined by library.
 }
 
 @injectable()
 export class DerivativeRelationshipView extends PolylineArrowEdgeView {
-
+    // Correctly defined by library.
 }
 
 @injectable()
-export class ConsequenceRelationshipView extends PolylineArrowEdgeView {
+export class ConsequenceRelationshipView extends PolylineEdgeView {
 
+    gap = 10;
+
+    // Draw a double stroke line
+    protected renderLine(edge: SEdge, segments: Point[], context: RenderingContext): VNode {
+        console.log("Rendering Line.")
+        const firstPoint = segments[0];
+        let path = `M ${firstPoint.x + 1},${firstPoint.y}`;
+        for (let i = 1; i < segments.length; i++) {
+            const p = segments[i];
+            path += ` L ${p.x},${p.y}`;
+
+            if (segments[i-1].x === segments[i].x) {
+                // A horizontal line.
+                console.log("Horizontal part!");
+                let lastPoint = segments[i-1];
+                let currPoint = segments[i];
+                // Draw second line slightly to the side of the current line.
+                path += ` M ${lastPoint.x},${lastPoint.y+this.gap} L ${currPoint.x},${currPoint.y+this.gap}`;
+            } else {
+                // A vertical line.
+                console.log("Vertical part!");
+                let lastPoint = segments[i-1];
+                let currPoint = segments[i];
+                path += ` M ${lastPoint.x+this.gap},${lastPoint.y} L ${currPoint.x+this.gap},${currPoint.y}`;
+            }
+            // Move back
+            path += ` M ${p.x},${p.y}`;
+        }
+        return <path d={path}/>;
+    }
 }
 
+
 @injectable()
-export class OptionRelationshipView extends PolylineArrowEdgeView {
+/**
+ * Copied from the sprotty library @PolylineEdgeView and changed a bit.
+ *
+ * For reference on svg paths: https://developer.mozilla.org/de/docs/Web/SVG/Tutorial/Paths.
+ */
+export class OptionRelationshipView extends PolylineEdgeView {
+
+    // @Override
+    protected renderLine(edge: SEdge, segments: Point[], context: RenderingContext): VNode {
+        const firstPoint = segments[0];
+
+        // Defines an aggregation arrow head at the beginning of the line.
+        // Move to the beginning of the line.
+        let path = `M ${firstPoint.x},${firstPoint.y}`;
+        // Draw the rhombus.
+        path = path + ` L ${firstPoint.x + 3} ${firstPoint.y + 5}`;
+        path = path + ` L ${firstPoint.x} ${firstPoint.y + 10}`;
+        path = path + ` L ${firstPoint.x - 3} ${firstPoint.y + 5}`;
+        path = path + ` L ${firstPoint.x} ${firstPoint.y}`;
+        path = path + ` M ${firstPoint.x} ${firstPoint.y + 10}`;
+        // Draw the rest of the line.
+        for (let i = 1; i < segments.length; i++) {
+            const p = segments[i];
+            path += ` L ${p.x},${p.y}`;
+        }
+        // Put the line into a path.
+        return <path d={path} stroke-width="1" />;
+    }
 
 }
 

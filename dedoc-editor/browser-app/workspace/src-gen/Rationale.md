@@ -2,7 +2,7 @@
 
 **User story:** Ticket-123
 
-My Summary
+Write your summary here
 
 ## Considered Alterantives
 
@@ -13,4 +13,4 @@ My Summary
 ## Decision Outcome
 
 * **Chosen Alternative:** Write your 3rd alternative here
-* **Reason:** I said so
+* **Reason:** HERE COMES YOUR RATIONALE

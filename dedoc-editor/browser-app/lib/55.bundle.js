@@ -1027,60 +1027,67 @@ var DRObjectView = /** @class */ (function (_super) {
     return DRObjectView;
 }(sprotty_1.RectangularNodeView));
 exports.DRObjectView = DRObjectView;
-var StatementView = /** @class */ (function (_super) {
-    __extends(StatementView, _super);
+var StatementView = /** @class */ (function () {
     function StatementView() {
-        return _super !== null && _super.apply(this, arguments) || this;
     }
+    StatementView.prototype.render = function (node, context) {
+        return snabbdom_jsx_1.svg("g", null,
+            snabbdom_jsx_1.svg("rect", { x: "0", y: "0", width: Math.max(node.size.width, 0), height: Math.max(node.size.height, 0), style: { fill: "skyblue" } }),
+            context.renderChildren(node));
+    };
     StatementView = __decorate([
         inversify_1.injectable()
     ], StatementView);
     return StatementView;
-}(sprotty_1.RectangularNodeView));
+}());
 exports.StatementView = StatementView;
-var DecisionProblemOrResultView = /** @class */ (function (_super) {
-    __extends(DecisionProblemOrResultView, _super);
+var DecisionProblemOrResultView = /** @class */ (function () {
     function DecisionProblemOrResultView() {
-        return _super !== null && _super.apply(this, arguments) || this;
     }
+    DecisionProblemOrResultView.prototype.render = function (node, context, args) {
+        return getTwoPartedNode("Decision Option", node, context);
+    };
     DecisionProblemOrResultView = __decorate([
         inversify_1.injectable()
     ], DecisionProblemOrResultView);
     return DecisionProblemOrResultView;
-}(sprotty_1.RectangularNodeView));
+}());
 exports.DecisionProblemOrResultView = DecisionProblemOrResultView;
-var DecisionProblemView = /** @class */ (function (_super) {
-    __extends(DecisionProblemView, _super);
+var DecisionProblemView = /** @class */ (function () {
     function DecisionProblemView() {
-        return _super !== null && _super.apply(this, arguments) || this;
     }
+    DecisionProblemView.prototype.render = function (node, context, args) {
+        return getTwoPartedNode("Decision Problem", node, context);
+    };
     DecisionProblemView = __decorate([
         inversify_1.injectable()
     ], DecisionProblemView);
     return DecisionProblemView;
-}(sprotty_1.RectangularNodeView));
+}());
 exports.DecisionProblemView = DecisionProblemView;
-var DecisionResultView = /** @class */ (function (_super) {
-    __extends(DecisionResultView, _super);
+var DecisionResultView = /** @class */ (function () {
     function DecisionResultView() {
-        return _super !== null && _super.apply(this, arguments) || this;
     }
+    DecisionResultView.prototype.render = function (node, context, args) {
+        return getTwoPartedNode("Decision Result", node, context);
+    };
     DecisionResultView = __decorate([
         inversify_1.injectable()
     ], DecisionResultView);
     return DecisionResultView;
-}(sprotty_1.RectangularNodeView));
+}());
 exports.DecisionResultView = DecisionResultView;
-var DecisionOptionView = /** @class */ (function (_super) {
-    __extends(DecisionOptionView, _super);
+var DecisionOptionView = /** @class */ (function () {
     function DecisionOptionView() {
-        return _super !== null && _super.apply(this, arguments) || this;
     }
+    DecisionOptionView.prototype.render = function (node, context, args) {
+        return getTwoPartedNode("Decision Option", node, context);
+    };
     DecisionOptionView = __decorate([
         inversify_1.injectable()
     ], DecisionOptionView);
     return DecisionOptionView;
-}(sprotty_1.RectangularNodeView));
+}());
 exports.DecisionOptionView = DecisionOptionView;
 // Connection Elements
 var GenericRelationshipView = /** @class */ (function (_super) {
@@ -1088,11 +1095,20 @@ var GenericRelationshipView = /** @class */ (function (_super) {
     function GenericRelationshipView() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    GenericRelationshipView.prototype.renderLine = function (edge, segments, context) {
+        var firstPoint = segments[0];
+        var path = "M " + firstPoint.x + "," + firstPoint.y;
+        for (var i = 1; i < segments.length; i++) {
+            var p = segments[i];
+            path += " L " + p.x + "," + p.y;
+        }
+        return snabbdom_jsx_1.svg("path", { d: path, stroke: "green" });
+    };
     GenericRelationshipView = __decorate([
         inversify_1.injectable()
     ], GenericRelationshipView);
     return GenericRelationshipView;
-}(PolylineArrowEdgeView));
+}(sprotty_1.PolylineEdgeView));
 exports.GenericRelationshipView = GenericRelationshipView;
 var ArgumentativeRelationshipView = /** @class */ (function (_super) {
     __extends(ArgumentativeRelationshipView, _super);
@@ -1103,7 +1119,7 @@ var ArgumentativeRelationshipView = /** @class */ (function (_super) {
         inversify_1.injectable()
     ], ArgumentativeRelationshipView);
     return ArgumentativeRelationshipView;
-}(PolylineArrowEdgeView));
+}(sprotty_1.PolylineEdgeView));
 exports.ArgumentativeRelationshipView = ArgumentativeRelationshipView;
 var DerivativeRelationshipView = /** @class */ (function (_super) {
     __extends(DerivativeRelationshipView, _super);
@@ -1119,25 +1135,94 @@ exports.DerivativeRelationshipView = DerivativeRelationshipView;
 var ConsequenceRelationshipView = /** @class */ (function (_super) {
     __extends(ConsequenceRelationshipView, _super);
     function ConsequenceRelationshipView() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.gap = 10;
+        return _this;
     }
+    // Draw a double stroke line
+    ConsequenceRelationshipView.prototype.renderLine = function (edge, segments, context) {
+        console.log("Rendering Line.");
+        var firstPoint = segments[0];
+        var path = "M " + (firstPoint.x + 1) + "," + firstPoint.y;
+        for (var i = 1; i < segments.length; i++) {
+            var p = segments[i];
+            path += " L " + p.x + "," + p.y;
+            if (segments[i - 1].x === segments[i].x) {
+                // A horizontal line.
+                console.log("Horizontal part!");
+                var lastPoint = segments[i - 1];
+                var currPoint = segments[i];
+                // Draw second line slightly to the side of the current line.
+                path += " M " + lastPoint.x + "," + (lastPoint.y + this.gap) + " L " + currPoint.x + "," + (currPoint.y + this.gap);
+            }
+            else {
+                // A vertical line.
+                console.log("Vertical part!");
+                var lastPoint = segments[i - 1];
+                var currPoint = segments[i];
+                path += " M " + (lastPoint.x + this.gap) + "," + lastPoint.y + " L " + (currPoint.x + this.gap) + "," + currPoint.y;
+            }
+            // Move back
+            path += " M " + p.x + "," + p.y;
+        }
+        return snabbdom_jsx_1.svg("path", { d: path });
+    };
     ConsequenceRelationshipView = __decorate([
         inversify_1.injectable()
     ], ConsequenceRelationshipView);
     return ConsequenceRelationshipView;
-}(PolylineArrowEdgeView));
+}(sprotty_1.PolylineEdgeView));
 exports.ConsequenceRelationshipView = ConsequenceRelationshipView;
 var OptionRelationshipView = /** @class */ (function (_super) {
     __extends(OptionRelationshipView, _super);
+    /**
+     * Copied from the sprotty library @PolylineEdgeView and changed a bit.
+     *
+     * For reference on svg paths: https://developer.mozilla.org/de/docs/Web/SVG/Tutorial/Paths.
+     */
     function OptionRelationshipView() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    // @Override
+    OptionRelationshipView.prototype.renderLine = function (edge, segments, context) {
+        var firstPoint = segments[0];
+        // Defines an aggregation arrow head at the beginning of the line.
+        // Move to the beginning of the line.
+        var path = "M " + firstPoint.x + "," + firstPoint.y;
+        // Draw the rhombus.
+        path = path + (" L " + (firstPoint.x + 3) + " " + (firstPoint.y + 5));
+        path = path + (" L " + firstPoint.x + " " + (firstPoint.y + 10));
+        path = path + (" L " + (firstPoint.x - 3) + " " + (firstPoint.y + 5));
+        path = path + (" L " + firstPoint.x + " " + firstPoint.y);
+        path = path + (" M " + firstPoint.x + " " + (firstPoint.y + 10));
+        // Draw the rest of the line.
+        for (var i = 1; i < segments.length; i++) {
+            var p = segments[i];
+            path += " L " + p.x + "," + p.y;
+        }
+        // Put the line into a path.
+        return snabbdom_jsx_1.svg("path", { d: path, "stroke-width": "1" });
+    };
     OptionRelationshipView = __decorate([
         inversify_1.injectable()
+        /**
+         * Copied from the sprotty library @PolylineEdgeView and changed a bit.
+         *
+         * For reference on svg paths: https://developer.mozilla.org/de/docs/Web/SVG/Tutorial/Paths.
+         */
     ], OptionRelationshipView);
     return OptionRelationshipView;
-}(PolylineArrowEdgeView));
+}(sprotty_1.PolylineEdgeView));
 exports.OptionRelationshipView = OptionRelationshipView;
+function getTwoPartedNode(text, node, context) {
+    var height = Math.max(node.size.height, 0);
+    var width = Math.max(node.size.width, 0);
+    return snabbdom_jsx_1.svg("g", null,
+        snabbdom_jsx_1.svg("rect", { x: "0", y: "0", width: width, height: height, style: { fill: "skyblue" } }),
+        context.renderChildren(node),
+        snabbdom_jsx_1.svg("rect", { x: "0", y: height, width: width, height: 0.5 * height, style: { fill: "#A5A4A5" } }),
+        snabbdom_jsx_1.svg("text", { x: "10", y: 1.37 * height, style: { textDecorationLine: 'underline' } }, text));
+}
 
 
 /***/ }),
