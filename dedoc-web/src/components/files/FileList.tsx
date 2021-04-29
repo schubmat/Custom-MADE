@@ -66,6 +66,8 @@ export const FileList = ({onClickFile}: {onClickFile: (file: State<File>) => voi
     const isPending: boolean = version.version !== null && version.version.files.items.filter(file => fileChanges.isPending(file.id)).length > 0;
 
     return (
+        <span></span>
+        /*
         <div>
         <Search
             value={searchString}
@@ -90,6 +92,6 @@ export const FileList = ({onClickFile}: {onClickFile: (file: State<File>) => voi
                     </Button>
                 </td>
             </tr></table>
-    </div>
+    </div>*/
     );
 };

@@ -9,4 +9,4 @@ cd browser-app
 # 	Path after "yarn start": 	Workspace to be used by default.
 #	--hostname: 			Hostname
 #	--port:				Port
-yarn start ./workspace
+yarn start ./workspace/

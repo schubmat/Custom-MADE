@@ -7,12 +7,13 @@ import {
     PolylineEdgeView,
     RenderingContext,
     SEdge,
-    toDegrees,
     IView,
+    toDegrees,
     SPort,
-    RectangularNodeView
+    RectangularNodeView, RectangularNode
 } from "sprotty";
 import {injectable} from "inversify";
+import {MdrNode} from "./model";
 
 @injectable()
 export class PolylineArrowEdgeView extends PolylineEdgeView {
@@ -49,28 +50,44 @@ export class DRObjectView extends RectangularNodeView {
 }
 
 @injectable()
-export class StatementView extends RectangularNodeView {
-
+export class StatementView implements IView {
+    render(node: Readonly<MdrNode>, context: RenderingContext): VNode {
+        return <g>
+            <rect
+                x="0" y="0" width={Math.max(node.size.width, 0)} height={Math.max(node.size.height, 0)}
+                style={{fill: "skyblue"}}
+            ></rect>
+            { context.renderChildren(node) }
+        </g>
+    }
 }
 
 @injectable()
-export class DecisionProblemOrResultView extends RectangularNodeView {
-
+export class DecisionProblemOrResultView implements IView {
+    render(node: MdrNode, context: RenderingContext, args?: object): VNode {
+        return getTwoPartedNode("Decision Option", node, context);
+    }
 }
 
 @injectable()
-export class DecisionProblemView extends RectangularNodeView {
-
+export class DecisionProblemView implements IView {
+    render(node: MdrNode, context: RenderingContext, args?: object): VNode {
+        return getTwoPartedNode("Decision Problem", node, context);
+    }
 }
 
 @injectable()
-export class DecisionResultView extends RectangularNodeView {
-
+export class DecisionResultView implements IView {
+    render(node: MdrNode, context: RenderingContext, args?: object): VNode {
+        return getTwoPartedNode("Decision Result", node, context);
+    }
 }
 
 @injectable()
-export class DecisionOptionView extends RectangularNodeView {
-
+export class DecisionOptionView implements IView {
+    render(node: MdrNode, context: RenderingContext, args?: object): VNode {
+        return getTwoPartedNode("Decision Option", node, context);
+    }
 }
 
 // Connection Elements
@@ -99,5 +116,21 @@ export class OptionRelationshipView extends PolylineArrowEdgeView {
 
 }
 
+function getTwoPartedNode(text : String, node : RectangularNode, context : RenderingContext) : VNode {
+    let height = Math.max(node.size.height, 0)
+    let width = Math.max(node.size.width, 0)
 
-
+    return <g>
+        <rect
+            x="0" y="0" width={width} height={height}
+            style={{fill: "skyblue"}}></rect>
+        {context.renderChildren(node)}
+        <rect
+            x="0" y={height} width={width} height={0.5*height}
+            style={{fill: "#A5A4A5"}}
+        ></rect>
+        <text x="10" y={1.37 * height} style={{textDecorationLine: 'underline'}}>
+            { text }
+        </text>
+    </g>;
+}

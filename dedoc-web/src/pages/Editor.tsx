@@ -78,7 +78,7 @@ const Page  = ({initFileId}: {initFileId: number}) => {
             <Layout style={{marginLeft: 200, height: '100vh', width: '100%'}}>
                 <Header title={getFileName()}/>
                 <Layout.Content>
-                    <div style={{float: "left", width: "70%", height: "100%", padding: "10px"}}>
+                    <div style={{float: "left", width: "100%", height: "100%", padding: "10px"}}>
                         <iframe
                             title={"monaco-editor"}
                             src={`http://localhost:3001/`}
