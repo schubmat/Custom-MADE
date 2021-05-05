@@ -183,8 +183,10 @@ export class OptionRelationshipView extends PolylineEdgeView {
 }
 
 function getTwoPartedNode(text : String, node : RectangularNode, context : RenderingContext) : VNode {
+
     let height = Math.max(node.size.height, 0)
-    let width = Math.max(node.size.width, 0)
+    // 110 is the space taken up by the bottom node.
+    let width = Math.max(node.size.width, 110)
 
     return <g>
         <rect

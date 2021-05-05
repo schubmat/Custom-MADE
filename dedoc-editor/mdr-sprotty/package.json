@@ -7,7 +7,7 @@
     "css"
   ],
   "dependencies": {
-    "sprotty": "0.7.0"
+    "sprotty": "0.8.0"
   },
   "devDependencies": {
     "rimraf": "latest",
