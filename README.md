@@ -14,6 +14,10 @@ Documenting decisions helps to preserve knowledge over a long time to diminish s
 * **Clone** the project
 * **Enter** the project
 * **Run** `bash run.sh` and it will start the application in three screens. 
+  * A website will open up. You might need to **wait** until all background processes finished starting up. If login attempts do still fail, just wait a little and retry. As soon as the login is successful, the background processes finished starting up.
+  * **Login** as 
+    * *user:* `user`
+    * *password:* `password`
   * You can view more information about the currently running screens with `screen -x`. Enter one of them with `screen -x NNNN` where `NNNN` is the listed pid of the desired screen. 
   * Over time more screens should pop up which run an instance of a language server each. 
 * **Stop** the project and close everything with `bash stop.sh`.
