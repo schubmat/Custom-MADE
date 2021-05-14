@@ -49,18 +49,9 @@ public class DataInitializer {
 
     @PostConstruct
     void initData() {
-        GitAccount btuGit = GitAccount.builder()
-                .plattformUrl("git@git.informatik.tu-cottbus.de")
-                .name("Custom-MADE_")
-                .isPublic(true)
-                .build();
-        GitAccount testGit = GitAccount.builder()
-                .plattformUrl("git@mattes.schubbe.test.de")
-                .name("schubmat")
-                .isPublic(true)
-                .build();
-        btuGit = gitRepository.save(btuGit);
-        testGit = gitRepository.save(testGit);
+
+
+        // init user accounts for application
 
         User user = User.builder()
                 .username("user")
@@ -76,6 +67,22 @@ public class DataInitializer {
                 .build();
         user = userRepository.save(user);
         admin = userRepository.save(admin);
+
+        // init data for git connection
+
+        GitAccount btuGit = GitAccount.builder()
+                .plattformUrl("git@git.informatik.tu-cottbus.de")
+                .name("Custom-MADE_")
+                .isPublic(true)
+                .build();
+        GitAccount testGit = GitAccount.builder()
+                .plattformUrl("git@mattes.schubbe.test.de")
+                .name("schubmat")
+                .isPublic(true)
+                .build();
+        btuGit = gitRepository.save(btuGit);
+        testGit = gitRepository.save(testGit);
+        
         GitAccount privateGit = GitAccount.builder()
                 .plattformUrl("git@sth.bla.whatever")
                 .name("User")
@@ -84,141 +91,138 @@ public class DataInitializer {
                 .build();
         privateGit = gitRepository.save(privateGit);
 
-            Project mdrSimpleGrammar = Project.builder()
-                    .name("MDR Simple")
-                    .owner(user)
-                    .level(ProjectLevel.M1)
-                    .build();
-            Project mdrGrammar = Project.builder()
-                    .name("MDR")
-                    .owner(user)
-                    .level(ProjectLevel.M1)
-                    .build();
-            Project metaGrammar = Project.builder()
-                    .name("The Meta Grammar")
-                    .owner(user)
-                    .level(ProjectLevel.M2)
-                    .build();
+        // init projects for supported languages
 
-            log.info("Initialized: " + projectRepository.save(mdrSimpleGrammar));
-            log.info("Initialized: " + projectRepository.save(mdrGrammar));
-            log.info("Initialized: " + projectRepository.save(metaGrammar));
+        Project mdrSimpleGrammar = Project.builder()
+                .name("MDR Simple")
+                .owner(user)
+                .level(ProjectLevel.M1)
+                .build();
+        Project mdrGrammar = Project.builder()
+                .name("MDR")
+                .owner(user)
+                .level(ProjectLevel.M1)
+                .build();
+        Project metaGrammar = Project.builder()
+                .name("The Meta Grammar")
+                .owner(user)
+                .level(ProjectLevel.M2)
+                .build();
 
-            LanguageServer metaServer = LanguageServer.builder()
-                    .languageName("grammar_MDR_simplified")
-                    .build();
-            LanguageServer mdrServer = LanguageServer.builder()
-                    .languageName("grammar_MDR")
-                    .build();
-            LanguageServer mdrSimpleServer = LanguageServer.builder()
-                    .languageName("grammar_MDR_simplified")
-                    .build();
-            Version metaGrammarVersion = Version.builder()
-                    .description("Not implemented!")
-                    .version("1.0.0-SNAPSHOT")
-                    .dslExtension("xtext")
-                    .visibility(VisibilityLevel.PUBLIC)
-                    .project(metaGrammar)
-                    .languageServer(metaServer)
-                    .owner(admin)
-                    .build();
-            log.info("Initialized: " + versionRepository.save(metaGrammarVersion));
+        log.info("Initialized: " + projectRepository.save(mdrSimpleGrammar));
+        log.info("Initialized: " + projectRepository.save(mdrGrammar));
+        log.info("Initialized: " + projectRepository.save(metaGrammar));
 
-            Version mdrGrammarVersion = Version.builder()
-                    .owner(admin)
-                    .description("from the xtext example")
-                    .version("1.0.0-SNAPSHOT")
-                    .dslExtension("mydsl")
-                    .project(mdrGrammar)
-                    .languageServer(mdrServer)
-                    .visibility(VisibilityLevel.PUBLIC)
-                    .grammar(metaGrammarVersion)
-                    .build();
-            Version mdrSimpleGrammarVersion = Version.builder()
-                    .owner(user)
-                    .description("")
-                    .version("1.0.0-SNAPSHOT")
-                    .dslExtension("mydsl")
-                    .project(mdrSimpleGrammar)
-                    .languageServer(mdrSimpleServer)
-                    .visibility(VisibilityLevel.PRIVATE)
-                    .grammar(metaGrammarVersion)
-                    .hasGenerator(true)
-                    .build();
-            mdrGrammarVersion.addUser(admin, Permissions.OWNER);
-            mdrSimpleGrammarVersion.addUser(admin, Permissions.OWNER);
+        // create language server objects for which language server instances will be built and started later
 
-            log.info("Initialized: " + versionRepository.save(mdrGrammarVersion));
-            log.info("Initialized: " + versionRepository.save(mdrSimpleGrammarVersion));
-            log.info("Initialized: " + lspRepository.save(mdrServer));
-            log.info("Initialized: " + lspRepository.save(mdrSimpleServer));
+        LanguageServer metaServer = LanguageServer.builder()
+                .languageName("simple-decision-record-language")
+                .build();
+        LanguageServer mdrSimpleServer = LanguageServer.builder()
+                .languageName("simple-decision-record-language")
+                .build();
 
 
+        // create version objects which host an existing language and its corresponding language server object
 
-            Project mdrDsl = Project.builder()
-                    .name("Project A")
-                    .description("Description of Project A.")
-                    .level(ProjectLevel.M0)
-                    .owner(user)
-                    .build();
-            Project mdrSimpleDsl = Project.builder()
-                    .name("Project B")
-                    .description("Description of Project B.")
-                    .level(ProjectLevel.M0)
-                    .owner(admin)
-                    .build();
-            log.info("Initialized: " + projectRepository.save(mdrDsl));
-            log.info("Initialized: " + projectRepository.save(mdrSimpleDsl));
+        Version metaGrammarVersion = Version.builder()
+                .description("Not implemented!")
+                .version("1.0.0-SNAPSHOT")
+                .dslExtension("xtext")
+                .visibility(VisibilityLevel.PUBLIC)
+                .project(metaGrammar)
+                .languageServer(metaServer)
+                .owner(admin)
+                .build();
+        log.info("Initialized: " + versionRepository.save(metaGrammarVersion));
 
-            Version mdrDslVersion = Version.builder()
-                    .owner(admin)
-                    .description("Project 1")
-                    .version("1.0.0-SNAPSHOT")
-                    .project(mdrDsl)
-                    .grammar(mdrGrammarVersion)
-                    .visibility(VisibilityLevel.PUBLIC)
-                    .build();
-            Version mdrSimpleDslVersion = Version.builder()
-                    .owner(user)
-                    .description("Project 2")
-                    .version("1.0.0-SNAPSHOT")
-                    .project(mdrSimpleDsl)
-                    .grammar(mdrSimpleGrammarVersion)
-                    .visibility(VisibilityLevel.PRIVATE)
-                    .build();
+        Version mdrSimpleGrammarVersion = Version.builder()
+                .owner(user)
+                .description("")
+                .version("1.0.0-SNAPSHOT")
+                .dslExtension("mydsl")
+                .project(mdrSimpleGrammar)
+                .languageServer(mdrSimpleServer)
+                .visibility(VisibilityLevel.PRIVATE)
+                .grammar(metaGrammarVersion)
+                .hasGenerator(true)
+                .build();
 
-            mdrDslVersion.addUser(admin, Permissions.OWNER);
-            mdrSimpleDslVersion.addUser(user, Permissions.OWNER);
-            log.info("Initialized: " + versionRepository.save(mdrDslVersion));
-            log.info("Initialized: " + versionRepository.save(mdrSimpleDslVersion));
+        mdrSimpleGrammarVersion.addUser(admin, Permissions.OWNER);
+
+        log.info("Initialized: " + versionRepository.save(mdrSimpleGrammarVersion));
+        log.info("Initialized: " + lspRepository.save(mdrSimpleServer));
+
+        // finally, create user space projects and connect them to their langauge / LSP objects
+
+        Project project_mdrDsl = Project.builder()
+                .name("Project A")
+                .description("Description of Project A.")
+                .level(ProjectLevel.M0)
+                .owner(user)
+                .build();
+        Project project_mdrSimpleDsl = Project.builder()
+                .name("Project B")
+                .description("Description of Project B.")
+                .level(ProjectLevel.M0)
+                .owner(admin)
+                .build();
+        log.info("Initialized: " + projectRepository.save(project_mdrDsl));
+        log.info("Initialized: " + projectRepository.save(project_mdrSimpleDsl));
+
+        // map the projects to a project version
+
+        Version project_mdrDsl_Version = Version.builder()
+                .owner(admin)
+                .description("Project 1")
+                .version("1.0.0-SNAPSHOT")
+                .project(project_mdrDsl)
+                .grammar(mdrSimpleGrammarVersion)
+                .visibility(VisibilityLevel.PUBLIC)
+                .build();
+        Version project_mdrSimpleDsl_Version = Version.builder()
+                .owner(user)
+                .description("Project 2")
+                .version("1.0.0-SNAPSHOT")
+                .project(project_mdrSimpleDsl)
+                .grammar(mdrSimpleGrammarVersion)
+                .visibility(VisibilityLevel.PRIVATE)
+                .build();
+
+        project_mdrDsl_Version.addUser(admin, Permissions.OWNER);
+        project_mdrSimpleDsl_Version.addUser(user, Permissions.OWNER);
+        log.info("Initialized: " + versionRepository.save(project_mdrDsl_Version));
+        log.info("Initialized: " + versionRepository.save(project_mdrSimpleDsl_Version));
 
 //            Set<User> editors = new HashSet<>();
 //            editors.add(user1);
 //            editors.add(user2);
 
-            File mdrSimpleGrammarFile = File.builder()
-                    .name(mdrSimpleGrammar.getName())
-                    .version(mdrSimpleGrammarVersion)
-                    .status(FileStatus.VALID)
-                    .build();
-            File mdrGrammarFile = File.builder()
-                    .name(mdrGrammar.getName())
-                    .version(mdrGrammarVersion)
-                    .build();
-            File mdrSimpleDslFile = File.builder()
-                    .name("FirstTest")
-//                    .editors(editors)
-                    .version(mdrSimpleDslVersion)
-                    .build();
-            File mdrDslFile = File.builder()
-                    .name("Super")
-//                    .editors(editors)
-                    .version(mdrDslVersion)
-                    .build();
+        // create files for virtual workspace (required for communication with LSP instance)
 
-            log.info("Initialized: " + fileRepository.save(mdrSimpleGrammarFile));
-            log.info("Initialized: " + fileRepository.save(mdrGrammarFile));
-            log.info("Initialized: " + fileRepository.save(mdrSimpleDslFile));
-            log.info("Initialized: " + fileRepository.save(mdrDslFile));
+        File mdrSimpleGrammarFile = File.builder()
+                .name(mdrSimpleGrammar.getName())
+                .version(mdrSimpleGrammarVersion)
+                .status(FileStatus.VALID)
+                .build();
+        File mdrGrammarFile = File.builder()
+                .name(mdrGrammar.getName())
+                .version(mdrSimpleGrammarVersion)
+                .build();
+        File mdrSimpleDslFile = File.builder()
+                .name("FirstTest")
+//                    .editors(editors)
+                .version(project_mdrSimpleDsl_Version)
+                .build();
+        File mdrDslFile = File.builder()
+                .name("Super")
+//                    .editors(editors)
+                .version(project_mdrDsl_Version)
+                .build();
+
+        log.info("Initialized: " + fileRepository.save(mdrSimpleGrammarFile));
+        log.info("Initialized: " + fileRepository.save(mdrGrammarFile));
+        log.info("Initialized: " + fileRepository.save(mdrSimpleDslFile));
+        log.info("Initialized: " + fileRepository.save(mdrDslFile));
     }
 }
