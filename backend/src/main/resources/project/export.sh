@@ -16,9 +16,9 @@ TARGET_REL_DIR=$6
 #
 M1_STANDALONE_SETUP="org.xtext.example.mydsl.MyDslStandaloneSetup"
 
-echo "#### "
-echo "# ${POM_PATH}"
-echo "#### "
+# echo "#### "
+# echo "# ${POM_PATH}"
+# echo "#### "
 
 echo "### " >> tmp.txt
 echo "## ${1} #### ${2} ## ${3} ## ${4} ## ${5} ## ${6}" >> tmp.txt
