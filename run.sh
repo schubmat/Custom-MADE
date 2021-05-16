@@ -19,7 +19,11 @@ fi
 # start spring backend 
 
 cd backend
-	screen -dmS Custom-MADE-Backend bash -c "mvn clean compile process-classes exec:java"
+	if [[ $1 == "no-clean" ]]; then
+		screen -dmS Custom-MADE-Backend bash -c "mvn compile process-classes exec:java"
+	else 
+		screen -dmS Custom-MADE-Backend bash -c "mvn clean compile process-classes exec:java"
+	fi
 cd ..
 
 # ------------------------------------------------------------
