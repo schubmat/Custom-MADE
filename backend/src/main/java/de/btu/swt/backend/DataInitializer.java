@@ -116,10 +116,10 @@ public class DataInitializer {
         // create language server objects for which language server instances will be built and started later
 
         LanguageServer metaServer = LanguageServer.builder()
-                .languageName("simple-decision-record-language")
+                .languageName("simple_decision_record_language")
                 .build();
         LanguageServer mdrSimpleServer = LanguageServer.builder()
-                .languageName("simple-decision-record-language")
+                .languageName("simple_decision_record_language")
                 .build();
 
 
