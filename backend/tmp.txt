@@ -1,0 +1,4 @@
+### 
+## 4 #### /home/christian/dev/Custom-MADE/backend/target/classes/project ## simple_decision_record_language ## 1.0.0-SNAPSHOT ## /home/christian/dev/Custom-MADE/backend/src/main/resources/tmp/user_2021-05-21 15:35:35.746/FirstTest/src/Project B/1.0.0-SNAPSHOT ## /home/christian/dev/Custom-MADE/backend/src/main/resources/tmp/user_2021-05-21 15:35:35.746/FirstTest/target/Project B/1.0.0-SNAPSHOT
+### 
+mvn clean compile -B -q "-Dm1-groupId=de.btu.sst.swt.xtextLsp" "-Dm1-artifactId=simple_decision_record_language" "-Dm1-standaloneSetup=org.xtext.example.mydsl.MyDslStandaloneSetup" "-Dm1-version=1.0.0-SNAPSHOT-simple_decision_record_language" "-Dsource-dir=/home/christian/dev/Custom-MADE/backend/src/main/resources/tmp/user_2021-05-21 15:35:35.746/FirstTest/src/Project B/1.0.0-SNAPSHOT" "-Dtarget-dir=/home/christian/dev/Custom-MADE/backend/src/main/resources/tmp/user_2021-05-21 15:35:35.746/FirstTest/target/Project B/1.0.0-SNAPSHOT"
