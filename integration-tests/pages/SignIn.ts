@@ -6,6 +6,9 @@ export class SignInPage {
     private passwordElement: WebElementPromise;
     private loginButton: WebElementPromise;
 
+    protected BASE_URL = 'http://localhost:3000/';
+    private SUCCESS_URL = 'http://localhost:3000/home';
+
     /**
      * Constructs the page `"localhost:3000"` which will be immedeatly forwarded to the SignIn page and provides function for thesting the login process
      * @param driver the current `WebDriver` from the `'selenium-webdriver'` package
@@ -22,8 +25,13 @@ export class SignInPage {
     /**
      * navigates the `WebDriver` to `"localhost:3000"`
      */
-    async navigate() {
-        await this.driver.get('localhost:3000');
+    async navigate(): Promise<SignInPage> {
+        return new Promise<SignInPage>((resolve, reject) => {
+            this.driver
+                .get(this.BASE_URL)
+                .then(() => resolve(this))
+                .catch((error) => reject('Error on SignInPage.navigate(): ' + error));
+        });
     }
 
     /**
@@ -38,16 +46,46 @@ export class SignInPage {
         password: string,
         withEnter: boolean = false,
         showTime: number = 0,
-    ) {
-        await this.usernameElement.sendKeys(username);
-        await this.driver.sleep(showTime);
-        await this.passwordElement.sendKeys(password);
-        await this.driver.sleep(showTime);
-        if (withEnter) {
-            await this.passwordElement.sendKeys(Key.ENTER);
-        } else {
-            await this.loginButton.click();
-        }
+    ): Promise<SignInPage> {
+        return new Promise<SignInPage>((resolve, reject) =>
+            this.usernameElement
+                .sendKeys(username)
+                .then(() => this.driver.sleep(showTime))
+                .then(() => this.passwordElement.sendKeys(password))
+                .then(() => this.driver.sleep(showTime))
+                .then(() =>
+                    withEnter ? this.passwordElement.sendKeys(Key.ENTER) : this.loginButton.click(),
+                )
+                .then(() => resolve(this))
+                .catch((error) => reject('Error on SignInPage.login(): ' + error)),
+        );
+    }
+
+    async sleep(ms: number): Promise<SignInPage> {
+        return new Promise((resolve, reject) => {
+            this.driver
+                .sleep(ms)
+                .then(() => resolve(this))
+                .catch((error) => reject(`Error on SignInPage.sleep(${ms}): ` + error));
+        });
+    }
+
+    async validatePage(success: boolean = true): Promise<SignInPage> {
+        return new Promise((resolve, reject) => {
+            this.driver.getCurrentUrl().then((url) => {
+                if (success) {
+                    url === this.SUCCESS_URL
+                        ? resolve(this)
+                        : reject(`SignInPage was not forwarded to ${this.SUCCESS_URL} but ${url}`);
+                } else {
+                    url === this.BASE_URL
+                        ? resolve(this)
+                        : reject(
+                              `SignInPage was unexpectedly forwarded from ${this.BASE_URL} to ${url}`,
+                          );
+                }
+            });
+        });
     }
 }
 
