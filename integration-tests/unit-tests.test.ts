@@ -19,7 +19,7 @@ afterEach(() => {
 });
 
 describe('Login [Unit-Test]', () => {
-    test('successful login', () => {
+    test('successful login', async () => {
         return new SignInPage(driver)
             .navigate()
             .then((page) => page.validatePage())
@@ -47,5 +47,16 @@ describe('Login [Unit-Test]', () => {
             .then((page) => page.validatePage())
             .then((page) => page.isSuccessfullyLoggedIn())
             .then((result) => expect(result).toBe(false));
+    });
+});
+
+
+describe('Data-Management [Unit-Test]', () => {
+    test('successful creation of a file ', async () => {
+        await new SignInPage(driver)
+            .navigate()
+            .then((page) => page.login(VALID_USERNAME, VALID_PASSWORD, false))
+
+        // return new HomePage.navigate()....
     });
 });
