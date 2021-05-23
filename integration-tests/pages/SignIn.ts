@@ -1,10 +1,10 @@
-import { By, Key, WebDriver, WebElementPromise } from 'selenium-webdriver';
+import { By, Key, until, WebDriver } from 'selenium-webdriver';
 
 export class SignInPage {
     private driver: WebDriver;
-    private usernameElement: WebElementPromise;
-    private passwordElement: WebElementPromise;
-    private loginButton: WebElementPromise;
+    private usernameBy: By;
+    private passwordBy: By;
+    private loginButtonBy: By;
 
     protected BASE_URL = 'http://localhost:3000/';
     private SUCCESS_URL = 'http://localhost:3000/home';
@@ -15,11 +15,9 @@ export class SignInPage {
      */
     constructor(driver: WebDriver) {
         this.driver = driver;
-        this.usernameElement = driver.findElement(By.id('username'));
-        this.passwordElement = driver.findElement(By.id('password'));
-        this.loginButton = driver.findElement(
-            By.className('ant-btn login-form-button ant-btn-primary'),
-        );
+        this.usernameBy = By.id('username');
+        this.passwordBy = By.id('password');
+        this.loginButtonBy = By.className('ant-btn login-form-button ant-btn-primary');
     }
 
     /**
@@ -36,6 +34,7 @@ export class SignInPage {
 
     /**
      * Proceeds a login with the given `username` and `password`
+     * - TODO: this function should retrun a new HomePage
      * @param username
      * @param password
      * @param withEnter should the login be submitted by pressing the `Key.ENTER`. Uses the page's login button otherwise
@@ -47,20 +46,34 @@ export class SignInPage {
         withEnter: boolean = false,
         showTime: number = 0,
     ): Promise<SignInPage> {
-        return new Promise<SignInPage>((resolve, reject) =>
-            this.usernameElement
-                .sendKeys(username)
-                .then(() => this.driver.sleep(showTime))
-                .then(() => this.passwordElement.sendKeys(password))
-                .then(() => this.driver.sleep(showTime))
-                .then(() =>
-                    withEnter ? this.passwordElement.sendKeys(Key.ENTER) : this.loginButton.click(),
-                )
-                .then(() => resolve(this))
-                .catch((error) => reject('Error on SignInPage.login(): ' + error)),
+        return new Promise<SignInPage>(
+            async (resolve, reject) => {
+                try {
+                    await this.driver.findElement(this.usernameBy).sendKeys(username);
+                    await this.driver.sleep(showTime);
+                    await this.driver.findElement(this.passwordBy).sendKeys(password);
+                    await this.driver.sleep(showTime);
+                    withEnter
+                        ? await this.driver.findElement(this.passwordBy).sendKeys(Key.ENTER)
+                        : await this.driver.findElement(this.loginButtonBy).click();
+                    await this.driver.wait(
+                        until.elementLocated(By.className('ant-input')),
+                        1000,
+                        'Timed out after 1 second1',
+                    );
+                    resolve(this);
+                } catch (error) {
+                    reject('Error on SignInPage.login(): ' + error);
+                }
+            },
         );
     }
 
+    /**
+     * sets the driver to sleep for the given amount of `ms`.
+     * @param ms to sleep until the next async task
+     * @returns the chained Page as Promise
+     */
     async sleep(ms: number): Promise<SignInPage> {
         return new Promise((resolve, reject) => {
             this.driver
@@ -70,18 +83,37 @@ export class SignInPage {
         });
     }
 
-    async validatePage(success: boolean = true): Promise<SignInPage> {
+    /**
+     * @returns a boolean Promise if the Login attempt was successful
+     */
+    async isSuccessfullyLoggedIn(): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            this.driver
+                .getCurrentUrl()
+                .then((url) => (url === this.SUCCESS_URL ? resolve(true) : resolve(false)))
+                .catch((error) => reject(`Error on SignInPage.isSuccessfullyLoggedIn(): ` + error));
+        });
+    }
+
+    /**
+     * 
+     * @param asExpected indicates if the current page should be the sign in page. (*defaults to `true`*)
+     * @returns the chained Page as Promise if valid. Rejects an Error otherwise 
+     */
+    async validatePage(asExpected: boolean = true): Promise<SignInPage> {
         return new Promise((resolve, reject) => {
             this.driver.getCurrentUrl().then((url) => {
-                if (success) {
-                    url === this.SUCCESS_URL
-                        ? resolve(this)
-                        : reject(`SignInPage was not forwarded to ${this.SUCCESS_URL} but ${url}`);
-                } else {
+                if (asExpected) {
                     url === this.BASE_URL
                         ? resolve(this)
                         : reject(
                               `SignInPage was unexpectedly forwarded from ${this.BASE_URL} to ${url}`,
+                          );
+                } else {
+                    url !== this.BASE_URL
+                        ? resolve(this)
+                        : reject(
+                              `SignInPage was not forwarded from ${this.BASE_URL} to another page`,
                           );
                 }
             });
