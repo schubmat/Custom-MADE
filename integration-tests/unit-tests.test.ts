@@ -1,4 +1,4 @@
-import { SignInPage } from './pages/SignIn';
+import { ProjectsPage, SignInPage } from './pages';
 import { Builder, WebDriver } from 'selenium-webdriver';
 
 const VALID_USERNAME = 'user';
@@ -20,43 +20,45 @@ afterEach(() => {
 
 describe('Login [Unit-Test]', () => {
     test('successful login', async () => {
-        return new SignInPage(driver)
-            .navigate()
-            .then((page) => page.validatePage())
-            .then((page) => page.login(VALID_USERNAME, VALID_PASSWORD, false))
-            .then((page) => page.validatePage(false))
-            .then((page) => page.isSuccessfullyLoggedIn())
-            .then((result) => expect(result).toBe(true));
+        const siPage = new SignInPage(driver);
+        await siPage.navigate();
+        await siPage.validatePage();
+        const pPage = await siPage.login(VALID_USERNAME, VALID_PASSWORD, false);
+        expect(pPage).toBeDefined();
     });
 
-    test('unsuccessful login (username)', () => {
-        return new SignInPage(driver)
-            .navigate()
-            .then((page) => page.login('th1s i5 d3finetly a wr0ng usern4me', VALID_PASSWORD))
-            .then((page) => page.validatePage())
-            .then((page) => page.validatePage())
-            .then((page) => page.isSuccessfullyLoggedIn())
-            .then((result) => expect(result).toBe(false));
-    });
+        test('unsuccessful login (username)', async () => {
+            expect.assertions(1);
+            try {
+                const siPage = new SignInPage(driver);
+                await siPage.navigate();
+                await siPage.login("wrong", VALID_PASSWORD);
+            } catch (error) {
+                expect(error).toMatch('Error');
+            }
+        });
 
-    test('unsuccessful login (password)', () => {
-        return new SignInPage(driver)
-            .navigate()
-            .then((page) => page.validatePage())
-            .then((page) => page.login(VALID_USERNAME, 'wrong'))
-            .then((page) => page.validatePage())
-            .then((page) => page.isSuccessfullyLoggedIn())
-            .then((result) => expect(result).toBe(false));
-    });
+        test('unsuccessful login (password)', async () => {
+            expect.assertions(1);
+            try {
+                const siPage = new SignInPage(driver);
+                await siPage.navigate();
+                await siPage.login(VALID_USERNAME, 'wrong');
+            } catch (error) {
+                expect(error).toMatch('Error');
+            }
+        });
 });
 
-
 describe('Data-Management [Unit-Test]', () => {
+    beforeEach(async () => {
+        const siPage = new SignInPage(driver);
+        await siPage.navigate();
+        await siPage.login(VALID_USERNAME, VALID_PASSWORD);
+    });
     test('successful creation of a file ', async () => {
-        await new SignInPage(driver)
-            .navigate()
-            .then((page) => page.login(VALID_USERNAME, VALID_PASSWORD, false))
-
-        // return new HomePage.navigate()....
+        const pPage = new ProjectsPage(driver);
+        await pPage.validatePage();
+        pPage.sleep(4000);
     });
 });

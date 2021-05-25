@@ -1,7 +1,6 @@
 # Ausführen der Tests
 Entweder aus dem root Verzeichnis:
 > `$ bash test.sh` 
-> 
 ausführen, oder im Ordner `integration-tests`:
 > `$ npm test` oder `$ npm t` oder `$ npx jest`
 ausführen
