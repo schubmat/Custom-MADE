@@ -54,11 +54,7 @@ export class SignInPage extends Page {
                     ? await this.driver.findElement(this.passwordBy).sendKeys(Key.ENTER)
                     : await this.driver.findElement(this.loginButtonBy).click();
                 // wait for page to load
-                await this.driver.wait(
-                    until.elementLocated(By.className('ant-input')),
-                    1000,
-                    'Timed out after 1 second!',
-                );
+                await this.waitForElement(By.className('ant-input'));
                 // resolve next page
                 const next = new ProjectsPage(this.driver);
                 await next.validatePage();
