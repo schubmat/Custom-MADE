@@ -58,29 +58,33 @@ export class ProjectsPage extends Page {
    */
   async openProject(name: string) {
     return new Promise<VersionPage>(async (resolve, reject) => {
-      const tableBody = await this.driver.findElement(this.tableBodyBy);
-      const rows = await tableBody.findElements(this.tableRowsBy);
-      for (const row of rows) {
-        const cols = await row.findElements(this.rowColumnsBy);
-        for (const col of cols) {
-          try {
-            const text = await col.getText();
-            if (text === name) {
-              try {
-                await col.click();
-                const next = new VersionPage(this.driver);
-                await next.validatePage();
-                resolve(next);
-              } catch (error) {
-                reject(`Error on Projects.openProject('${name}'): ${error}`);
+      try {
+        const tableBody = await this.driver.findElement(this.tableBodyBy);
+        const rows = await tableBody.findElements(this.tableRowsBy);
+        for (const row of rows) {
+          const cols = await row.findElements(this.rowColumnsBy);
+          for (const col of cols) {
+            try {
+              const text = await col.getText();
+              if (text === name) {
+                try {
+                  await col.click();
+                  const next = new VersionPage(this.driver);
+                  await next.validatePage();
+                  resolve(next);
+                } catch (error) {
+                  reject(`Error on Projects.openProject('${name}'): ${error}`);
+                }
               }
+            } catch (e) {
+              /* ignore columns without text */
             }
-          } catch (e) {
-            /* ignore columns without text */
           }
         }
+        reject(`Error on Projects.openProject('${name}'): No File found with this name!`);
+      } catch (error) {
+        reject(`Error on Projects.openProject('${name}'): ${error}`);
       }
-      reject(`Error on Version.selectFile('${name}'): No File found with this name!`);
     });
   }
 }

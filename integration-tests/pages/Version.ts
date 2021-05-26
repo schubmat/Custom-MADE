@@ -4,23 +4,28 @@ import { Page } from './Page';
 export class VersionPage extends Page {
   private PAGE = 'versions/';
 
+  // file selection
   private tableBodyBy = By.className('ant-table-tbody');
   private tableRowsBy = By.className('ant-table-row');
   private rowColumnsBy = By.css('td');
 
-  private saveButtonBy = By.className('anticon anticon-save');
-  private uploadButtonBy = By.className('anticon anticon-upload');
-
+  // file creation
   private addButtonBy = By.className('anticon anticon-plus-circle');
   private createPopoverBy = By.className('ant-popover ant-popover-placement-top');
   private createNameBy = By.id('name');
   private createButtonBy = By.className('ant-btn ant-btn-primary');
 
+  // file deletion
   private deleteButtonBy = By.className('anticon anticon-delete');
   private deleteModalBy = By.className('ant-modal-content');
   private confirmDeleteButtonBy = By.className('ant-btn ant-btn-primary');
 
-  private messageBy = By.className('ant-message');
+  // file upload
+  private uploadSpanBy = By.className('ant-upload');
+  private uploadInputBy = By.css('input');
+
+  // file export
+  private saveButtonBy = By.className('anticon anticon-save');
 
   /**
    * Constructs the page `"localhost:3000/home"` which corresponds to the page "Project Overview"
@@ -58,7 +63,11 @@ export class VersionPage extends Page {
         await popOver.findElement(this.createNameBy).sendKeys(name);
         const createButton = await popOver.findElement(this.createButtonBy);
         await createButton.click();
-        await this.alerts('success');
+        await this.alerts('error')
+          .then(() => reject(`Error on Version.createFile('${name}'): there should be no error`))
+          .catch(() => {
+            /* ignore as expected */
+          });
         await addButton.click(); //to close the popover again
         resolve();
       } catch (error) {
@@ -71,27 +80,32 @@ export class VersionPage extends Page {
    * selects the file with the given `name`
    * @param name of the file to select
    */
-  selectFile(name: string): Promise<void> {
+  selectFile(name: string, justVerify: boolean = false): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
-      const tableBody = await this.driver.findElement(this.tableBodyBy);
-      const rows = await tableBody.findElements(this.tableRowsBy);
-      for (const row of rows) {
-        const cols = await row.findElements(this.rowColumnsBy);
-        for (const col of cols) {
-          try {
-            const text = await col.getText();
-            if (text === name) {
-              await cols[0]
-                .click()
-                .catch((error) => reject(`Error on Version.deleteFile('${name}'): ${error}`));
-              resolve();
+      try {
+        const tableBody = await this.driver.findElement(this.tableBodyBy);
+        const rows = await tableBody.findElements(this.tableRowsBy);
+        for (const row of rows) {
+          const cols = await row.findElements(this.rowColumnsBy);
+          for (const col of cols) {
+            try {
+              const text = await col.getText();
+              if (text === name) {
+                !justVerify &&
+                  (await cols[0]
+                    .click()
+                    .catch((error) => reject(`Error on Version.selectFile('${name}'): ${error}`)));
+                resolve();
+              }
+            } catch (e) {
+              /* ignore columns without text */
             }
-          } catch (e) {
-            /* ignore columns without text */
           }
         }
+        reject(`Error on Version.selectFile('${name}'): No File found with this name!`);
+      } catch (error) {
+        reject(`Error on Version.selectFile('${name}'): ${error}`);
       }
-      reject(`Error on Version.selectFile('${name}'): No File found with this name!`);
     });
   }
 
@@ -102,31 +116,62 @@ export class VersionPage extends Page {
    */
   deleteFile(name: string, ...others: string[]): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
-      // select the file/s
-      await this.selectFile(name).catch((error) =>
-        reject(`Error on Version.deleteFile('${name}', '${others.join('\', \'')}'): ${error}`),
-      );
-      for (const other of others) {
-        await this.selectFile(other).catch((error) =>
-          reject(`Error on Version.deleteFile('${name}', '${others.join('\', \'')}'): ${error}`),
-        );
+      try {
+        const files = [name, ...others];
+        // select the file/s
+        for (const file of files) {
+          await this.selectFile(file).catch((error) =>
+            reject(`Error on Version.deleteFile('${name}', '${others.join("', '")}'): ${error}`),
+          );
+        }
+
+        // delete the file/s
+        const deleteButton = await this.driver.findElement(this.deleteButtonBy);
+        await deleteButton.click();
+        const deleteModal = await this.driver.findElement(this.deleteModalBy);
+        await this.sleep(300); // TODO wait for WHAT?
+        const confirmButton = await deleteModal.findElement(this.confirmDeleteButtonBy);
+        await confirmButton.click();
+
+        // validate file/s is/are deleted
+
+        for (const file of files) {
+          await this.selectFile(file, true)
+            .then(() =>
+              reject(
+                `Error on Version.deleteFile('${name}', '${others.join(
+                  "', '",
+                )}'): File was not deleted!`,
+              ),
+            )
+            .catch(() => {
+              /** expected behaviour */
+            });
+        }
+
+        resolve();
+      } catch (error) {
+        reject(`Error on Version.deleteFile('${name}'): ${error}`);
       }
-
-      // delete the file/s
-      const deleteButton = await this.driver.findElement(this.deleteButtonBy);
-      await deleteButton.click();
-      const deleteModal = await this.driver.findElement(this.deleteModalBy);
-      const confirmButton = await deleteModal.findElement(this.confirmDeleteButtonBy);
-      await confirmButton.click();
-
-      // validate file is deleted
-      await this.selectFile(name)
-        .then(() => reject(`Error on Version.deleteFile('${name}', '${others.join('\', \'')}'): File was not deleted!`))
-        .catch(() => resolve());
-
-      resolve();
     });
   }
 
-  
+  uploadFile(absPath: string, fileName: string, ending: string): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const uploadSpan = await this.driver.findElement(this.uploadSpanBy);
+        const uploadInput = await uploadSpan.findElement(this.uploadInputBy);
+        await uploadInput.sendKeys(absPath + '/' + fileName + ending);
+        await this.sleep(300); // wait for file to be rendered
+        await this.alerts('no-error');
+        await this.selectFile(fileName, true).catch(() =>
+          reject(`Error on Version.uploadFile('${fileName}'): File was not uploaded!`),
+        );
+
+        resolve();
+      } catch (error) {
+        reject(`Error on Version.uploadFile('${absPath + '/' + fileName + ending}'): ${error}`);
+      }
+    });
+  }
 }

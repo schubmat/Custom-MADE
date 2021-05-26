@@ -80,36 +80,42 @@ export class Page {
         .findElement(this.alertBy)
         .then((alert /* Alert found */) =>
           alert
-            .findElement(this.messageSuccessBy) /* success alert found */
-            .then((succ) =>
-              type === 'success'
-                ? resolve() // TODO expected success
+            .findElement(this.messageErrorBy)
+            .then((err /* error alert found */) =>
+              type === 'error'
+                ? resolve() // TODO expected error
                 : reject(
-                    `Error on Page.alerts(${type}, '${subtext}'): was expected to be '${type}', but is 'success'!`,
+                    `Error on Page.alerts(${type}, '${subtext}'): was expected to be '${type}', but is 'error'!`,
                   ),
             )
             .catch(() =>
               alert
-                .findElement(this.messageErrorBy) /* error alert found */
-                .then((err) =>
-                  type === 'error'
-                    ? resolve() // TODO expected error
+                .findElement(this.messageSuccessBy)
+                .then((succ /* success alert found */) =>
+                  type === 'success' || type === 'no-error'
+                    ? resolve() // TODO expected success
                     : reject(
-                        `Error on Page.alerts(${type}, '${subtext}'): was expected to be '${type}', but is 'error'!`,
+                        `Error on Page.alerts(${type}, '${subtext}'): was expected to be '${type}', but is 'success'!`,
                       ),
                 )
-                .catch(() => /* unexpected alert found */
-                  alert
-                    .getText()
-                    .then(async (text) =>
-                      type === 'nothing'
-                        ? reject(
-                            `Error on Page.alerts(${type}, '${subtext}'): was expected to NOT alert, but alerts: '${text}'!`,
-                          )
-                        : reject(
-                            `Error on Page.alerts(${type}, '${subtext}'): the Alert is neighter "error" nor "success": '${text}'!`,
-                          ),
-                    ),
+                .catch(() =>
+                  /* unexpected alert found */
+                  alert.getText().then(async (text) => {
+                    switch (type) {
+                      case 'no-error':
+                        resolve(); // there is something but no error
+                        break;
+                      case 'nothing':
+                        reject(
+                          `Error on Page.alerts(${type}, '${subtext}'): was expected to NOT alert, but alerts: '${text}'!`,
+                        );
+                        break;
+                      default:
+                        reject(
+                          `Error on Page.alerts(${type}, '${subtext}'): the Alert is neighter "error" nor "success": '${text}'!`,
+                        );
+                    }
+                  }),
                 ),
             ),
         )
@@ -125,6 +131,6 @@ export class Page {
   }
 }
 
-export type AlertType = 'nothing' | 'success' | 'error';
+export type AlertType = 'nothing' | 'success' | 'error' | 'no-error';
 // ant-message-custom-content ant-message-error
 // ant-message-custom-content ant-message-success
