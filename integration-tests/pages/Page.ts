@@ -60,10 +60,20 @@ export class Page {
     });
   }
 
+  /**
+   * waits until the `WebElement` of the given `By` is located. Times out after 2s.
+   * @param elementBy The `WebElement` to wait for
+   * @returns the `WebElement` waited for
+   */
   protected waitForElement(elementBy: By) {
     return this.driver.wait(until.elementLocated(elementBy), 2000, 'Timed out after 1 second!');
   }
 
+  /**
+   * checks if the current page shows an Alert of a given `type` containing a given `subText`.
+   * @param type of the Alert (`'nothing' | 'error' | 'success'`)
+   * @param subtext ***[TODO not implemented]*** that the Alert message must include
+   */
   alerts(type: AlertType, subtext?: string): Promise<void> {
     return new Promise((resolve, reject) =>
       this.driver
@@ -92,7 +102,7 @@ export class Page {
                   alert
                     .getText()
                     .then(async (text) =>
-                      type === 'none'
+                      type === 'nothing'
                         ? reject(
                             `Error on Page.alerts(${type}, '${subtext}'): was expected to NOT alert, but alerts: '${text}'!`,
                           )
@@ -105,7 +115,7 @@ export class Page {
         )
         .catch(() => {
           /* no Alert found */
-          type === 'none'
+          type === 'nothing'
             ? resolve() // expected non error
             : reject(
                 `Error on Page.alerts(${type}, '${subtext}'): was expected to alert, but did not!`,
@@ -115,6 +125,6 @@ export class Page {
   }
 }
 
-export type AlertType = 'none' | 'success' | 'error';
+export type AlertType = 'nothing' | 'success' | 'error';
 // ant-message-custom-content ant-message-error
 // ant-message-custom-content ant-message-success

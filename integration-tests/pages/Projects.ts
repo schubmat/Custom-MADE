@@ -32,8 +32,8 @@ export class ProjectsPage extends Page {
   }
 
   /**
-   *
-   * @returns TODO NOT WORKING
+   * ***TODO NOT WORKING***
+   * @deprecated
    */
   async createProject(): Promise<NewProjectPage> {
     return new Promise<NewProjectPage>(async (resolve, reject) => {
@@ -52,37 +52,35 @@ export class ProjectsPage extends Page {
     });
   }
 
+  /**
+   * @param name of the project to open
+   * @returns the `VersionPage` of the corresponding project
+   */
   async openProject(name: string) {
     return new Promise<VersionPage>(async (resolve, reject) => {
-      try {
-        await this.driver
-          .findElement(this.tableBodyBy)
-          .then((tableBody) => tableBody.findElements(this.tableRowsBy))
-          .then((rows) =>
-            rows.forEach(async (row) => {
-              row.findElements(this.rowColumnsBy).then(async (cols) => {
-                for (const col of cols) {
-                  await col
-                    .getText()
-                    .then(async (text) => {
-                      if (text === name) {
-                        await col.click();
-                        const next = new VersionPage(this.driver);
-                        await next
-                          .validatePage()
-                          .then(() => resolve(next))
-                          .catch((e) => reject(`Error on Projects.openProject('${name}'): ${e}`));
-                      }
-                    })
-                    .catch(() => {});
-                }
-                reject(`Error on Projects.openProject('${name}'): No Project found with this name`);
-              });
-            }),
-          );
-      } catch (error) {
-        reject('Error on ProjectsPage.test(): ' + error);
+      const tableBody = await this.driver.findElement(this.tableBodyBy);
+      const rows = await tableBody.findElements(this.tableRowsBy);
+      for (const row of rows) {
+        const cols = await row.findElements(this.rowColumnsBy);
+        for (const col of cols) {
+          try {
+            const text = await col.getText();
+            if (text === name) {
+              try {
+                await col.click();
+                const next = new VersionPage(this.driver);
+                await next.validatePage();
+                resolve(next);
+              } catch (error) {
+                reject(`Error on Projects.openProject('${name}'): ${error}`);
+              }
+            }
+          } catch (e) {
+            /* ignore columns without text */
+          }
+        }
       }
+      reject(`Error on Version.selectFile('${name}'): No File found with this name!`);
     });
   }
 }

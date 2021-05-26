@@ -30,31 +30,28 @@ export class SignInPage extends Page {
 
     /**
      * Proceeds a login with the given `username` and `password`
-     * - TODO: this function should retrun a new HomePage
      * @param username
      * @param password
      * @param withEnter should the login be submitted by pressing the `Key.ENTER`. Uses the page's login button otherwise
-     * @param showTime time (in ms) between the entering of the credentials.
+     * @returns the `ProjectsPage` after logging in
      */
     async login(
         username: string,
         password: string,
         withEnter: boolean = false,
-        showTime: number = 0,
     ): Promise<ProjectsPage> {
         return new Promise<ProjectsPage>(async (resolve, reject) => {
             try {
                 // fill the credentials
                 await this.driver.findElement(this.usernameBy).sendKeys(username);
-                await this.driver.sleep(showTime);
                 await this.driver.findElement(this.passwordBy).sendKeys(password);
-                await this.driver.sleep(showTime);
                 // submit
                 withEnter
                     ? await this.driver.findElement(this.passwordBy).sendKeys(Key.ENTER)
                     : await this.driver.findElement(this.loginButtonBy).click();
                 // wait for page to load
                 await this.waitForElement(By.className('ant-input'));
+                await this.alerts("nothing")
                 // resolve next page
                 const next = new ProjectsPage(this.driver);
                 await next.validatePage();
