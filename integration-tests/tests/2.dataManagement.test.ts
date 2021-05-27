@@ -7,6 +7,7 @@ import {
   ACCESSABLE_PROJECT,
   CORRECT_FILE_EXTENSION,
   WRONG_FILE_EXTENSION,
+  RESSOURCES,
 } from './Config';
 export const CREATE_FILE = 'DMcreateTestFile';
 export const DUPLICATE_FILE = 'DMduplicateTestFile';
@@ -78,7 +79,7 @@ describe('Data-Management [Unit-Test]', () => {
   });
 
   test('successful upload of a file', async () => {
-    const filePath = Path.resolve('./tests/');
+    const filePath = Path.resolve(RESSOURCES);
     const version = new VersionPage(driver);
     await version.uploadFile(filePath, UPLOAD_FILE, CORRECT_FILE_EXTENSION);
     expect(version).toBeDefined();
@@ -87,7 +88,7 @@ describe('Data-Management [Unit-Test]', () => {
   test('unsuccessful upload of a file (wrong ending)', async () => {
     expect.assertions(1);
     try {
-      const filePath = Path.resolve('./tests/');
+      const filePath = Path.resolve(RESSOURCES);
       const version = new VersionPage(driver);
       await version.uploadFile(filePath, UPLOAD_FILE, WRONG_FILE_EXTENSION);
     } catch (error) {

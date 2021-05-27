@@ -9,6 +9,8 @@ export class Page {
   private messageErrorBy = By.className('ant-message-custom-content ant-message-error');
   private messageSuccessBy = By.className('ant-message-custom-content ant-message-success');
 
+  private goBackBy = By.className('anticon anticon-arrow-left go-back-icon');
+
   /**
    * @param driver the current `WebDriver` from the `'selenium-webdriver'` package
    */
@@ -27,6 +29,7 @@ export class Page {
         .catch((error) => reject(`Error on Page.navigate(${Page.BASE_URL + page}): ${error}`));
     });
   }
+
   /**
    * sets the driver to sleep for the given amount of `ms`.
    * @param ms to sleep until the next async task
@@ -159,6 +162,19 @@ export class Page {
           : reject(
               `Error on Page.alerts(${type}, '${subtext}'): was expected to alert, but did not!`,
             );
+      }
+    });
+  }
+
+  goPageBack(): Promise<Page> {
+    return new Promise<Page>(async (resolve, reject) => {
+      try {
+        // fill the credentials
+        const backButton = await this.driver.findElement(this.goBackBy);
+        await backButton.click();
+        resolve(this)
+      } catch (error) {
+        reject('Error on SignInPage.login(): ' + error);
       }
     });
   }

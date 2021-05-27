@@ -9,6 +9,7 @@ export class VersionPage extends Page {
   private tableRowsBy = By.className('ant-table-row');
   private rowColumnsBy = By.css('td');
   private validateButtonBy = By.className('anticon anticon-file-done');
+  private messageModalBy = By.className('ant-notification ant-notification-topRight');
 
   // file creation
   private addButtonBy = By.className('anticon anticon-plus-circle');

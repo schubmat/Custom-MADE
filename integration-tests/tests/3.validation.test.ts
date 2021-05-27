@@ -6,6 +6,7 @@ import {
   VALID_PASSWORD,
   ACCESSABLE_PROJECT,
   CORRECT_FILE_EXTENSION,
+  RESSOURCES,
 } from './Config';
 export const CREATE_FILE = 'VcreateTestFile';
 export const UPLOAD_FILE = 'VuploadTestFile';
@@ -25,7 +26,7 @@ beforeAll(async () => {
     const projects = new ProjectsPage(driver);
     const version = await projects.openProject(ACCESSABLE_PROJECT);
     await version.createFile(CREATE_FILE);
-    const filePath = Path.resolve('./tests/');
+    const filePath = Path.resolve(RESSOURCES);
     await version.uploadFile(filePath, UPLOAD_FILE, CORRECT_FILE_EXTENSION);
     driver.quit();
   } catch (error) {
