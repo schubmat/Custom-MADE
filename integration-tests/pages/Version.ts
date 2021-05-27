@@ -26,7 +26,7 @@ export class VersionPage extends Page {
   private uploadInputBy = By.css('input');
 
   // file export
-  private saveButtonBy = By.className('anticon anticon-save');
+  private exportButtonBy = By.className('anticon anticon-save');
 
   /**
    * Constructs the page `"localhost:3000/home"` which corresponds to the page "Project Overview"
@@ -183,7 +183,7 @@ export class VersionPage extends Page {
   }
 
   /**
-   * selects the file with the given `name`
+   * validates the file with the given `name`
    * @param name of the file to select
    */
   validateFile(name: string): Promise<boolean> {
@@ -208,7 +208,6 @@ export class VersionPage extends Page {
             validated = true;
           }
         }
-        await this.sleep(3000);
         file.validityStatus
           .findElement(By.className('anticon anticon-check'))
           .then(() => resolve(true)) // validation okay
@@ -224,6 +223,33 @@ export class VersionPage extends Page {
           );
       } catch (error) {
         reject(`Error on Version.validateFile('${name}'): ${error}`);
+      }
+    });
+  }
+
+  /**
+   * exports the file with the given `name`
+   * @param name of the file to export
+   * @param others a list of other files for exporting multiple files
+   */
+  exportFile(name: string, ...others: string[]): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        const files = [name, ...others];
+        // select the file/s
+        for (const fileName of files) {
+          const file = await this.findFile(fileName);
+          await file.checkBox.click();
+        }
+
+        // export the file/s
+        const exportButton = await this.driver.findElement(this.exportButtonBy);
+        await exportButton.click();
+        await this.alerts('success', 'Export successful.')
+
+        resolve();
+      } catch (error) {
+        reject(`Error on Version.exportFile('${name}', '${others.join("', '")}'): ${error}`);
       }
     });
   }
