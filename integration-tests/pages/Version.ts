@@ -8,6 +8,7 @@ export class VersionPage extends Page {
   private tableBodyBy = By.className('ant-table-tbody');
   private tableRowsBy = By.className('ant-table-row');
   private rowColumnsBy = By.css('td');
+  private validateButtonBy = By.className('anticon anticon-file-done');
 
   // file creation
   private addButtonBy = By.className('anticon anticon-plus-circle');
@@ -77,34 +78,40 @@ export class VersionPage extends Page {
   }
 
   /**
-   * selects the file with the given `name`
+   * finds the file with the given `name` from the table of files and returns the corresponding column
    * @param name of the file to select
+   * @returns the list of columns of the found file:
+   * - [0] = CheckBox
+   * - [1] = Name
+   * - [2] = Date of Creation
+   * - [3] = Edited By
+   * - [4] = Last Edited
+   * - [5] = "Actions"
+   * - [6] = Validity Status
    */
-  selectFile(name: string, justVerify: boolean = false): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
+  findFile(name: string): Promise<FileType> {
+    return new Promise<FileType>(async (resolve, reject) => {
       try {
         const tableBody = await this.driver.findElement(this.tableBodyBy);
         const rows = await tableBody.findElements(this.tableRowsBy);
         for (const row of rows) {
           const cols = await row.findElements(this.rowColumnsBy);
-          for (const col of cols) {
-            try {
-              const text = await col.getText();
-              if (text === name) {
-                !justVerify &&
-                  (await cols[0]
-                    .click()
-                    .catch((error) => reject(`Error on Version.selectFile('${name}'): ${error}`)));
-                resolve();
-              }
-            } catch (e) {
-              /* ignore columns without text */
-            }
+          const text = await cols[1].getText();
+          if (text === name) {
+            resolve({
+              checkBox: cols[0],
+              name: cols[1],
+              dateOfcreation: cols[2],
+              editedBy: cols[3],
+              lastEdited: cols[4],
+              actions: cols[5],
+              validityStatus: cols[6],
+            });
           }
         }
-        reject(`Error on Version.selectFile('${name}'): No File found with this name!`);
+        reject(`Error on Version.findFile('${name}'): No File found with this name!`);
       } catch (error) {
-        reject(`Error on Version.selectFile('${name}'): ${error}`);
+        reject(`Error on Version.findFile('${name}'): ${error}`);
       }
     });
   }
@@ -119,10 +126,9 @@ export class VersionPage extends Page {
       try {
         const files = [name, ...others];
         // select the file/s
-        for (const file of files) {
-          await this.selectFile(file).catch((error) =>
-            reject(`Error on Version.deleteFile('${name}', '${others.join("', '")}'): ${error}`),
-          );
+        for (const fileName of files) {
+          const file = await this.findFile(fileName);
+          await file.checkBox.click();
         }
 
         // delete the file/s
@@ -136,42 +142,99 @@ export class VersionPage extends Page {
         // validate file/s is/are deleted
 
         for (const file of files) {
-          await this.selectFile(file, true)
-            .then(() =>
-              reject(
-                `Error on Version.deleteFile('${name}', '${others.join(
-                  "', '",
-                )}'): File was not deleted!`,
-              ),
-            )
-            .catch(() => {
-              /** expected behaviour */
-            });
+          try {
+            await this.findFile(file);
+            reject(
+              `Error on Version.deleteFile('${name}', '${others.join(
+                "', '",
+              )}'): File was not deleted!`,
+            );
+          } catch (error) {
+            /** expected behaviour */
+          }
         }
 
         resolve();
       } catch (error) {
-        reject(`Error on Version.deleteFile('${name}'): ${error}`);
+        reject(`Error on Version.deleteFile('${name}', '${others.join("', '")}'): ${error}`);
       }
     });
   }
 
-  uploadFile(absPath: string, fileName: string, ending: string): Promise<void> {
+  uploadFile(absPath: string, file: string, fileExtension: string): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       try {
         const uploadSpan = await this.driver.findElement(this.uploadSpanBy);
         const uploadInput = await uploadSpan.findElement(this.uploadInputBy);
-        await uploadInput.sendKeys(absPath + '/' + fileName + ending);
+        await uploadInput.sendKeys(absPath + '/' + file + fileExtension);
         await this.sleep(300); // wait for file to be rendered
         await this.alerts('no-error');
-        await this.selectFile(fileName, true).catch(() =>
-          reject(`Error on Version.uploadFile('${fileName}'): File was not uploaded!`),
-        );
+        try {
+          await this.findFile(file);
+        } catch (error) {
+          reject(`Error on Version.uploadFile('${file}'): File was not uploaded: ${error}`);
+        }
 
         resolve();
       } catch (error) {
-        reject(`Error on Version.uploadFile('${absPath + '/' + fileName + ending}'): ${error}`);
+        reject(`Error on Version.uploadFile('${absPath + '/' + file + fileExtension}'): ${error}`);
       }
     });
   }
+
+  /**
+   * selects the file with the given `name`
+   * @param name of the file to select
+   */
+  validateFile(name: string): Promise<boolean> {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        const file = await this.findFile(name);
+        const buttons = await file.actions.findElements(By.className('ant-btn ant-btn-icon-only'));
+        for (const button of buttons) {
+          await button
+            .findElement(this.validateButtonBy)
+            .then(() => button.click())
+            .catch(() => {
+              /* wrong button */
+            });
+        }
+        let validated = false;
+        while (!validated) {
+          try {
+            await file.actions.findElement(By.className('ant-btn-loading'));
+          } catch (e) {
+            // stopped loading
+            validated = true;
+          }
+        }
+        await this.sleep(3000);
+        file.validityStatus
+          .findElement(By.className('anticon anticon-check'))
+          .then(() => resolve(true)) // validation okay
+          .catch(() =>
+            file.validityStatus
+              .findElement(By.className('anticon anticon-close'))
+              .then(() => resolve(false)) // validation wrong
+              .catch((error) =>
+                reject(
+                  `Error on Version.validateFile('${name}'): Probably not validated: ${error}`,
+                ),
+              ),
+          );
+      } catch (error) {
+        reject(`Error on Version.validateFile('${name}'): ${error}`);
+      }
+    });
+  }
+}
+
+interface FileType {
+  checkBox: WebElement;
+  name: WebElement;
+  dateOfcreation: WebElement;
+  editedBy: WebElement;
+  lastEdited: WebElement;
+  actions: WebElement;
+  validityStatus: WebElement;
 }
