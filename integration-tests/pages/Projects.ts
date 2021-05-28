@@ -107,6 +107,7 @@ export class ProjectsPage extends Page {
   openProject(name: string) {
     return new Promise<VersionPage>(async (resolve, reject) => {
       try {
+        await this.sleep(100);
         const project = await this.findProject(name);
         await project.name.click();
         const next = new VersionPage(this.driver);
@@ -251,8 +252,9 @@ export class ProjectsPage extends Page {
         );
         const tabs = await tabList.findElements(By.className('ant-menu-item'));
         tab === 'Access rights' && (await tabs[1].click());
+        const body = modal.findElement(By.className('ant-modal-body'));
 
-        resolve(modal);
+        resolve(body);
       } catch (error) {
         reject(`Error on Project.openProjectSettings('${name}'): ${error}`);
       }
@@ -265,22 +267,98 @@ export class ProjectsPage extends Page {
         // open settings
         const body = await this.openProjectSettings(projectName, 'Access rights');
         const selections = await body.findElements(By.className('ant-select-selection__rendered'));
-        await selections[0].click();
 
         // add the user
+        let userFound = false;
+        await selections[0].click();
+        await this.sleep(100);
+        const userDropdown = await this.driver.findElement(
+          By.className(
+            'ant-select-dropdown ant-select-dropdown--single ant-select-dropdown-placement-bottomLeft',
+          ),
+        );
+        const users = await userDropdown.findElements(By.css('li'));
+        for (const user of users) {
+          const text = await user.getText();
+          if (userName === text) {
+            await user.click();
+            userFound = true;
+          }
+        }
+        !userFound &&
+          reject(
+            `Error on Project.addUserToProject('${projectName}', '${userName}', '${userRole}'): User not found`,
+          );
 
+        // add the role
+        let roleFound = false;
+        await selections[1].click();
+        await this.sleep(100);
+        const bothDropdowns = await this.driver.findElements(
+          By.className(
+            'ant-select-dropdown ant-select-dropdown--single ant-select-dropdown-placement-bottomLeft',
+          ),
+        );
+        const roleDropdown = bothDropdowns[1];
+        const roles = await roleDropdown.findElements(By.css('li'));
+        for (const role of roles) {
+          const text = await role.getText();
+          if (userRole === text) {
+            await role.click();
+            roleFound = true;
+          }
+        }
+        !roleFound &&
+          reject(
+            `Error on Project.addUserToProject('${projectName}', '${userName}', '${userRole}'): Role not found`,
+          );
 
-
+        // click the add button
+        const addButton = await body.findElement(By.className('ant-btn ant-btn-primary'));
+        await addButton.click();
+        await this.alerts('success', userName + 'was added');
         resolve();
       } catch (error) {
-        reject(`Error on Project.addUserToProject('${projectName}', '${userName}', '${userRole}'): ${error}`);
+        reject(
+          `Error on Project.addUserToProject('${projectName}', '${userName}', '${userRole}'): ${error}`,
+        );
+      }
+    });
+  }
+
+  removeUserToProject(projectName: string, userName: string) {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        // open settings
+        const body = await this.openProjectSettings(projectName, 'Access rights');
+
+        // find user
+        const list = await body.findElements(By.className('ant-table-row ant-table-row-level-0'));
+        for (const userRow of list) {
+          const cols = await userRow.findElements(By.css('td'));
+          const name = await cols[0].getText();
+          if (name === userName) {
+            // remove user
+            const delBtn = await cols[5].findElement(By.css('button'));
+            await delBtn.click();
+          }
+        }
+        await this.alerts('success', 'Member was removed from version');
+        const closeBtn = await this.driver.findElement(
+          By.className('anticon anticon-close ant-modal-close-icon'),
+        );
+        await closeBtn.click();
+        await this.sleep(300);
+        resolve();
+      } catch (error) {
+        reject(`Error on Project.addUserToProject('${projectName}', '${userName}'): ${error}`);
       }
     });
   }
 }
 
 type SettingsType = 'General' | 'Access rights';
-type UserRoleType = 'Reporter' | 'Contributer' | 'Maintainer';
+type UserRoleType = 'Reporter' | 'Contributor' | 'Maintainer';
 interface ProjectType {
   checkBox: WebElement;
   name: WebElement;

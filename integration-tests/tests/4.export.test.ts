@@ -52,7 +52,7 @@ afterAll(async () => {
   }
 });
 
-describe.skip('Export [Unit-Test]', () => {
+describe('Export [Unit-Test]', () => {
   // use a new driver for every test (independability)
   beforeEach(async () => {
     driver = await new Builder().forBrowser('firefox').build();

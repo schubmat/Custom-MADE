@@ -19,7 +19,7 @@ let driver: WebDriver;
 // increase the test timeout
 jest.setTimeout(60000);
 
-describe.skip('Data-Management [Unit-Test]', () => {
+describe('Data-Management [Unit-Test]', () => {
   beforeEach(async () => {
     // use a new driver for every test (independability)
     driver = await new Builder().forBrowser('firefox').build();

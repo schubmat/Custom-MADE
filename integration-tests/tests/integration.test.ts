@@ -39,6 +39,7 @@ describe('Integration tests', () => {
       await signIn.navigate();
       await signIn.login(VALID_USERNAME, VALID_PASSWORD);
       const projects = new ProjectsPage(driver);
+      await projects.removeUserToProject(ACCESSABLE_PROJECT, 'admin');
       const version = await projects.openProject(ACCESSABLE_PROJECT);
       try {
         await version.deleteFile(IT1_File);
@@ -159,7 +160,7 @@ describe('Integration tests', () => {
     if (!result) {
       await projects.sleep(300);
       await projects.downloadLog();
-      await projects.sleep(3000);
+      await projects.sleep(1500);
     }
     // TODO interact with download dialog
     expect(version).toBeDefined();
@@ -196,7 +197,7 @@ describe('Integration tests', () => {
     await version.goPageBack();
     projects = new ProjectsPage(driver);
     await projects.exportProject(ACCESSABLE_PROJECT);
-    await projects.sleep(3000);
+    await projects.sleep(1500);
 
     // TODO interact with download dialog
     expect(version).toBeDefined();
@@ -208,7 +209,7 @@ describe('Integration tests', () => {
    * - Im Anschluss muss es möglich sein den Einstellungsdialog zu öffnen und
    *   dem Nutzer "admin" mit den Rechten "Contributor" zum Projekt hinzuzufügen.
    */
-  test.skip('IT-5', async () => {
+  test('IT-5', async () => {
     // sign in and open accessable project
     const signIn = new SignInPage(driver);
     await signIn.navigate();
@@ -217,16 +218,14 @@ describe('Integration tests', () => {
     const version = await projects.openProject(ACCESSABLE_PROJECT);
     await version.validatePage();
     await version.isAccessable();
-    await version.sleep(1500);
 
     // go back to project
     await version.goPageBack();
     projects = new ProjectsPage(driver);
-    await projects.sleep(1500);
 
     // open settings and add user
-    await projects.addUserToProject(ACCESSABLE_PROJECT, 'admin', 'Contributer');
-    await projects.sleep(1500);
+    await projects.sleep(300);
+    await projects.addUserToProject(ACCESSABLE_PROJECT, 'admin', 'Contributor');
 
     expect(version).toBeDefined();
   });

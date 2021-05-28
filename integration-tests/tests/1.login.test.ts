@@ -7,7 +7,7 @@ let driver: WebDriver;
 // increase the test timeout
 jest.setTimeout(60000);
 
-describe.skip('Login [Unit-Test]', () => {
+describe('Login [Unit-Test]', () => {
   // use a new driver for every test (independability)
   beforeEach(() => {
     async function setup() {

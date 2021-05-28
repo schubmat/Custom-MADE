@@ -1,4 +1,4 @@
-import { By, Condition, Key, until, WebDriver } from 'selenium-webdriver';
+import { By, Condition, Key, until, WebDriver, WebElement } from 'selenium-webdriver';
 import { ProjectsPage } from './Projects';
 
 export class Page {
@@ -71,6 +71,17 @@ export class Page {
    */
   protected waitForElement(elementBy: By) {
     return this.driver.wait(until.elementLocated(elementBy), 2000, 'Timed out after 1 second!');
+  }
+
+  /**
+   * highlights the given `WebElement`s
+   * @param elements to highlight
+   */
+  protected highlightElements(...elements: WebElement[]) {
+    return this.driver.executeScript(
+      "for (element of arguments) {element.setAttribute('style', 'background: yellow; border: 2px solid red;');}",
+      ...elements,
+    );
   }
 
   /**
@@ -172,10 +183,45 @@ export class Page {
         // fill the credentials
         const backButton = await this.driver.findElement(this.goBackBy);
         await backButton.click();
-        resolve(this)
+        resolve(this);
       } catch (error) {
         reject('Error on SignInPage.login(): ' + error);
       }
+    });
+  }
+
+  printElement(element: WebElement) {
+    return new Promise<String>(async (resolve, reject) => {
+      const tag = await element.getTagName();
+      const className = await element.getAttribute('class');
+      const text = await element.getText().catch(() => {
+        return "";
+      });
+      let result = '<' + tag + ' className="' + className + '"> ' + text + "\n";
+      resolve(result);
+    });    
+  }
+
+  private getChildrenString(element: WebElement, depth: number = 3, indent: string = '') {
+    return new Promise<String>(async (resolve, reject) => {
+      const children = await element.findElements(By.xpath('./child::*'));
+      const elemString = await this.printElement(element);
+      let result = indent + elemString + "\n";
+
+      depth === 0 && resolve(result);
+
+      for (const child of children) {
+        result += await this.getChildrenString(child, depth - 1, indent + '| ');
+      }
+      resolve(result);
+    });
+  }
+
+  logChildren(element: WebElement, depth: number = 3) {
+    return new Promise<void>(async (resolve, reject) => {
+      const log = await this.getChildrenString(element, 15);
+      console.log("CHILDREN:\n", log);
+      resolve();
     });
   }
 }
