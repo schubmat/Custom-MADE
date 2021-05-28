@@ -6,16 +6,22 @@ import { VersionPage } from './Version';
 export class ProjectsPage extends Page {
   private PAGE = 'home';
 
-  private footerBy = By.className('ant-layout-footer');
+  // table
   private tableBodyBy = By.className('ant-table-tbody');
   private tableRowsBy = By.className('ant-table-row');
   private rowColumnsBy = By.css('td');
+
+  // project actions
   private validateButtonBy = By.className('anticon anticon-file-done');
   private exportButtonBy = By.className('anticon anticon-export');
+  private settingsButtonBy = By.className('anticon anticon-setting');
 
+  // modal (validation)
   private messageModalBy = By.className('ant-notification ant-notification-topRight');
   private messageDownloadLinkBy = By.css('a');
 
+  // footer
+  private footerBy = By.className('ant-layout-footer');
   private addButtonBy = By.className('anticon anticon-plus-circle');
   private saveButtonBy = By.className('anticon anticon-save');
   private deleteButtonBy = By.className('anticon anticon-delete');
@@ -112,6 +118,31 @@ export class ProjectsPage extends Page {
     });
   }
 
+  private findActionButton(project: ProjectType, actionIconBy: By) {
+    return new Promise<WebElement>(async (resolve, reject) => {
+      try {
+        const buttons = await project.actions.findElements(
+          By.className('ant-btn ant-btn-icon-only'),
+        );
+        for (const button of buttons) {
+          await button
+            .findElement(actionIconBy)
+            .then(() => resolve(button))
+            .catch(() => {
+              /* wrong button */
+            });
+        }
+        reject(
+          `Error on Projects.findProjectAction('${project.name}', '${actionIconBy}'): No matching Action found!`,
+        );
+      } catch (error) {
+        reject(
+          `Error on Projects.findProjectAction('${project.name}', '${actionIconBy}'): ${error}`,
+        );
+      }
+    });
+  }
+
   /**
    * validates the project with the given `name`
    * @param name of the project to select
@@ -119,18 +150,12 @@ export class ProjectsPage extends Page {
   validateProject(name: string): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
+        // click validate button
         const project = await this.findProject(name);
-        const buttons = await project.actions.findElements(
-          By.className('ant-btn ant-btn-icon-only'),
-        );
-        for (const button of buttons) {
-          await button
-            .findElement(this.validateButtonBy)
-            .then(() => button.click())
-            .catch(() => {
-              /* wrong button */
-            });
-        }
+        const validateButton = await this.findActionButton(project, this.validateButtonBy);
+        await validateButton.click();
+
+        // wait for validation
         let validated = false;
         while (!validated) {
           try {
@@ -140,6 +165,8 @@ export class ProjectsPage extends Page {
             validated = true;
           }
         }
+
+        // confirm validation result
         project.validityStatus
           .findElement(By.className('anticon anticon-check'))
           .then(() => resolve(true)) // validation okay
@@ -160,9 +187,9 @@ export class ProjectsPage extends Page {
   }
 
   /**
-   * downloads the log from the upcoming modal after a failed validation
+   * downloads the log from the appearing modal after a failed validation
    */
-  async downloadLog(): Promise<void> {
+  downloadLog(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       try {
         const modal = await this.driver.findElement(this.messageModalBy);
@@ -183,33 +210,77 @@ export class ProjectsPage extends Page {
   exportProject(name: string, downloadRaw: boolean = true, downloadExport: boolean = true) {
     return new Promise<void>(async (resolve, reject) => {
       try {
+        // click export button
         const project = await this.findProject(name);
-        const buttons = await project.actions.findElements(
-          By.className('ant-btn ant-btn-icon-only'),
-        );
-        for (const button of buttons) {
-          await button
-            .findElement(this.exportButtonBy)
-            .then(() => button.click())
-            .catch(() => {
-              /* wrong button */
-            });
-        }
+        const exportButton = await this.findActionButton(project, this.exportButtonBy);
+        await exportButton.click();
 
+        // click the checkboxes
         const popup = await this.driver.findElement(By.className('ant-popover-content'));
         const checkboxes = await popup.findElements(By.className('ant-checkbox'));
         downloadRaw && (await checkboxes[0].click());
         downloadExport && (await checkboxes[1].click());
+        // click download
         const downloadButton = await popup.findElement(By.className('ant-btn full-line-field'));
         await downloadButton.click();
+
         resolve();
       } catch (error) {
         reject(`Error on Project.exportProject('${name}'): ${error}`);
       }
     });
   }
+
+  /**
+   * @param name of the project to settings
+   * @param downloadRaw should the "raw" be downloaded? defaults to `true`
+   * @param downloadExport should the "settings" be downloaded? defaults to `true`
+   */
+  openProjectSettings(name: string, tab: SettingsType = 'General') {
+    return new Promise<WebElement>(async (resolve, reject) => {
+      try {
+        // click settings button
+        const project = await this.findProject(name);
+        const settingsButton = await this.findActionButton(project, this.settingsButtonBy);
+        await settingsButton.click();
+
+        // open corresponding tab
+        const modal = await this.driver.findElement(By.className('ant-modal'));
+        const tabList = await modal.findElement(
+          By.className('ant-menu ant-menu-light ant-menu-root ant-menu-horizontal'),
+        );
+        const tabs = await tabList.findElements(By.className('ant-menu-item'));
+        tab === 'Access rights' && (await tabs[1].click());
+
+        resolve(modal);
+      } catch (error) {
+        reject(`Error on Project.openProjectSettings('${name}'): ${error}`);
+      }
+    });
+  }
+
+  addUserToProject(projectName: string, userName: string, userRole: UserRoleType) {
+    return new Promise<void>(async (resolve, reject) => {
+      try {
+        // open settings
+        const body = await this.openProjectSettings(projectName, 'Access rights');
+        const selections = await body.findElements(By.className('ant-select-selection__rendered'));
+        await selections[0].click();
+
+        // add the user
+
+
+
+        resolve();
+      } catch (error) {
+        reject(`Error on Project.addUserToProject('${projectName}', '${userName}', '${userRole}'): ${error}`);
+      }
+    });
+  }
 }
 
+type SettingsType = 'General' | 'Access rights';
+type UserRoleType = 'Reporter' | 'Contributer' | 'Maintainer';
 interface ProjectType {
   checkBox: WebElement;
   name: WebElement;

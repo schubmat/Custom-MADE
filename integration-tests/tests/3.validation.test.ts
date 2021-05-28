@@ -50,7 +50,7 @@ afterAll(async () => {
   }
 });
 
-describe('Validation [Unit-Test]', () => {
+describe.skip('Validation [Unit-Test]', () => {
   // use a new driver for every test (independability)
   beforeEach(async () => {
     driver = await new Builder().forBrowser('firefox').build();

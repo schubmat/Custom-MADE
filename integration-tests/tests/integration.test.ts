@@ -76,11 +76,13 @@ describe('Integration tests', () => {
   // --------------------------------------------------------------------------
 
   /**
-   * Dieser Integrations-Test sichert ab, dass ein Nutzer sich anmelden kann und ein
-   * Projekt, für das der Nutzer Rechte besitzt, öffnen kann. Sobald dieses geöffent ist,
-   * lädt der Nutzer für das Projekt erfolgreich eine neue Datei hoch.
+   * - Dieser Integrations-Test sichert ab, dass ein Nutzer sich anmelden kann
+   *   und ein Projekt, für das der Nutzer Rechte besitzt, öffnen kann.
+   * - Sobald dieses geöffent ist, lädt der Nutzer für das Projekt erfolgreich
+   *   eine neue Datei hoch.
    */
   test('IT-1', async () => {
+    // login to accessable project
     const signIn = new SignInPage(driver);
     await signIn.navigate();
     const projects = await signIn.login(VALID_USERNAME, VALID_PASSWORD);
@@ -88,23 +90,29 @@ describe('Integration tests', () => {
     const version = await projects.openProject(ACCESSABLE_PROJECT);
     await version.validatePage();
     await version.isAccessable();
+
+    // upload a new file
     const filePath = Path.resolve(RESSOURCES);
     await version.uploadFile(filePath, IT1_File, CORRECT_FILE_EXTENSION);
     expect(version).toBeDefined();
   });
 
   /**
-   * Dieser Integrations-Test sichert ab, dass ein Nutzer sich anmelden kann und ein
-   * Projekt, für das der Nutzer KEINE Rechte besitzt, nicht öffnen kann. Sobald ein
-   * entsprechender  Versuch  unternommen  wird,  muss  eine  entsprechende
-   * Fehlermeldungaufgezeigt werden.
+   * - Dieser Integrations-Test sichert ab, dass ein Nutzer sich anmelden kann
+   *   und ein Projekt, für das der Nutzer KEINE Rechte besitzt, nicht öffnen
+   *   kann.
+   * - Sobald ein entsprechender Versuch unternommen wird, muss eine  ent-
+   *   sprechende Fehlermeldungaufgezeigt werden.
    */
   test('IT-2', async () => {
+    // login to locked project
     const signIn = new SignInPage(driver);
     await signIn.navigate();
     const projects = await signIn.login(VALID_USERNAME, VALID_PASSWORD);
     await projects.validatePage();
     const version = await projects.openProject(LOCKED_PROJECT);
+
+    // ensure there is an alert with the  error
     await version.alerts(
       'error',
       'Version does not exist or user does not have permission to browse version',
@@ -113,22 +121,23 @@ describe('Integration tests', () => {
   });
 
   /**
-   * - Dieser Integrations-Test sichert ab, dass ein Nutzer sich anmelden kann und ein
-   *   Projekt, für das der Nutzer Rechte besitzt, öffnen kann.
-   * - Im Anschluss müssen für das Projekt solange Dateien mit beliebigem Namen angelegt werden,
-   *   bis fünf Dateien dem Projekt zugeordnet sind.
-   * - Im Anschluss wird eine Ebene nach oben navigiert (auf Projektebene) und die Validierung angestoßen.
-   * - Final ist das Log-File herunter zu laden, falls die Validierung fehl schlägt.
+   * - Dieser Integrations-Test sichert ab, dass ein Nutzer sich anmelden kann
+   *   und ein Projekt, für das der Nutzer Rechte besitzt, öffnen kann.
+   * - Im Anschluss müssen für das Projekt solange Dateien mit beliebigem Namen
+   *   angelegt werden, bis fünf Dateien dem Projekt zugeordnet sind.
+   * - Im Anschluss wird eine Ebene nach oben navigiert (auf Projektebene) und
+   *   die Validierung angestoßen.
+   * - Final ist das Log-File herunter zu laden, falls die Validierung
+   *   fehlschlägt.
    * TODO:
-   * - Sollte Letzteres eintreten,muss im Anschluss eine Zip-Datei auf dem Rechner vorhanden sein.
+   * - Sollte Letzteres eintreten,muss im Anschluss eine Zip-Datei auf dem
+   *   Rechner vorhanden sein.
    */
   test('IT-3', async () => {
-    // sign in
+    // sign in and open accessable project
     const signIn = new SignInPage(driver);
     await signIn.navigate();
     let projects = await signIn.login(VALID_USERNAME, VALID_PASSWORD);
-
-    // open accessable project
     await projects.validatePage();
     const version = await projects.openProject(ACCESSABLE_PROJECT);
     await version.validatePage();
@@ -152,26 +161,25 @@ describe('Integration tests', () => {
       await projects.downloadLog();
       await projects.sleep(3000);
     }
+    // TODO interact with download dialog
     expect(version).toBeDefined();
   });
 
   /**
-   * - Dieser Integrations-Test sichert ab, dass ein Nutzer sich anmelden kann und einProjekt,
-   *   für das der Nutzer Rechte besitzt, öffnen kann.
-   * - Im Anschluss müssen für das Projekt solange Dateien mit beliebigem Namen angelegt werden
-   *   bis fünf Dateien dem Projekt zugeordnet sind.
-   * - Im Anschluss wird eine Ebene nach oben navigiert (auf Projektebene) und der Export
-   *   inklusive der Roh-Dateien angestoßen.
+   * - Dieser Integrations-Test sichert ab, dass ein Nutzer sich anmelden kann
+   *   und ein Projekt, für das der Nutzer Rechte besitzt, öffnen kann.
+   * - Im Anschluss müssen für das Projekt solange Dateien mit beliebigem Namen
+   *   angelegt werden, bis fünf Dateien dem Projekt zugeordnet sind.
+   * - Im Anschluss wird eine Ebene nach oben navigiert (auf Projektebene) und
+   *   der Export inklusive der Roh-Dateien angestoßen.
    * TODO:
    * - Es müssen im Anschluss zwei Zip-Dateien auf dem Rechner vorhanden sein.
    */
   test('IT-4', async () => {
-    // sign in
+    // sign in and open accessable project
     const signIn = new SignInPage(driver);
     await signIn.navigate();
     let projects = await signIn.login(VALID_USERNAME, VALID_PASSWORD);
-
-    // open accessable project
     await projects.validatePage();
     const version = await projects.openProject(ACCESSABLE_PROJECT);
     await version.validatePage();
@@ -189,6 +197,36 @@ describe('Integration tests', () => {
     projects = new ProjectsPage(driver);
     await projects.exportProject(ACCESSABLE_PROJECT);
     await projects.sleep(3000);
+
+    // TODO interact with download dialog
+    expect(version).toBeDefined();
+  });
+
+  /**
+   * - Dieser Integrations-Test sichert ab, dass ein Nutzer sich anmelden kann
+   *   und ein Projekt, für das der Nutzer Rechte besitzt, öffnen kann.
+   * - Im Anschluss muss es möglich sein den Einstellungsdialog zu öffnen und
+   *   dem Nutzer "admin" mit den Rechten "Contributor" zum Projekt hinzuzufügen.
+   */
+  test.skip('IT-5', async () => {
+    // sign in and open accessable project
+    const signIn = new SignInPage(driver);
+    await signIn.navigate();
+    let projects = await signIn.login(VALID_USERNAME, VALID_PASSWORD);
+    await projects.validatePage();
+    const version = await projects.openProject(ACCESSABLE_PROJECT);
+    await version.validatePage();
+    await version.isAccessable();
+    await version.sleep(1500);
+
+    // go back to project
+    await version.goPageBack();
+    projects = new ProjectsPage(driver);
+    await projects.sleep(1500);
+
+    // open settings and add user
+    await projects.addUserToProject(ACCESSABLE_PROJECT, 'admin', 'Contributer');
+    await projects.sleep(1500);
 
     expect(version).toBeDefined();
   });
