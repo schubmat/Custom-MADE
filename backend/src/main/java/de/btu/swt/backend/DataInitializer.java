@@ -116,7 +116,7 @@ public class DataInitializer {
         // create language server objects for which language server instances will be built and started later
 
         LanguageServer metaServer = LanguageServer.builder()
-                .languageName("Meta_Model")
+                .languageName("meta_model_language")
                 .build();
         LanguageServer mdrSimpleServer = LanguageServer.builder()
                 .languageName("simple_decision_record_language")
@@ -134,7 +134,9 @@ public class DataInitializer {
                 .languageServer(metaServer)
                 .owner(user)
                 .build();
+        
         log.info("Initialized: " + versionRepository.save(metaGrammarVersion));
+        log.info("Initialized: " + lspRepository.save(metaServer));
 
         Version mdrSimpleGrammarVersion = Version.builder()
                 .owner(user)
