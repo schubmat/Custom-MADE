@@ -15,7 +15,7 @@ if [ ! -d "xtext-lsp" ] && [ ! command == "killAll" ]; then
 		if [ ! -d "xtext-lsp" ]; then
 			echo "# cloning LSP environment"
 
-			echo "### PWD ### -- `pwd`" > tmp.txt
+			# echo "### PWD ### -- `pwd`" > tmp.txt
 
 			# extract the repository URL of the repo that's hosting the XText DSLs to be processed
 			GIT_LANGUAGE_REPOSITORY=`cat langauge-repository.git.cnf | grep -v "#"`

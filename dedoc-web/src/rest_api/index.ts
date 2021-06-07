@@ -7,7 +7,7 @@ import {restVersionMembership, VersionMembershipRest} from "./VersionMembership"
 import {User} from "../services/users";
 import {restUser, UserRest} from "./User";
 import {LspRest, restLsp} from "./Lsp";
-import {isPrimitive, onlyArrayTypes, onlyObjects, onlyPrimitives} from "../model/stateEntity";
+import {isPrimitive, onlyArrayTypes, onlyObjects, onlyPrimitives} from "../state/stateEntity";
 import {restPermissions} from "./Permissions";
 
 const restImplementations = [
