@@ -39,12 +39,12 @@ public class Project {
     @JsonIgnore
     private User owner;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private final Set<Version> versions = new HashSet<>();
 
     @JsonProperty("versions")
-    public Set<Version> getVersions(@AuthenticationPrincipal UserDetails userDetails) {
+    public Set<Version> getVersions(UserDetails userDetails) {
         String username = userDetails.getUsername();
         return versions.stream()
                 .filter(version -> version.getVisibility() == VisibilityLevel.PUBLIC

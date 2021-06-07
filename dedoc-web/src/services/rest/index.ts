@@ -1,7 +1,7 @@
 import {fetchAPI, fetchAuthAPI, fetchAuthGetFile, FetchFileResponse} from "../http";
 import {DeepPartial} from "../../model/types";
 import {ROUTES} from "../../constants/routes";
-import {Authentication} from "../../contexts/Authentication";
+import {Authentication} from "../../gui/shared/contexts/Authentication";
 import {User} from "../users";
 import {File} from "../../model/types";
 

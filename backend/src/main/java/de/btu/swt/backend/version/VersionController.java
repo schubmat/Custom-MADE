@@ -99,6 +99,7 @@ public class VersionController {
                     .body("The selected grammar contains errors");
         }
         newVersion.addUser(user, Permissions.OWNER);
+        newVersion.setOwner(user);
         newVersion = versionRepository.save(newVersion);
         return ResponseEntity.ok(new VersionDTOBuilder(newVersion).build());
     }
@@ -118,7 +119,7 @@ public class VersionController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Specified permissions do not exist");
         User addedMember = userRepository.getOne(memberId);
         Version version = versionRepository.getOne(versionId);
-        if (!version.getPermissions(addedMember).equals(Permissions.STRANGER))
+        if (version.getMembership(addedMember.getUsername()) != null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is already a member");
         version.addUser(addedMember, ship.getPermissions());
         version = versionRepository.save(version);
@@ -182,10 +183,12 @@ public class VersionController {
     }
 
     @DeleteMapping("/{versionId}/members/{memberId}")
-    public ResponseEntity removeMember(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity removeMember(@AuthenticationPrincipal User user,
                                        @PathVariable long versionId,
                                        @PathVariable long memberId) {
-        ResponseEntity error = getPermissionsEditingError(userDetails, versionId, memberId, null);
+        if (user.getId() == memberId)
+            return removeUser(user, versionId);
+        ResponseEntity error = getPermissionsEditingError(user, versionId, memberId, null);
         if (error != null)
             return error;
         User removedMember = userRepository.getOne(memberId);
@@ -198,9 +201,8 @@ public class VersionController {
     }
 
     @DeleteMapping("/{versionId}/members/user")
-    public ResponseEntity removeUser(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity removeUser(@AuthenticationPrincipal User user,
                                      @PathVariable long versionId) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
         Version version = versionRepository.getOne(versionId);
         if (version.getOwner().getId().longValue() == user.getId().longValue())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An owner cannot leave his/her project");
@@ -302,8 +304,13 @@ public class VersionController {
         if (version.getUsedLanguages().size() > 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There are still projects implementing this grammar");
         }
+        Project project = version.getProject();
+        version.delete();
+        version = versionRepository.save(version);
         versionRepository.delete(version);
-        return ResponseEntity.ok(new VersionDTOBuilder(version).build());
+        if (project != null && project.getLevel() == ProjectLevel.M0)
+            projectRepository.delete(project);
+        return ResponseEntity.ok(version);
     }
 
 
