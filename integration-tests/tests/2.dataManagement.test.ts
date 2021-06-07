@@ -17,7 +17,7 @@ export const UPLOAD_FILE = 'DMuploadTestFile';
 let driver: WebDriver;
 
 // increase the test timeout
-jest.setTimeout(60000);
+jest.setTimeout(10000);
 
 describe('Data-Management [Unit-Test]', () => {
   beforeEach(async () => {

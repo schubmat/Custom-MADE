@@ -6,8 +6,10 @@ import { VersionPage } from './Version';
 export class ProjectsPage extends Page {
   private PAGE = 'home';
 
+  
   // table
   private tableBodyBy = By.className('ant-table-tbody');
+  public READY_BY = this.tableBodyBy;
   private tableRowsBy = By.className('ant-table-row');
   private rowColumnsBy = By.css('td');
 
@@ -35,7 +37,11 @@ export class ProjectsPage extends Page {
   }
 
   navigate(): Promise<void> {
-    return super.navigate(this.PAGE);
+    return new Promise<void>(async (resolve, reject) => {
+      await super.navigate(this.PAGE);
+      await this.waitForElement(By.className("ant-table-tbody"), "navigate");
+      resolve();
+    })
   }
 
   validatePage(): Promise<void> {
@@ -111,7 +117,7 @@ export class ProjectsPage extends Page {
         const project = await this.findProject(name);
         await project.name.click();
         const next = new VersionPage(this.driver);
-        await next.validatePage();
+        await next.validateJustPage();
         resolve(next);
       } catch (error) {
         reject(`Error on Projects.openProject('${name}'): ${error}`);
@@ -326,7 +332,7 @@ export class ProjectsPage extends Page {
     });
   }
 
-  removeUserToProject(projectName: string, userName: string) {
+  removeUserFromProject(projectName: string, userName: string) {
     return new Promise<void>(async (resolve, reject) => {
       try {
         // open settings

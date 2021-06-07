@@ -1,7 +1,7 @@
 import { By, Condition, Key, until, WebDriver, WebElement } from 'selenium-webdriver';
 import { ProjectsPage } from './Projects';
 
-export class Page {
+export abstract class Page {
   protected driver: WebDriver;
   public static BASE_URL: string = 'http://localhost:3000/';
   private alertBy = By.className('ant-message');
@@ -10,6 +10,7 @@ export class Page {
   private messageSuccessBy = By.className('ant-message-custom-content ant-message-success');
 
   private goBackBy = By.className('anticon anticon-arrow-left go-back-icon');
+  public abstract READY_BY: By;
 
   /**
    * @param driver the current `WebDriver` from the `'selenium-webdriver'` package
@@ -22,11 +23,12 @@ export class Page {
    * navigates the `WebDriver` to the page's url
    */
   protected navigate(page: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.driver
+    return new Promise<void>(async (resolve, reject) => {
+      await this.driver
         .get(Page.BASE_URL + page)
-        .then(() => resolve())
         .catch((error) => reject(`Error on Page.navigate(${Page.BASE_URL + page}): ${error}`));
+      await this.waitForElement(this.READY_BY, "navigate");
+      resolve()
     });
   }
 
@@ -50,9 +52,11 @@ export class Page {
    * @param hasSuffix indicates if there is a suffix like `'http://localhost:3000/<page>/<suffix>'`.
    * Actively checks if the `url.startsWith('http://localhost:3000/<page>')`.
    */
-  protected validatePage(page: string, hasSuffix: boolean = false): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.driver.getCurrentUrl().then((url) => {
+  protected validatePage(page: string, hasSuffix: boolean = false, skipWait: boolean = false): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      
+      !skipWait && await this.waitForElement(this.READY_BY, "validatePage");
+      await this.driver.getCurrentUrl().then((url) => {
         const matches = hasSuffix
           ? url.startsWith(Page.BASE_URL + page)
           : url === Page.BASE_URL + page;
@@ -69,8 +73,8 @@ export class Page {
    * @param elementBy The `WebElement` to wait for
    * @returns the `WebElement` waited for
    */
-  protected waitForElement(elementBy: By) {
-    return this.driver.wait(until.elementLocated(elementBy), 2000, 'Timed out after 1 second!');
+  protected waitForElement(elementBy: By, caller: string) {
+    return this.driver.wait(until.elementLocated(elementBy), 2000, `${this.constructor.name}.${caller}.waitForElement(${elementBy.toString()}): Timed out after 2 second!`);
   }
 
   /**
@@ -177,12 +181,13 @@ export class Page {
     });
   }
 
-  goPageBack(): Promise<Page> {
+  goPageBack(readyBy: By): Promise<Page> {
     return new Promise<Page>(async (resolve, reject) => {
       try {
-        // fill the credentials
+        await this.waitForElement(this.goBackBy, "goPageBack");
         const backButton = await this.driver.findElement(this.goBackBy);
         await backButton.click();
+        await this.waitForElement(readyBy, "goPageBack");
         resolve(this);
       } catch (error) {
         reject('Error on SignInPage.login(): ' + error);

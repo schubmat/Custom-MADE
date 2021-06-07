@@ -3,9 +3,10 @@ import { Page } from './Page';
 import { ProjectsPage } from './Projects';
 
 export class SignInPage extends Page {
-    private usernameBy: By;
-    private passwordBy: By;
-    private loginButtonBy: By;
+    private usernameBy: By = By.id('username');
+    READY_BY = this.usernameBy;
+    private passwordBy: By = By.id('password');
+    private loginButtonBy: By = By.className('ant-btn login-form-button ant-btn-primary');
 
     private PAGE = ''; // login page has noting on base url
 
@@ -15,9 +16,6 @@ export class SignInPage extends Page {
      */
     constructor(driver: WebDriver) {
         super(driver);
-        this.usernameBy = By.id('username');
-        this.passwordBy = By.id('password');
-        this.loginButtonBy = By.className('ant-btn login-form-button ant-btn-primary');
     }
 
     navigate(): Promise<void> {
@@ -50,7 +48,7 @@ export class SignInPage extends Page {
                     ? await this.driver.findElement(this.passwordBy).sendKeys(Key.ENTER)
                     : await this.driver.findElement(this.loginButtonBy).click();
                 // wait for page to load
-                await this.waitForElement(By.className('ant-input'));
+                await this.waitForElement(By.className('ant-input'), "login");
                 await this.alerts("nothing")
                 // resolve next page
                 const next = new ProjectsPage(this.driver);

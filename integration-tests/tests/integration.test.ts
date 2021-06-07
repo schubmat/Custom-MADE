@@ -1,5 +1,5 @@
 import { VersionPage, ProjectsPage, SignInPage } from '../pages';
-import { Builder, WebDriver } from 'selenium-webdriver';
+import { Builder, By, WebDriver } from 'selenium-webdriver';
 import Path from 'path';
 import {
   VALID_USERNAME,
@@ -39,7 +39,7 @@ describe('Integration tests', () => {
       await signIn.navigate();
       await signIn.login(VALID_USERNAME, VALID_PASSWORD);
       const projects = new ProjectsPage(driver);
-      await projects.removeUserToProject(ACCESSABLE_PROJECT, 'admin');
+      await projects.removeUserFromProject(ACCESSABLE_PROJECT, 'admin');
       const version = await projects.openProject(ACCESSABLE_PROJECT);
       try {
         await version.deleteFile(IT1_File);
@@ -152,7 +152,7 @@ describe('Integration tests', () => {
     await version.createFile(IT3_File + 'E');
 
     // navigate back + validate
-    await version.goPageBack();
+    await version.goPageBack(projects.READY_BY);
     projects = new ProjectsPage(driver);
     const result = await projects.validateProject(ACCESSABLE_PROJECT);
 
@@ -194,7 +194,7 @@ describe('Integration tests', () => {
     await version.createFile(IT4_File + 'E');
 
     // navigate back + export
-    await version.goPageBack();
+    await version.goPageBack(projects.READY_BY);
     projects = new ProjectsPage(driver);
     await projects.exportProject(ACCESSABLE_PROJECT);
     await projects.sleep(1500);
@@ -220,7 +220,7 @@ describe('Integration tests', () => {
     await version.isAccessable();
 
     // go back to project
-    await version.goPageBack();
+    await version.goPageBack(projects.READY_BY);
     projects = new ProjectsPage(driver);
 
     // open settings and add user

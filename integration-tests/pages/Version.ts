@@ -6,6 +6,7 @@ export class VersionPage extends Page {
 
   // file selection
   private tableBodyBy = By.className('ant-table-tbody');
+  READY_BY = this.tableBodyBy
   private tableRowsBy = By.className('ant-table-row');
   private rowColumnsBy = By.css('td');
   private validateButtonBy = By.className('anticon anticon-file-done');
@@ -45,6 +46,10 @@ export class VersionPage extends Page {
     return super.validatePage(this.PAGE, true);
   }
 
+  validateJustPage(): Promise<void> {
+    return super.validatePage(this.PAGE, true, true);
+  }
+
   /**
    * @throws an error if the opened project (`VersionPage`) shows any alert
    */
@@ -61,7 +66,7 @@ export class VersionPage extends Page {
       try {
         const addButton = await this.driver.findElement(this.addButtonBy);
         await addButton.click();
-        const popOver = await this.waitForElement(this.createPopoverBy);
+        const popOver = await this.waitForElement(this.createPopoverBy, "createFile");
         await popOver.findElement(this.createNameBy).sendKeys(name);
         const createButton = await popOver.findElement(this.createButtonBy);
         await createButton.click();

@@ -5,7 +5,7 @@ import { VALID_PASSWORD, VALID_USERNAME } from './Config';
 let driver: WebDriver;
 
 // increase the test timeout
-jest.setTimeout(60000);
+jest.setTimeout(10000);
 
 describe('Login [Unit-Test]', () => {
   // use a new driver for every test (independability)
