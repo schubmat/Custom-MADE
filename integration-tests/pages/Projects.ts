@@ -22,6 +22,9 @@ export class ProjectsPage extends Page {
   private messageModalBy = By.className('ant-notification ant-notification-topRight');
   private messageDownloadLinkBy = By.css('a');
 
+  // modal (validation)
+  private userTableRowBy = By.className('ant-table-row ant-table-row-level-1');
+
   // footer
   private footerBy = By.className('ant-layout-footer');
   private addButtonBy = By.className('anticon anticon-plus-circle');
@@ -145,6 +148,22 @@ export class ProjectsPage extends Page {
       } catch (error) {
         reject(
           `Error on Projects.findProjectAction('${project.name}', '${actionIconBy}'): ${error}`,
+        );
+      }
+    });
+  }
+
+  findUserTableRow() {
+    return new Promise<WebElement>(async (resolve, reject) => {
+      try {
+        const tableRow = await this.driver.findElement(this.userTableRowBy)
+        resolve (tableRow);
+        reject(
+          `Error on findUserTableRow(): No matching table row found!`,
+        );
+      } catch (error) {
+        reject(
+          `Error on findUserTableRow(): ${error}`,
         );
       }
     });
@@ -322,7 +341,7 @@ export class ProjectsPage extends Page {
         // click the add button
         const addButton = await body.findElement(By.className('ant-btn ant-btn-primary'));
         await addButton.click();
-        await this.alerts('success', userName + 'was added');
+        // await this.alerts('success', userName + ' was added');
         resolve();
       } catch (error) {
         reject(
@@ -349,7 +368,7 @@ export class ProjectsPage extends Page {
             await delBtn.click();
           }
         }
-        await this.alerts('success', 'Member was removed from version');
+        // await this.alerts('success', 'Member was removed from version');
         const closeBtn = await this.driver.findElement(
           By.className('anticon anticon-close ant-modal-close-icon'),
         );

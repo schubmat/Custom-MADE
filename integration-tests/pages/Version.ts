@@ -13,7 +13,7 @@ export class VersionPage extends Page {
   private messageModalBy = By.className('ant-notification ant-notification-topRight');
 
   // file creation
-  private addButtonBy = By.className('anticon anticon-plus-circle');
+  private addButtonBy = By.className('anticon anticon-plus-circle ');
   private createPopoverBy = By.className('ant-popover ant-popover-placement-top');
   private createNameBy = By.id('name');
   private createButtonBy = By.className('ant-btn ant-btn-primary');
@@ -75,7 +75,7 @@ export class VersionPage extends Page {
           .catch(() => {
             /* ignore as expected */
           });
-        await addButton.click(); //to close the popover again
+        // await addButton.click(); //to close the popover again
         resolve();
       } catch (error) {
         reject(`Error on Version.createFile('${name}'): ${error}`);
@@ -174,7 +174,7 @@ export class VersionPage extends Page {
         const uploadInput = await uploadSpan.findElement(this.uploadInputBy);
         await uploadInput.sendKeys(absPath + '/' + file + fileExtension);
         await this.sleep(300); // wait for file to be rendered
-        await this.alerts('no-error');
+        // await this.alerts('no-error');
         try {
           await this.findFile(file);
         } catch (error) {
@@ -251,7 +251,7 @@ export class VersionPage extends Page {
         // export the file/s
         const exportButton = await this.driver.findElement(this.exportButtonBy);
         await exportButton.click();
-        await this.alerts('success', 'Export successful.')
+        // await this.alerts('success', 'Export successful.')
 
         resolve();
       } catch (error) {

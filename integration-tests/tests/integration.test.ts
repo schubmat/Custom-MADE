@@ -3,12 +3,14 @@ import { Builder, By, WebDriver } from 'selenium-webdriver';
 import Path from 'path';
 import {
   VALID_USERNAME,
+  VALID_ADMIN_USERNAME,
   VALID_PASSWORD,
   ACCESSABLE_PROJECT,
   CORRECT_FILE_EXTENSION,
   WRONG_FILE_EXTENSION,
   RESSOURCES,
   LOCKED_PROJECT,
+  LOCKED_PROJECT_ADMIN,
 } from './Config';
 
 export const IT1_File = 'IT1File';
@@ -109,9 +111,9 @@ describe('Integration tests', () => {
     // login to locked project
     const signIn = new SignInPage(driver);
     await signIn.navigate();
-    const projects = await signIn.login(VALID_USERNAME, VALID_PASSWORD);
+    const projects = await signIn.login(VALID_ADMIN_USERNAME, VALID_PASSWORD);
     await projects.validatePage();
-    const version = await projects.openProject(LOCKED_PROJECT);
+    const version = await projects.openProject(LOCKED_PROJECT_ADMIN);
 
     // ensure there is an alert with the  error
     await version.alerts(
@@ -227,6 +229,6 @@ describe('Integration tests', () => {
     await projects.sleep(300);
     await projects.addUserToProject(ACCESSABLE_PROJECT, 'admin', 'Contributor');
 
-    expect(version).toBeDefined();
+    expect(projects.findUserTableRow()).toBeDefined();
   });
 });
