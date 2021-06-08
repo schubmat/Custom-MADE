@@ -376,7 +376,7 @@ export class ProjectsPage extends Page {
         await this.sleep(300);
         resolve();
       } catch (error) {
-        reject(`Error on Project.addUserToProject('${projectName}', '${userName}'): ${error}`);
+        reject(`Error on Project.removeUserFromProject('${projectName}', '${userName}'): ${error}`);
       }
     });
   }
