@@ -1,4 +1,5 @@
 import { By, WebDriver, WebElement } from 'selenium-webdriver';
+import { NewProjectPage } from './NewProject';
 import { Page } from './Page';
 import { VersionPage } from './Version';
 
@@ -48,6 +49,28 @@ export class ProjectsPage extends Page {
   validatePage(): Promise<void> {
     return super.validatePage(this.PAGE);
   }
+
+  /**
+   * ***TODO NOT WORKING***
+   * @deprecated
+   */
+  async createProject(): Promise<NewProjectPage> {
+    return new Promise<NewProjectPage>(async (resolve, reject) => {
+      try {
+        const footer = await this.driver.findElement(this.footerBy);
+        const addButton = await footer.findElement(this.addButtonBy);
+        await addButton.click();
+
+        // resolve next page
+        const next = new NewProjectPage(this.driver);
+        await next.validatePage();
+        resolve(next);
+      } catch (error) {
+        reject('Error on Projects.createFile(): ' + error);
+      }
+    });
+  }
+
 
   /**
    * finds the file with the given `name` from the table of files and returns the corresponding column
