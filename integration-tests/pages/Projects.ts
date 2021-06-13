@@ -1,12 +1,10 @@
-import { By, Key, until, WebDriver, WebElement } from 'selenium-webdriver';
-import { NewProjectPage } from './NewProject';
+import { By, WebDriver, WebElement } from 'selenium-webdriver';
 import { Page } from './Page';
 import { VersionPage } from './Version';
 
 export class ProjectsPage extends Page {
   private PAGE = 'home';
 
-  
   // table
   private tableBodyBy = By.className('ant-table-tbody');
   public READY_BY = this.tableBodyBy;
@@ -42,34 +40,13 @@ export class ProjectsPage extends Page {
   navigate(): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       await super.navigate(this.PAGE);
-      await this.waitForElement(By.className("ant-table-tbody"), "navigate");
+      await this.waitForElement(By.className('ant-table-tbody'), 'navigate');
       resolve();
-    })
+    });
   }
 
   validatePage(): Promise<void> {
     return super.validatePage(this.PAGE);
-  }
-
-  /**
-   * ***TODO NOT WORKING***
-   * @deprecated
-   */
-  async createProject(): Promise<NewProjectPage> {
-    return new Promise<NewProjectPage>(async (resolve, reject) => {
-      try {
-        const footer = await this.driver.findElement(this.footerBy);
-        const addButton = await footer.findElement(this.addButtonBy);
-        await addButton.click();
-
-        // resolve next page
-        const next = new NewProjectPage(this.driver);
-        await next.validatePage();
-        resolve(next);
-      } catch (error) {
-        reject('Error on Projects.createFile(): ' + error);
-      }
-    });
   }
 
   /**
@@ -102,9 +79,9 @@ export class ProjectsPage extends Page {
             });
           }
         }
-        reject(`Error on Projects.findProject('${name}'): No Project found with this name!`);
+        reject(this.appendError(`findProject('${name}')`, 'No Project found with this name!'));
       } catch (error) {
-        reject(`Error on Projects.findProject('${name}'): ${error}`);
+        reject(this.appendError(`findProject('${name}')`, '', error));
       }
     });
   }
@@ -123,7 +100,7 @@ export class ProjectsPage extends Page {
         await next.validateJustPage();
         resolve(next);
       } catch (error) {
-        reject(`Error on Projects.openProject('${name}'): ${error}`);
+        reject(this.appendError(`openProject('${name}')`, '', error));
       }
     });
   }
@@ -143,11 +120,14 @@ export class ProjectsPage extends Page {
             });
         }
         reject(
-          `Error on Projects.findProjectAction('${project.name}', '${actionIconBy}'): No matching Action found!`,
+          this.appendError(
+            `findProjectAction('${project.name}', '${actionIconBy}')`,
+            'No matching Action found!',
+          ),
         );
       } catch (error) {
         reject(
-          `Error on Projects.findProjectAction('${project.name}', '${actionIconBy}'): ${error}`,
+          this.appendError(`findProjectAction('${project.name}', '${actionIconBy}')`, '', error),
         );
       }
     });
@@ -156,15 +136,11 @@ export class ProjectsPage extends Page {
   findUserTableRow() {
     return new Promise<WebElement>(async (resolve, reject) => {
       try {
-        const tableRow = await this.driver.findElement(this.userTableRowBy)
-        resolve (tableRow);
-        reject(
-          `Error on findUserTableRow(): No matching table row found!`,
-        );
+        const tableRow = await this.driver.findElement(this.userTableRowBy);
+        resolve(tableRow);
+        reject(this.appendError(`findUserTableRow()`, 'No matching table row found!'));
       } catch (error) {
-        reject(
-          `Error on findUserTableRow(): ${error}`,
-        );
+        reject(this.appendError(`findUserTableRow()`, '', error));
       }
     });
   }
@@ -202,12 +178,12 @@ export class ProjectsPage extends Page {
               .then(() => resolve(false)) // validation wrong
               .catch((error) =>
                 reject(
-                  `Error on Project.validateProject('${name}'): Probably not validated: ${error}`,
+                  this.appendError(`validateProject('${name}')`, `Probably not validated`, error),
                 ),
               ),
           );
       } catch (error) {
-        reject(`Error on Project.validateProject('${name}'): ${error}`);
+        reject(this.appendError(`validateProject('${name}')}`, '', error));
       }
     });
   }
@@ -223,7 +199,7 @@ export class ProjectsPage extends Page {
         await downloadLink.click();
         resolve();
       } catch (error) {
-        reject('Error on Projects.downloadLog(): ' + error);
+        reject(this.appendError('downloadLog()', '', error));
       }
     });
   }
@@ -252,7 +228,7 @@ export class ProjectsPage extends Page {
 
         resolve();
       } catch (error) {
-        reject(`Error on Project.exportProject('${name}'): ${error}`);
+        reject(this.appendError(`exportProject('${name}')`, '', error));
       }
     });
   }
@@ -281,7 +257,7 @@ export class ProjectsPage extends Page {
 
         resolve(body);
       } catch (error) {
-        reject(`Error on Project.openProjectSettings('${name}'): ${error}`);
+        reject(this.appendError(`openProjectSettings('${name}')`, '', error));
       }
     });
   }
@@ -312,7 +288,10 @@ export class ProjectsPage extends Page {
         }
         !userFound &&
           reject(
-            `Error on Project.addUserToProject('${projectName}', '${userName}', '${userRole}'): User not found`,
+            this.appendError(
+              `addUserToProject('${projectName}', '${userName}', '${userRole}')`,
+              'User not found',
+            ),
           );
 
         // add the role
@@ -335,7 +314,10 @@ export class ProjectsPage extends Page {
         }
         !roleFound &&
           reject(
-            `Error on Project.addUserToProject('${projectName}', '${userName}', '${userRole}'): Role not found`,
+            this.appendError(
+              `addUserToProject('${projectName}', '${userName}', '${userRole}')`,
+              'Role not found',
+            ),
           );
 
         // click the add button
@@ -345,7 +327,11 @@ export class ProjectsPage extends Page {
         resolve();
       } catch (error) {
         reject(
-          `Error on Project.addUserToProject('${projectName}', '${userName}', '${userRole}'): ${error}`,
+          this.appendError(
+            `addUserToProject('${projectName}', '${userName}', '${userRole}')`,
+            '',
+            error,
+          ),
         );
       }
     });
@@ -376,7 +362,9 @@ export class ProjectsPage extends Page {
         await this.sleep(300);
         resolve();
       } catch (error) {
-        reject(`Error on Project.addUserToProject('${projectName}', '${userName}'): ${error}`);
+        reject(
+          this.appendError(`removeUserFromProject('${projectName}', '${userName}')`, '', error),
+        );
       }
     });
   }

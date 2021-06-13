@@ -1,4 +1,5 @@
-import { By, Key, until, WebDriver, WebElement } from 'selenium-webdriver';
+import { By, WebDriver, WebElement } from 'selenium-webdriver';
+import { EditorPage } from './Editor';
 import { Page } from './Page';
 
 export class VersionPage extends Page {
@@ -6,14 +7,14 @@ export class VersionPage extends Page {
 
   // file selection
   private tableBodyBy = By.className('ant-table-tbody');
-  READY_BY = this.tableBodyBy
+  READY_BY = this.tableBodyBy;
   private tableRowsBy = By.className('ant-table-row');
   private rowColumnsBy = By.css('td');
   private validateButtonBy = By.className('anticon anticon-file-done');
   private messageModalBy = By.className('ant-notification ant-notification-topRight');
 
   // file creation
-  private addButtonBy = By.className('anticon anticon-plus-circle ');
+  private addButtonBy = By.className('anticon anticon-plus-circle');
   private createPopoverBy = By.className('ant-popover ant-popover-placement-top');
   private createNameBy = By.id('name');
   private createButtonBy = By.className('ant-btn ant-btn-primary');
@@ -66,19 +67,19 @@ export class VersionPage extends Page {
       try {
         const addButton = await this.driver.findElement(this.addButtonBy);
         await addButton.click();
-        const popOver = await this.waitForElement(this.createPopoverBy, "createFile");
+        const popOver = await this.waitForElement(this.createPopoverBy, 'createFile');
         await popOver.findElement(this.createNameBy).sendKeys(name);
         const createButton = await popOver.findElement(this.createButtonBy);
         await createButton.click();
         await this.alerts('error')
-          .then(() => reject(`Error on Version.createFile('${name}'): there should be no error`))
+          .then(() => reject(this.appendError(`createFile('${name}')`, 'there should be no error')))
           .catch(() => {
             /* ignore as expected */
           });
         // await addButton.click(); //to close the popover again
         resolve();
       } catch (error) {
-        reject(`Error on Version.createFile('${name}'): ${error}`);
+        reject(this.appendError(`createFile('${name}')`, '', error));
       }
     });
   }
@@ -115,13 +116,26 @@ export class VersionPage extends Page {
             });
           }
         }
-        reject(`Error on Version.findFile('${name}'): No File found with this name!`);
+        reject(this.appendError(`findFile('${name}')`, 'No File found with this name!'));
       } catch (error) {
-        reject(`Error on Version.findFile('${name}'): ${error}`);
+        reject(this.appendError(`findFile('${name}')`, '', error));
       }
     });
   }
 
+  openFile(name: string): Promise<EditorPage> {
+    return new Promise<EditorPage>(async (resolve, reject) => {
+      try {
+        const file = await this.findFile(name);
+        await file.name.click();
+        const next = new EditorPage(this.driver);
+        await next.validatePage();
+        resolve(next);
+      } catch (error) {
+        reject(this.appendError(`openFile('${name}')`, `File can not be opened`, error));
+      }
+    });
+  }
   /**
    * deletes the file with the given `name`
    * @param name of the file to delete
@@ -151,9 +165,10 @@ export class VersionPage extends Page {
           try {
             await this.findFile(file);
             reject(
-              `Error on Version.deleteFile('${name}', '${others.join(
-                "', '",
-              )}'): File was not deleted!`,
+              this.appendError(
+                `deleteFile('${name}', '${others.join("', '")}')`,
+                'File was not deleted!',
+              ),
             );
           } catch (error) {
             /** expected behaviour */
@@ -162,7 +177,7 @@ export class VersionPage extends Page {
 
         resolve();
       } catch (error) {
-        reject(`Error on Version.deleteFile('${name}', '${others.join("', '")}'): ${error}`);
+        reject(this.appendError(`deleteFile('${name}', '${others.join("', '")}')`, '', error));
       }
     });
   }
@@ -173,17 +188,26 @@ export class VersionPage extends Page {
         const uploadSpan = await this.driver.findElement(this.uploadSpanBy);
         const uploadInput = await uploadSpan.findElement(this.uploadInputBy);
         await uploadInput.sendKeys(absPath + '/' + file + fileExtension);
+        // await this.sleep(5000);
         await this.sleep(300); // wait for file to be rendered
         // await this.alerts('no-error');
         try {
           await this.findFile(file);
         } catch (error) {
-          reject(`Error on Version.uploadFile('${file}'): File was not uploaded: ${error}`);
+          reject(
+            this.appendError(
+              `uploadFile('${absPath + '/' + file + fileExtension}')`,
+              `File was not uploaded`,
+              error,
+            ),
+          );
         }
 
         resolve();
       } catch (error) {
-        reject(`Error on Version.uploadFile('${absPath + '/' + file + fileExtension}'): ${error}`);
+        reject(
+          this.appendError(`uploadFile('${absPath + '/' + file + fileExtension}')`, '', error),
+        );
       }
     });
   }
@@ -223,12 +247,12 @@ export class VersionPage extends Page {
               .then(() => resolve(false)) // validation wrong
               .catch((error) =>
                 reject(
-                  `Error on Version.validateFile('${name}'): Probably not validated: ${error}`,
+                  this.appendError(`validateFile('${name}')`, `Probably not validated`, error),
                 ),
               ),
           );
       } catch (error) {
-        reject(`Error on Version.validateFile('${name}'): ${error}`);
+        reject(this.appendError(`validateFile('${name}')`, '', error));
       }
     });
   }
@@ -255,7 +279,7 @@ export class VersionPage extends Page {
 
         resolve();
       } catch (error) {
-        reject(`Error on Version.exportFile('${name}', '${others.join("', '")}'): ${error}`);
+        reject(this.appendError(`exportFile('${name}', '${others.join("', '")}')`, '', error));
       }
     });
   }

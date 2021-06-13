@@ -1,5 +1,4 @@
-import { By, Condition, Key, until, WebDriver, WebElement } from 'selenium-webdriver';
-import { ProjectsPage } from './Projects';
+import { By, until, WebDriver, WebElement } from 'selenium-webdriver';
 
 export abstract class Page {
   protected driver: WebDriver;
@@ -26,9 +25,9 @@ export abstract class Page {
     return new Promise<void>(async (resolve, reject) => {
       await this.driver
         .get(Page.BASE_URL + page)
-        .catch((error) => reject(`Error on Page.navigate(${Page.BASE_URL + page}): ${error}`));
-      await this.waitForElement(this.READY_BY, "navigate");
-      resolve()
+        .catch((error) => reject(this.appendError(`navigate(${Page.BASE_URL + page})`, '', error)));
+      await this.waitForElement(this.READY_BY, 'navigate');
+      resolve();
     });
   }
 
@@ -42,7 +41,7 @@ export abstract class Page {
       this.driver
         .sleep(ms)
         .then(() => resolve())
-        .catch((error) => reject(`Error on Page.sleep(${ms}): ` + error));
+        .catch((error) => reject(this.appendError(`sleep(${ms})`, '', error)));
     });
   }
 
@@ -52,10 +51,13 @@ export abstract class Page {
    * @param hasSuffix indicates if there is a suffix like `'http://localhost:3000/<page>/<suffix>'`.
    * Actively checks if the `url.startsWith('http://localhost:3000/<page>')`.
    */
-  protected validatePage(page: string, hasSuffix: boolean = false, skipWait: boolean = false): Promise<void> {
+  protected validatePage(
+    page: string,
+    hasSuffix: boolean = false,
+    skipWait: boolean = false,
+  ): Promise<void> {
     return new Promise(async (resolve, reject) => {
-      
-      !skipWait && await this.waitForElement(this.READY_BY, "validatePage");
+      !skipWait && (await this.waitForElement(this.READY_BY, 'validatePage'));
       await this.driver.getCurrentUrl().then((url) => {
         const matches = hasSuffix
           ? url.startsWith(Page.BASE_URL + page)
@@ -63,7 +65,9 @@ export abstract class Page {
         const be = hasSuffix ? 'include' : 'be';
         matches
           ? resolve()
-          : reject(`Page was expected to ${be} ${Page.BASE_URL + page} but is ${url}`);
+          : reject(
+              this.appendError(`Page was expected to ${be} ${Page.BASE_URL + page} but is ${url}`),
+            );
       });
     });
   }
@@ -74,7 +78,13 @@ export abstract class Page {
    * @returns the `WebElement` waited for
    */
   protected waitForElement(elementBy: By, caller: string) {
-    return this.driver.wait(until.elementLocated(elementBy), 2000, `${this.constructor.name}.${caller}.waitForElement(${elementBy.toString()}): Timed out after 2 second!`);
+    return this.driver.wait(
+      until.elementLocated(elementBy),
+      2000,
+      `${
+        this.constructor.name
+      }.${caller}.waitForElement(${elementBy.toString()})\n>>> Timed out after 2 seconds!`,
+    );
   }
 
   /**
@@ -106,7 +116,10 @@ export abstract class Page {
         // nothing
         type === 'nothing' &&
           reject(
-            `Error on Page.alerts(${type}, '${subtext}'): was expected to NOT alert, but did!`,
+            this.appendError(
+              `alerts(${type}, '${subtext}')`,
+              'was expected to NOT alert, but did!',
+            ),
           );
 
         // save these for the no-error with subtext check
@@ -121,7 +134,10 @@ export abstract class Page {
             // no-error
             type === 'no-error' &&
               reject(
-                `Error on Page.alerts(${type}, '${subtext}'): was expected to alert and not error, but did!`,
+                this.appendError(
+                  `alerts(${type}, '${subtext}')`,
+                  'was expected to alert and not error, but did!',
+                ),
               );
 
             // some error
@@ -169,13 +185,16 @@ export abstract class Page {
         }
 
         // no match found
-        reject(`Error on Page.alerts(${type}, '${subtext}'): No matching alert found!`);
+        reject(this.appendError(`alerts(${type}, '${subtext}')`, 'No matching alert found!'));
       } catch (noAlert) {
         // NO ALERT ----------------------------------------
         type === 'nothing'
           ? resolve()
           : reject(
-              `Error on Page.alerts(${type}, '${subtext}'): was expected to alert, but did not!`,
+              this.appendError(
+                `alerts(${type}, '${subtext}')`,
+                'was expected to alert, but did not!',
+              ),
             );
       }
     });
@@ -184,13 +203,13 @@ export abstract class Page {
   goPageBack(readyBy: By): Promise<Page> {
     return new Promise<Page>(async (resolve, reject) => {
       try {
-        await this.waitForElement(this.goBackBy, "goPageBack");
+        await this.waitForElement(this.goBackBy, 'goPageBack');
         const backButton = await this.driver.findElement(this.goBackBy);
         await backButton.click();
-        await this.waitForElement(readyBy, "goPageBack");
+        await this.waitForElement(readyBy, 'goPageBack');
         resolve(this);
       } catch (error) {
-        reject('Error on SignInPage.login(): ' + error);
+        reject(this.appendError('Error on Page.goPageBack()', '', error));
       }
     });
   }
@@ -200,18 +219,18 @@ export abstract class Page {
       const tag = await element.getTagName();
       const className = await element.getAttribute('class');
       const text = await element.getText().catch(() => {
-        return "";
+        return '';
       });
-      let result = '<' + tag + ' className="' + className + '"> ' + text + "\n";
+      let result = '<' + tag + ' className="' + className + '"> ' + text + '\n';
       resolve(result);
-    });    
+    });
   }
 
   private getChildrenString(element: WebElement, depth: number = 3, indent: string = '') {
     return new Promise<String>(async (resolve, reject) => {
       const children = await element.findElements(By.xpath('./child::*'));
       const elemString = await this.printElement(element);
-      let result = indent + elemString + "\n";
+      let result = indent + elemString + '\n';
 
       depth === 0 && resolve(result);
 
@@ -225,9 +244,20 @@ export abstract class Page {
   logChildren(element: WebElement, depth: number = 3) {
     return new Promise<void>(async (resolve, reject) => {
       const log = await this.getChildrenString(element, 15);
-      console.log("CHILDREN:\n", log);
+      console.log('CHILDREN:\n', log);
       resolve();
     });
+  }
+
+  appendError(functionName: string, message: string = '', rest: string = '') {
+    let result = `Error on ${this.constructor.name}.${functionName}`;
+    if (message.length > 0) {
+      result += '\n  >>> ' + message;
+    }
+    if (rest.length > 0) {
+      result += '\n  ... ' + rest;
+    }
+    return result;
   }
 }
 

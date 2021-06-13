@@ -13,6 +13,7 @@ export const CREATE_FILE = 'DMcreateTestFile';
 export const DUPLICATE_FILE = 'DMduplicateTestFile';
 export const DELETE_FILE = 'DMdeleteTestFile';
 export const UPLOAD_FILE = 'DMuploadTestFile';
+export const UPLOAD_FILE_2 = 'DMuploadTestFile2';
 
 let driver: WebDriver;
 
@@ -90,8 +91,10 @@ describe('Data-Management [Unit-Test]', () => {
     try {
       const filePath = Path.resolve(RESSOURCES);
       const version = new VersionPage(driver);
-      await version.uploadFile(filePath, UPLOAD_FILE, WRONG_FILE_EXTENSION);
+      await version.uploadFile(filePath, UPLOAD_FILE_2, WRONG_FILE_EXTENSION);
+      await version.sleep(5000)
     } catch (error) {
+      console.log(error)
       expect(error).toMatch('Error');
     }
   });
