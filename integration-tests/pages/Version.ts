@@ -188,7 +188,6 @@ export class VersionPage extends Page {
         const uploadSpan = await this.driver.findElement(this.uploadSpanBy);
         const uploadInput = await uploadSpan.findElement(this.uploadInputBy);
         await uploadInput.sendKeys(absPath + '/' + file + fileExtension);
-        // await this.sleep(5000);
         await this.sleep(300); // wait for file to be rendered
         // await this.alerts('no-error');
         try {
@@ -275,6 +274,7 @@ export class VersionPage extends Page {
         // export the file/s
         const exportButton = await this.driver.findElement(this.exportButtonBy);
         await exportButton.click();
+        await this.sleep(5000)
         // await this.alerts('success', 'Export successful.')
 
         resolve();

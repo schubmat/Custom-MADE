@@ -153,6 +153,7 @@ export class ProjectsPage extends Page {
     return new Promise<boolean>(async (resolve, reject) => {
       try {
         // click validate button
+        await this.waitForElement(this.tableRowsBy, 'validateProject()')
         const project = await this.findProject(name);
         const validateButton = await this.findActionButton(project, this.validateButtonBy);
         await validateButton.click();

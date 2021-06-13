@@ -94,7 +94,6 @@ describe('Data-Management [Unit-Test]', () => {
       await version.uploadFile(filePath, UPLOAD_FILE_2, WRONG_FILE_EXTENSION);
       await version.sleep(5000)
     } catch (error) {
-      console.log(error)
       expect(error).toMatch('Error');
     }
   });
