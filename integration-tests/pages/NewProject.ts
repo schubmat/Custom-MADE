@@ -2,6 +2,8 @@ import { By, Key, until, WebDriver } from 'selenium-webdriver';
 import { Page } from './Page';
 
 export class NewProjectPage extends Page {
+    private callerIcon = By.className('anticon anticon-plus-circle');
+    public READY_BY = this.callerIcon;
     private PAGE = 'project/new';
     private nameInputBy: By;
     private descInputFieldBy: By;
