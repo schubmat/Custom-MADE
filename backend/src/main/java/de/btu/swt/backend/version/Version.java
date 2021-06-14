@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.btu.swt.backend.file.File;
 import de.btu.swt.backend.file.FileStatus;
-import de.btu.swt.backend.git.GitUserSettings;
 import de.btu.swt.backend.lsp.LanguageServer;
 import de.btu.swt.backend.project.Project;
 import de.btu.swt.backend.project.VersionMemberships;
@@ -77,7 +76,7 @@ public class Version {
     private final Set<VersionMemberships> memberships = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany (mappedBy = "grammar", cascade = CascadeType.ALL)
+    @OneToMany (mappedBy = "grammar")
     private final Set<Version> usedLanguages = new HashSet<>();
 
     public Long getGrammarId() {
@@ -118,8 +117,7 @@ public class Version {
     public VersionMemberships removeUser(User user) {
         VersionMemberships ship = getMembership(user.getUsername());
         if (ship != null) {
-            ship.setUser(null);
-            ship.setVersion(null);
+            deleteMembership(ship);
             memberships.remove(ship);
             return VersionMemberships.builder()
                     .user(user)
@@ -130,7 +128,21 @@ public class Version {
         return null;
     }
 
-    @JsonIgnore VersionMemberships editMember(User user, VersionMemberships newData) {
+    private void deleteMembership(VersionMemberships ship) {
+        ship.setUser(null);
+        ship.setVersion(null);
+    }
+
+    @JsonIgnore
+    public void delete() {
+        for (VersionMemberships ship : memberships) {
+            deleteMembership(ship);
+        }
+        memberships.clear();
+    }
+
+    @JsonIgnore
+    VersionMemberships editMember(User user, VersionMemberships newData) {
         VersionMemberships ship = getMembership(user.getUsername());
         if (ship == null)
             return null;
@@ -270,8 +282,8 @@ public class Version {
         VersionMemberships membership = getMembership(username);
         if (membership == null) {
             if (visibility == VisibilityLevel.PRIVATE)
-                return Permissions.STRANGER;
-            return Permissions.USE;
+                return Permissions.STRANGER_ON_PRIVATE;
+            return Permissions.STRANGER_ON_PUBLIC;
         }
         return membership.getPermissions();
     }
@@ -279,7 +291,7 @@ public class Version {
     @JsonProperty("usersPermissions")
     public Permissions getUsersPermissions() {
         if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated())
-            return Permissions.STRANGER;
+            return Permissions.STRANGER_ON_PRIVATE;
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return getPermissions(user.getUsername());
     }
@@ -291,6 +303,12 @@ public class Version {
         int dotIndex = fileName.lastIndexOf('.');
         return dotIndex >= 0 &&
                 fileName.substring(dotIndex + 1).equals(grammar.getDslExtension());
+    }
+
+    public String getFileExtension() {
+        if (grammar == null)
+            return null;
+        return grammar.dslExtension;
     }
 
 }

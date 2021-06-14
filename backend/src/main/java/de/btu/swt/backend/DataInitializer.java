@@ -94,15 +94,15 @@ public class DataInitializer {
         // init projects for supported languages
 
         Project mdrSimpleGrammar = Project.builder()
-                .name("MDR Simple")
+                .name("Simple decision recording language")
                 .owner(user)
                 .level(ProjectLevel.M1)
                 .build();
-        Project mdrGrammar = Project.builder()
-                .name("MDR")
-                .owner(user)
-                .level(ProjectLevel.M1)
-                .build();
+        // Project mdrGrammar = Project.builder()
+        //         .name("MDR")
+        //         .owner(user)
+        //         .level(ProjectLevel.M1)
+        //         .build();
         Project metaGrammar = Project.builder()
                 .name("The Meta Grammar")
                 .owner(user)
@@ -110,13 +110,13 @@ public class DataInitializer {
                 .build();
 
         log.info("Initialized: " + projectRepository.save(mdrSimpleGrammar));
-        log.info("Initialized: " + projectRepository.save(mdrGrammar));
+        // log.info("Initialized: " + projectRepository.save(mdrGrammar));
         log.info("Initialized: " + projectRepository.save(metaGrammar));
 
         // create language server objects for which language server instances will be built and started later
 
         LanguageServer metaServer = LanguageServer.builder()
-                .languageName("simple_decision_record_language")
+                .languageName("meta_model_language")
                 .build();
         LanguageServer mdrSimpleServer = LanguageServer.builder()
                 .languageName("simple_decision_record_language")
@@ -128,22 +128,24 @@ public class DataInitializer {
         Version metaGrammarVersion = Version.builder()
                 .description("Not implemented!")
                 .version("1.0.0-SNAPSHOT")
-                .dslExtension("xtext")
+                .dslExtension("mydsl")
                 .visibility(VisibilityLevel.PUBLIC)
                 .project(metaGrammar)
                 .languageServer(metaServer)
-                .owner(admin)
+                .owner(user)
                 .build();
+        
         log.info("Initialized: " + versionRepository.save(metaGrammarVersion));
+        log.info("Initialized: " + lspRepository.save(metaServer));
 
         Version mdrSimpleGrammarVersion = Version.builder()
                 .owner(user)
-                .description("")
+                .description("BETA State")
                 .version("1.0.0-SNAPSHOT")
                 .dslExtension("mydsl")
                 .project(mdrSimpleGrammar)
                 .languageServer(mdrSimpleServer)
-                .visibility(VisibilityLevel.PRIVATE)
+                .visibility(VisibilityLevel.PUBLIC)
                 .grammar(metaGrammarVersion)
                 .hasGenerator(true)
                 .build();
@@ -177,7 +179,7 @@ public class DataInitializer {
                 .description("Project 1")
                 .version("1.0.0-SNAPSHOT")
                 .project(project_mdrDsl)
-                .grammar(mdrSimpleGrammarVersion)
+                .grammar(metaGrammarVersion)
                 .visibility(VisibilityLevel.PUBLIC)
                 .build();
         Version project_mdrSimpleDsl_Version = Version.builder()
@@ -189,7 +191,7 @@ public class DataInitializer {
                 .visibility(VisibilityLevel.PRIVATE)
                 .build();
 
-        project_mdrDsl_Version.addUser(admin, Permissions.OWNER);
+        project_mdrDsl_Version.addUser(user, Permissions.OWNER);
         project_mdrSimpleDsl_Version.addUser(user, Permissions.OWNER);
         log.info("Initialized: " + versionRepository.save(project_mdrDsl_Version));
         log.info("Initialized: " + versionRepository.save(project_mdrSimpleDsl_Version));
@@ -205,10 +207,10 @@ public class DataInitializer {
                 .version(mdrSimpleGrammarVersion)
                 .status(FileStatus.VALID)
                 .build();
-        File mdrGrammarFile = File.builder()
-                .name(mdrGrammar.getName())
-                .version(mdrSimpleGrammarVersion)
-                .build();
+        // File mdrGrammarFile = File.builder()
+        //         .name(mdrGrammar.getName())
+        //         .version(mdrSimpleGrammarVersion)
+        //         .build();
         File mdrSimpleDslFile = File.builder()
                 .name("FirstTest")
 //                    .editors(editors)
@@ -221,7 +223,7 @@ public class DataInitializer {
                 .build();
 
         log.info("Initialized: " + fileRepository.save(mdrSimpleGrammarFile));
-        log.info("Initialized: " + fileRepository.save(mdrGrammarFile));
+        // log.info("Initialized: " + fileRepository.save(mdrGrammarFile));
         log.info("Initialized: " + fileRepository.save(mdrSimpleDslFile));
         log.info("Initialized: " + fileRepository.save(mdrDslFile));
     }
