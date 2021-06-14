@@ -37,6 +37,7 @@ public class ScriptRunner {
             log.info("ScriptRunner (Error): " + IOUtils.toString(process.getErrorStream()));
         } catch (InterruptedException | IOException e) {
             log.info(e.getMessage());
+            Thread.currentThread().interrupt();
         }
         return result;
     }

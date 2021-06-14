@@ -65,15 +65,19 @@ public class Permissions implements Serializable {
     }
 
     @JsonIgnore
-    public boolean equals(Permissions other) {
-        return this.canBrowseFiles == other.canBrowseFiles
-                && this.canChangeFiles == other.canChangeFiles
-                && this.canExportFiles == other.canExportFiles
-                && this.canAddUsers == other.canAddUsers
-                && this.canDeleteVersion == other.canDeleteVersion
-                && this.canUseAsModel == other.canUseAsModel
-                && this.canSetGitRepo == other.canSetGitRepo
-                && this.untouchable == other.untouchable;
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (other == null || getClass() != other.getClass()) return false;
+        Permissions otherPermission = (Permissions) other;
+        return this.canBrowseFiles == otherPermission.canBrowseFiles
+                && this.canChangeFiles == otherPermission.canChangeFiles
+                && this.canExportFiles == otherPermission.canExportFiles
+                && this.canAddUsers == otherPermission.canAddUsers
+                && this.canDeleteVersion == otherPermission.canDeleteVersion
+                && this.canUseAsModel == otherPermission.canUseAsModel
+                && this.canSetGitRepo == otherPermission.canSetGitRepo
+                && this.untouchable == otherPermission.untouchable;
     }
 
     @JsonIgnore
