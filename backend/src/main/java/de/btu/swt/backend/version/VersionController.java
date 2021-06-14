@@ -16,6 +16,7 @@ import de.btu.swt.backend.util.FileExport;
 import de.btu.swt.backend.version.git_sync.FileSystemOperations;
 import de.btu.swt.backend.version.git_sync.GitException;
 import de.btu.swt.backend.version.git_sync.RemoteSynchronizer;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -49,40 +50,49 @@ public class VersionController {
 
     @GetMapping("")
     public ResponseEntity all(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(versionRepository
-                .findAll().stream().filter(
-                        version -> version.getMemberships().stream()
-                                .anyMatch(projectMembership -> projectMembership.getPermissions().contains(
-                                        Permissions.USE) && projectMembership.getUser().getId() == user.getId()))
+        return ResponseEntity.ok(versionRepository.findAll().stream()
+                .filter(version -> version.getMemberships().stream()
+                        .anyMatch(projectMembership -> projectMembership.getPermissions().contains(Permissions.USE)
+                                && projectMembership.getUser().getId().equals(user.getId())))
                 .collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity get(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.BROWSE_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Version does not exist or user does not have permission to browse version");
         }
-        Version version = versionRepository.findById(id).get();
-        gitService.pullSynchronize(user, version);
-        version = versionRepository.findById(id).get();
-        return ResponseEntity.ok(new VersionDTOBuilder(version).build());
+        Optional<Version> oVersion = versionRepository.findById(id);
+        if (oVersion.isPresent()) {
+            Version version = oVersion.get();
+            gitService.pullSynchronize(user, version);
+            Optional<Version> oSynchronized = versionRepository.findById(id);
+            if (oSynchronized.isPresent()) {
+                return ResponseEntity.ok(new VersionDTOBuilder(version).build());
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("No Version with id=" + id + " found after git synchronization");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No Version with id=" + id + " found");
+        }
     }
 
     @PostMapping()
     public ResponseEntity create(@AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody Version newVersion) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         Project newProject = newVersion.getProject();
         if (newProject == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No new project specified.");
         }
-        if (projectRepository.findByName(newProject.getName()).size() >= 1) {
+        if (!projectRepository.findByName(newProject.getName()).isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Name has already been taken.");
         }
         newProject.setOwner(user);
-        newProject = projectRepository.save(newProject);
+        projectRepository.save(newProject);
         Optional<Version> optionalGrammar = versionRepository.findById(newVersion.getGrammar().getId());
         if (!optionalGrammar.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The selected grammar does not exist");
@@ -129,9 +139,12 @@ public class VersionController {
     public ResponseEntity putMembersSettings(@AuthenticationPrincipal UserDetails userDetails,
             @PathVariable long versionId, @PathVariable long memberId,
             @Valid @RequestBody final VersionMemberships ship) {
-        User addedMember = userRepository.getOne(memberId);
-        if (addedMember == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
+
+        User addedMember;
+        try {
+            addedMember = userRepository.getOne(memberId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist: " + e);
         }
         Version version = versionRepository.getOne(versionId);
         VersionMemberships oldShip = version.getMembership(addedMember.getUsername());
@@ -142,10 +155,12 @@ public class VersionController {
         Permissions newPermissions = ship.getPermissions();
         if (!newPermissions.equals(oldPermissions)) {
             ResponseEntity error = getPermissionsEditingError(userDetails, versionId, memberId, newPermissions);
-            if (error != null)
+            if (error != null) {
                 return error;
-            if (!Permissions.isKnown(newPermissions))
+            }
+            if (!Permissions.isKnown(newPermissions)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Specified permissions do not exist");
+            }
         }
         GitUserSettings newGitSettings = ship.getGitSettings();
         GitUserSettings oldGitSettings = oldShip.getGitSettings();
@@ -163,16 +178,18 @@ public class VersionController {
 
     private ResponseEntity getPermissionsEditingError(UserDetails userDetails, long versionId, long memberId,
             Permissions permissions) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, versionId, Permissions.ADD_USERS)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Version does not exists or user has no permission to add/remover members to this project");
         }
-        User addedUser = userRepository.getOne(memberId);
-        if (addedUser == null) {
+        User addedUser;
+        try {
+            addedUser = userRepository.getOne(memberId);
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Specified user does not exist");
         }
-        if (addedUser.getId() == user.getId() && permissions != null) {
+        if (addedUser.getId().equals(user.getId()) && permissions != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User cannot edit his/her own permissions");
         }
         Version version = versionRepository.getOne(versionId);
@@ -225,32 +242,46 @@ public class VersionController {
     @PostMapping("/{id}/export")
     public ResponseEntity export(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id,
             @Valid @RequestBody File[] requestedFiles) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.EXPORT_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Version does not exists or user does not have permission to export files");
         }
-        Version version = versionRepository.findById(id).get();
-        if (!version.getGrammar().isHasGenerator()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The grammar does not support any generation");
+        Optional<Version> oVersion = versionRepository.findById(id);
+        if (oVersion.isPresent()) {
+            Version version = oVersion.get();
+            if (!version.getGrammar().isHasGenerator()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("The grammar does not support any generation");
+            }
+            List<File> files = Arrays.stream(requestedFiles).map(file -> fileRepository.findById(file.getId()).get())
+                    .filter(Objects::nonNull).collect(Collectors.toList());
+            return FileExport.fetchExports(files, version, user);
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("No Version with id=" + id + " found after git synchronization");
         }
-        List<File> files = Arrays.stream(requestedFiles).map(file -> fileRepository.findById(file.getId()).get())
-                .filter(Objects::nonNull).collect(Collectors.toList());
-        return FileExport.fetchExports(files, version, user);
     }
 
     @GetMapping("/{id}/export")
     public ResponseEntity export(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.EXPORT_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Version does not exists or user does not have permission to export files");
         }
-        Version version = versionRepository.findById(id).get();
-        if (!version.getGrammar().isHasGenerator()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The grammar does not support any generation");
+        Optional<Version> oVersion = versionRepository.findById(id);
+        if (oVersion.isPresent()) {
+            Version version = oVersion.get();
+            if (!version.getGrammar().isHasGenerator()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("The grammar does not support any generation");
+            }
+            return FileExport.fetchExports(new LinkedList<>(version.getFiles()), version, user);
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("No Version with id=" + id + " found after git synchronization");
         }
-        return FileExport.fetchExports(new LinkedList<>(version.getFiles()), version, user);
     }
 
     @PostMapping("/export")
@@ -266,7 +297,7 @@ public class VersionController {
     @PostMapping("/{id}/files")
     public ResponseEntity add(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id,
             @Valid @RequestBody final File request) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.CHANGE_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Version does not exists or user does not have permission to add files");
@@ -293,7 +324,7 @@ public class VersionController {
 
     @GetMapping("/{id}/files")
     public ResponseEntity download(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.BROWSE_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Version does not exists or user does not have permission to browse files");
@@ -326,7 +357,7 @@ public class VersionController {
     @PostMapping("/{id}/files/upload")
     public ResponseEntity uploadFiles(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id,
             @RequestParam("files[]") MultipartFile[] files) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.CHANGE_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Version does not exists or user does not have permission to add files");
@@ -368,6 +399,7 @@ public class VersionController {
             gitService.commitPullAndPushChanges(modifiedFiles.toArray(new File[modifiedFiles.size()]),
                     "added/edited " + String.join(", ", fileNames), user, version);
         } catch (GitException | IOException e) {
+            // TODO: handle exception
         }
         return ResponseEntity.ok(new VersionDTOBuilder(version).build());
     }
@@ -375,7 +407,7 @@ public class VersionController {
     @PatchMapping("/{versionId}/files")
     public ResponseEntity setFiles(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long versionId,
             @RequestBody File[] files) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, versionId, Permissions.CHANGE_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Version does not exist or user does not have permission to edit files");
@@ -388,6 +420,7 @@ public class VersionController {
             try {
                 fileSystem.removeBackup();
             } catch (IOException e1) {
+                // TODO: handle exception
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to edit file system");
         }
@@ -411,6 +444,7 @@ public class VersionController {
             try {
                 fileSystem.removeBackup();
             } catch (IOException e) {
+                // TODO: handle exception
             }
         }
 
@@ -422,6 +456,7 @@ public class VersionController {
             List<File> deletedByThem = gitService.getDeletedByThemFiles(version, user);
             oneSidedDeleteConflict(deletedByThem, true);
         } catch (GitException | IOException e) {
+            // TODO: handle exception
         }
         return ResponseEntity.ok(new VersionDTOBuilder(version).build());
     }
@@ -437,19 +472,25 @@ public class VersionController {
             try {
                 file.setFileContent(content);
             } catch (IOException e) {
+                // TODO: handle exception
             }
         }
     }
 
     private File putFileContent(User user, long id, String newContent, long versionId) throws IOException {
-        File file = fileRepository.getOne(id);
-        if (file == null || file.getVersion().getId() != versionId) {
+        try {
+            File file = fileRepository.getOne(id);
+            if (file.getVersion().getId() != versionId) {
+                return null;
+            }
+            file.setFileContent(newContent);
+            file.setStatus(FileStatus.UNCHECKED);
+            file.addEditor(user);
+            return file;
+        } catch (Exception e) {
+            // TODO: handle exception
             return null;
         }
-        file.setFileContent(newContent);
-        file.setStatus(FileStatus.UNCHECKED);
-        file.addEditor(user);
-        return file;
     }
 
     @DeleteMapping("/{versionId}/files")
@@ -477,6 +518,7 @@ public class VersionController {
             gitService.commitPullAndPushChanges(files.toArray(new File[files.size()]),
                     "deleted " + String.join(", ", fileNames), user, version);
         } catch (GitException | IOException e) {
+            // TODO: handle exception
         }
 
         List<File> conflictFiles = files.stream().filter(file -> file.getStatus() == FileStatus.IN_CONFLICT)
@@ -487,7 +529,7 @@ public class VersionController {
 
     @PatchMapping("{id}/validate")
     public ResponseEntity validate(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.BROWSE_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Version does not exists or user does not have permission to browse files");
@@ -499,7 +541,7 @@ public class VersionController {
     @PostMapping("/{id}/validate")
     public ResponseEntity validate(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id,
             @Valid @RequestBody File[] requestedFiles) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.BROWSE_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Version does not exists or user does not have permission to browse files");
@@ -514,6 +556,7 @@ public class VersionController {
         try {
             gitService.commitPullAndPushChanges(files.toArray(new File[files.size()]), "added exports", user, version);
         } catch (GitException | IOException e) {
+            // TODO: handle exception
         }
         return ResponseEntity.ok(new VersionValidationDTO(version, erroneousFiles));
     }
@@ -538,7 +581,7 @@ public class VersionController {
                 gitService.commitPullAndPushChanges(files.toArray(new File[files.size()]),
                         "initialized with Custom-MADE", user, version);
             } catch (IOException e1) {
-
+                // TODO: handle exception
             }
             return ResponseEntity.ok(new VersionDTOBuilder(version).build());
         } catch (IOException e) {
@@ -549,11 +592,13 @@ public class VersionController {
     }
 
     private boolean validate(User user, long id, Permissions actions) {
-        Version version = versionRepository.getOne(id);
-        if (version == null) {
+        try {
+            Version version = versionRepository.getOne(id);
+            return version.getPermissions(user).contains(actions);
+        } catch (Exception e) {
+            // TODO: handle exception
             return false;
         }
-        return version.getPermissions(user).contains(actions);
     }
 
 }
