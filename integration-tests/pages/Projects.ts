@@ -22,7 +22,9 @@ export class ProjectsPage extends Page {
   private messageDownloadLinkBy = By.css('a');
 
   // modal (validation)
-  private userTableRowBy = By.className('ant-table-row ant-table-row-level-1');
+  private modalUserRightsBy = By.className('ant-modal-body');
+  private modalUserRightsByTable = By.className('ant-table-tbody');
+  private userTableRowBy = By.className('ant-table-row ant-table-row-level-0');
 
   // footer
   private footerBy = By.className('ant-layout-footer');
@@ -86,6 +88,7 @@ export class ProjectsPage extends Page {
   findProject(name: string): Promise<ProjectType> {
     return new Promise<ProjectType>(async (resolve, reject) => {
       try {
+        await(this.sleep(300))
         const tableBody = await this.driver.findElement(this.tableBodyBy);
         const rows = await tableBody.findElements(this.tableRowsBy);
         for (const row of rows) {
@@ -159,11 +162,13 @@ export class ProjectsPage extends Page {
   findUserTableRow() {
     return new Promise<WebElement>(async (resolve, reject) => {
       try {
-        const tableRow = await this.driver.findElement(this.userTableRowBy);
-        resolve(tableRow);
-        reject(this.appendError(`findUserTableRow()`, 'No matching table row found!'));
+        const modalBody = await this.driver.findElement(this.modalUserRightsBy);
+        await this.sleep(300);
+        const tableRows = await modalBody.findElements(this.userTableRowBy);
+
+        resolve(tableRows[1]);
       } catch (error) {
-        reject(this.appendError(`findUserTableRow()`, '', error));
+        reject(console.log(`findUserTableRow()`, error));
       }
     });
   }

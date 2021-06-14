@@ -229,6 +229,7 @@ describe('Integration tests', () => {
     await projects.sleep(300);
     await projects.addUserToProject(ACCESSABLE_PROJECT, 'admin', 'Contributor');
 
-    expect(projects.findUserTableRow()).toBeDefined();
+    await projects.findUserTableRow();
+    expect(projects).toBeDefined();
   });
 });
