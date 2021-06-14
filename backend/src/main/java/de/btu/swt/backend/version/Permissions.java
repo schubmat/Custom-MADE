@@ -20,7 +20,9 @@ public class Permissions implements Serializable {
     public static final Permissions MAINTAINER = Permissions.builder().canBrowseFiles(true).canChangeFiles(true).canExportFiles(true).canUseAsModel(true).canAddUsers(true).canDeleteVersion(true).canSetGitRepo(true).build();
     public static final Permissions CONTRIBUTOR = Permissions.builder().canBrowseFiles(true).canChangeFiles(true).canExportFiles(true).canUseAsModel(true).build();
     public static final Permissions REPORTER = Permissions.builder().canBrowseFiles(true).canExportFiles(true).canUseAsModel(true).build();
-    public static final Permissions STRANGER = Permissions.builder().canUseAsModel(true).build();
+    public static final Permissions STRANGER_ON_PRIVATE = Permissions.builder().canUseAsModel(true).build();
+    public static final Permissions STRANGER_ON_PUBLIC = Permissions.builder().canBrowseFiles(true).canUseAsModel(true).build();
+
 
     //actions
     public static final Permissions EMPTY = Permissions.builder().build();

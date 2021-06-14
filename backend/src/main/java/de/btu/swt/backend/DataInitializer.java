@@ -94,12 +94,7 @@ public class DataInitializer {
         // init projects for supported languages
 
         Project mdrSimpleGrammar = Project.builder()
-                .name("MDR Simple")
-                .owner(user)
-                .level(ProjectLevel.M1)
-                .build();
-        Project mdrGrammar = Project.builder()
-                .name("MDR")
+                .name("Simple decision recording language")
                 .owner(user)
                 .level(ProjectLevel.M1)
                 .build();
@@ -108,19 +103,30 @@ public class DataInitializer {
                 .owner(user)
                 .level(ProjectLevel.M2)
                 .build();
+        Project dummyGrammar = Project.builder()
+                .name("The Dummy Grammar")
+                .owner(admin)
+                .level(ProjectLevel.M2)
+                .build();
+
+
 
         log.info("Initialized: " + projectRepository.save(mdrSimpleGrammar));
-        log.info("Initialized: " + projectRepository.save(mdrGrammar));
         log.info("Initialized: " + projectRepository.save(metaGrammar));
+        log.info("Initialized: " + projectRepository.save(dummyGrammar));
 
         // create language server objects for which language server instances will be built and started later
 
         LanguageServer metaServer = LanguageServer.builder()
-                .languageName("simple_decision_record_language")
+                .languageName("meta_model_language")
                 .build();
         LanguageServer mdrSimpleServer = LanguageServer.builder()
                 .languageName("simple_decision_record_language")
                 .build();
+        LanguageServer dummyLSP_Server = LanguageServer.builder()
+                .languageName("meta_model_language")
+                .build();
+
 
 
         // create version objects which host an existing language and its corresponding language server object
@@ -128,22 +134,24 @@ public class DataInitializer {
         Version metaGrammarVersion = Version.builder()
                 .description("Not implemented!")
                 .version("1.0.0-SNAPSHOT")
-                .dslExtension("xtext")
+                .dslExtension("mydsl")
                 .visibility(VisibilityLevel.PUBLIC)
                 .project(metaGrammar)
                 .languageServer(metaServer)
-                .owner(admin)
+                .owner(user)
                 .build();
+        
         log.info("Initialized: " + versionRepository.save(metaGrammarVersion));
+        log.info("Initialized: " + lspRepository.save(metaServer));
 
         Version mdrSimpleGrammarVersion = Version.builder()
                 .owner(user)
-                .description("")
+                .description("BETA State")
                 .version("1.0.0-SNAPSHOT")
                 .dslExtension("mydsl")
                 .project(mdrSimpleGrammar)
                 .languageServer(mdrSimpleServer)
-                .visibility(VisibilityLevel.PRIVATE)
+                .visibility(VisibilityLevel.PUBLIC)
                 .grammar(metaGrammarVersion)
                 .hasGenerator(true)
                 .build();
@@ -152,6 +160,24 @@ public class DataInitializer {
 
         log.info("Initialized: " + versionRepository.save(mdrSimpleGrammarVersion));
         log.info("Initialized: " + lspRepository.save(mdrSimpleServer));
+
+
+        Version dummyGrammarVersion = Version.builder()
+                .owner(admin)
+                .description("BETA State")
+                .version("1.0.0-SNAPSHOT")
+                .dslExtension("mydsl")
+                .visibility(VisibilityLevel.PUBLIC)
+                .project(dummyGrammar)
+                .languageServer(dummyLSP_Server)
+                .grammar(metaGrammarVersion)
+                .hasGenerator(true)
+                .build();
+
+        dummyGrammarVersion.addUser(admin, Permissions.OWNER);
+
+        log.info("Initialized: " + versionRepository.save(dummyGrammarVersion));
+        log.info("Initialized: " + lspRepository.save(dummyLSP_Server));
 
         // finally, create user space projects and connect them to their langauge / LSP objects
 
@@ -167,30 +193,48 @@ public class DataInitializer {
                 .level(ProjectLevel.M0)
                 .owner(admin)
                 .build();
+        Project project_dummyProject = Project.builder()
+                .name("Project Dummy")
+                .description("Description of Project Dummy.")
+                .level(ProjectLevel.M0)
+                .owner(admin)
+                .build();
         log.info("Initialized: " + projectRepository.save(project_mdrDsl));
         log.info("Initialized: " + projectRepository.save(project_mdrSimpleDsl));
+        log.info("Initialized: " + projectRepository.save(project_dummyProject));
+
 
         // map the projects to a project version
 
         Version project_mdrDsl_Version = Version.builder()
                 .owner(admin)
-                .description("Project 1")
+                .description("Project A")
                 .version("1.0.0-SNAPSHOT")
                 .project(project_mdrDsl)
-                .grammar(mdrSimpleGrammarVersion)
+                .grammar(metaGrammarVersion)
                 .visibility(VisibilityLevel.PUBLIC)
                 .build();
         Version project_mdrSimpleDsl_Version = Version.builder()
                 .owner(user)
-                .description("Project 2")
+                .description("Project B")
                 .version("1.0.0-SNAPSHOT")
                 .project(project_mdrSimpleDsl)
                 .grammar(mdrSimpleGrammarVersion)
                 .visibility(VisibilityLevel.PRIVATE)
                 .build();
+        Version project_dummyProject_Version = Version.builder()
+                .owner(admin)
+                .description("Project Dummy")
+                .version("1.0.0-SNAPSHOT")
+                .project(project_dummyProject)
+                .grammar(dummyGrammarVersion)
+                .visibility(VisibilityLevel.PUBLIC)
+                .build();
 
-        project_mdrDsl_Version.addUser(admin, Permissions.OWNER);
+        project_dummyProject_Version.addUser(admin, Permissions.OWNER);
+        project_mdrDsl_Version.addUser(user, Permissions.OWNER);
         project_mdrSimpleDsl_Version.addUser(user, Permissions.OWNER);
+        log.info("Initialized: " + versionRepository.save(project_dummyProject_Version));
         log.info("Initialized: " + versionRepository.save(project_mdrDsl_Version));
         log.info("Initialized: " + versionRepository.save(project_mdrSimpleDsl_Version));
 
@@ -205,10 +249,10 @@ public class DataInitializer {
                 .version(mdrSimpleGrammarVersion)
                 .status(FileStatus.VALID)
                 .build();
-        File mdrGrammarFile = File.builder()
-                .name(mdrGrammar.getName())
-                .version(mdrSimpleGrammarVersion)
-                .build();
+        // File mdrGrammarFile = File.builder()
+        //         .name(mdrGrammar.getName())
+        //         .version(mdrSimpleGrammarVersion)
+        //         .build();
         File mdrSimpleDslFile = File.builder()
                 .name("FirstTest")
 //                    .editors(editors)
@@ -221,7 +265,7 @@ public class DataInitializer {
                 .build();
 
         log.info("Initialized: " + fileRepository.save(mdrSimpleGrammarFile));
-        log.info("Initialized: " + fileRepository.save(mdrGrammarFile));
+        // log.info("Initialized: " + fileRepository.save(mdrGrammarFile));
         log.info("Initialized: " + fileRepository.save(mdrSimpleDslFile));
         log.info("Initialized: " + fileRepository.save(mdrDslFile));
     }

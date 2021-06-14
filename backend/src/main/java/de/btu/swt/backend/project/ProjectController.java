@@ -1,5 +1,6 @@
 package de.btu.swt.backend.project;
 
+import com.sun.mail.iap.Response;
 import de.btu.swt.backend.file.File;
 import de.btu.swt.backend.file.FileRepository;
 import de.btu.swt.backend.user.User;
@@ -43,17 +44,9 @@ public class ProjectController {
     public ResponseEntity all(@AuthenticationPrincipal UserDetails userDetails, @PathVariable int level) {
         User user = userRepository.findByUsername(userDetails.getUsername()).get();
         ProjectLevel projectLevel = ProjectLevel.values()[level];
-        return ResponseEntity.ok(
-                Stream.concat(
-                        user.getMemberships()
-                                .stream()
-                                .filter(membership -> membership.getPermissions().contains(Permissions.USE))
-                                .map(versionMemberships -> versionMemberships.getVersion()
-                                        .getProject())
-                                .filter(project -> project.getLevel().equals(projectLevel)),
-                        user.getProjects().stream()
-                                .filter(project -> project.getLevel().equals(projectLevel))
-                ).collect(Collectors.toSet()));
+        return ResponseEntity.ok(projectRepository.findByLevel(projectLevel).stream()
+                .map(project -> new ProjectDTOBuilder(project, user).build())
+                .collect(Collectors.toSet()));
     }
 
     @PostMapping
@@ -103,6 +96,7 @@ public class ProjectController {
         }
         request.setGrammar(grammar);
         request.addUser(user, Permissions.OWNER);
+        request.setOwner(user);
         Version newVersion = versionRepository.save(request);
         if (project.getLevel() == ProjectLevel.M1) {
             setupM1Version(request, user);
