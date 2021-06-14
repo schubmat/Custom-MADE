@@ -3,7 +3,7 @@ Entweder aus dem root Verzeichnis:
 
 > `$ bash test.sh` 
 > 
-ausführen, oder im Ordner `integration-tests`:
+ausführen, oder im Ordner `test`:
 
 > `$ npm test` oder `$ npm t` oder `$ npx jest`
 > 

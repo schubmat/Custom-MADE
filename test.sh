@@ -1,3 +1,3 @@
-cd integration-tests
+cd test
 npm t
 cd ..
