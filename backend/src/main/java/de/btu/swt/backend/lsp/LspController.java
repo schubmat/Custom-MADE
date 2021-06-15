@@ -73,7 +73,12 @@ public class LspController {
 
     @GetMapping("/{lspId}")
     public ResponseEntity getLspInstance(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long lspId) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+
+        Optional<User> opt = userRepository.findByUsername(userDetails.getUsername());
+        if (!opt.isPresent())
+            return null;
+        User user = opt.get();
+
         if (!validate(user, lspId, Permissions.USE))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No binaries for the language server exists or user does not have permissions to browse file");
         LanguageServer lsp = lspRepository.getOne(lspId);
@@ -103,7 +108,7 @@ public class LspController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is no lsp-instance with given id: " + instanceId);
         }
         LspInstance lspInstance = optionalInstance.get();
-        if (lspInstance.getUser().getId() != userDetails.getId()) {
+        if (lspInstance.getUser().getId().equals(userDetails.getId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User "+ userDetails.getUsername() + " is not allowed to kill lsp-instance " + instanceId);
         }
         log.info("Stopping lsp instance on port: " + lspInstance.getPort());
@@ -122,8 +127,6 @@ public class LspController {
 
     private boolean validate(User user, long id, Permissions actions) {
         LanguageServer lsp = lspRepository.getOne(id);
-        if (lsp == null)
-            return false;
         return lsp.getVersion().getPermissions(user).contains(actions);
     }
 }
