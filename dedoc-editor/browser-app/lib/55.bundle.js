@@ -637,9 +637,9 @@ exports.MdrLanguageClientContribution = MdrLanguageClientContribution;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MDR_LANGUAGE_FILE_EXTENSION = '.mydsl';
-exports.MDR_LANGUAGE_SERVER_ID = 'MDR';
-exports.MDR_LANGUAGE_SERVER_NAME = 'MDR DSL';
+exports.MDR_LANGUAGE_FILE_EXTENSION = 'mydsl';
+exports.MDR_LANGUAGE_SERVER_ID = 'MyDsl';
+exports.MDR_LANGUAGE_SERVER_NAME = 'MyDsl';
 
 
 /***/ }),
@@ -1216,7 +1216,8 @@ var OptionRelationshipView = /** @class */ (function (_super) {
 exports.OptionRelationshipView = OptionRelationshipView;
 function getTwoPartedNode(text, node, context) {
     var height = Math.max(node.size.height, 0);
-    var width = Math.max(node.size.width, 0);
+    // 110 is the space taken up by the bottom node.
+    var width = Math.max(node.size.width, 110);
     return snabbdom_jsx_1.svg("g", null,
         snabbdom_jsx_1.svg("rect", { x: "0", y: "0", width: width, height: height, style: { fill: "skyblue" } }),
         context.renderChildren(node),

@@ -56,7 +56,7 @@ var MdrLanguageServerContribution = /** @class */ (function (_super) {
             this.forward(clientConnection, serverConnection);
         }
         else {
-            var args = [];
+            var args = ["9804"];
             var serverConnection = this.createProcessStreamConnection(EXECUTABLE_PATH, args);
             this.forward(clientConnection, serverConnection);
         }

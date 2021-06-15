@@ -1540,7 +1540,7 @@ var ParserBlock  = __webpack_require__(/*! ./parser_block */ "../node_modules/ma
 var ParserInline = __webpack_require__(/*! ./parser_inline */ "../node_modules/markdown-it/lib/parser_inline.js");
 var LinkifyIt    = __webpack_require__(/*! linkify-it */ "../node_modules/linkify-it/index.js");
 var mdurl        = __webpack_require__(/*! mdurl */ "../node_modules/mdurl/index.js");
-var punycode     = __webpack_require__(/*! punycode */ "../node_modules/node-libs-browser/node_modules/punycode/punycode.js");
+var punycode     = __webpack_require__(/*! punycode */ "../node_modules/punycode/punycode.js");
 
 
 var config = {
@@ -8007,10 +8007,10 @@ module.exports = urlParse;
 
 /***/ }),
 
-/***/ "../node_modules/node-libs-browser/node_modules/punycode/punycode.js":
-/*!***************************************************************************!*\
-  !*** ../node_modules/node-libs-browser/node_modules/punycode/punycode.js ***!
-  \***************************************************************************/
+/***/ "../node_modules/punycode/punycode.js":
+/*!********************************************!*\
+  !*** ../node_modules/punycode/punycode.js ***!
+  \********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8534,7 +8534,7 @@ module.exports = urlParse;
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack/buildin/module.js */ "../node_modules/webpack/buildin/module.js")(module), __webpack_require__(/*! ./../../../webpack/buildin/global.js */ "../node_modules/webpack/buildin/global.js")))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/module.js */ "../node_modules/webpack/buildin/module.js")(module), __webpack_require__(/*! ./../webpack/buildin/global.js */ "../node_modules/webpack/buildin/global.js")))
 
 /***/ }),
 

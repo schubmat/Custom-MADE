@@ -14,16 +14,16 @@
 #	  5. If Frontend is to be recompiled --> specify "-rc" --> script executes in /dedoc-editor/ "yarn"
 # 	6. In /dedoc-editor/browser-app --> "yarn start ./workspace/"
 
-#language_server_path="/home/robert/programming/XtextMDR_Forked/"
 language_server_path="/home/robert/Git/GitLab-XtextLS-Richter"
+# language_server_path="/home/robert/Git/GitLab-XtextLS-Richter"
 distribution_path="org.xtext.example.mydsl.ide/build/distributions/"
-#custom_made_path="/home/robert/programming/CustomMADE/"
+
 custom_made_path="/home/robert/Git/CustomMADE/"
 snapshot_name="org.xtext.example.mydsl.ide-1.0.0-SNAPSHOT"
 
 # Step 1
 cd "$language_server_path" || exit 1
-./gradlew clean build
+./gradlew distZip
 
 # Step 2
 cd "$distribution_path" || exit 1

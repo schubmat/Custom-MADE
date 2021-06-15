@@ -2,15 +2,15 @@
 
 **User story:** Ticket-123
 
-Write your summary here
+awdawd
 
 ## Considered Alterantives
 
-* Write your 1st alternative here
-* Write your 2nd alternative here
-* Write your 3rd alternative here
+* awd
+* a
+* ll
 
 ## Decision Outcome
 
-* **Chosen Alternative:** Write your 3rd alternative here
+* **Chosen Alternative:** ll
 * **Reason:** HERE COMES YOUR RATIONALE

@@ -34,7 +34,7 @@ export class MdrLanguageServerContribution extends BaseLanguageServerContributio
             });
             this.forward(clientConnection, serverConnection);
         } else {
-            const args: string[] = [];
+            const args: string[] = ["9804"];
             const serverConnection = this.createProcessStreamConnection(EXECUTABLE_PATH, args);
             this.forward(clientConnection, serverConnection);
         }
