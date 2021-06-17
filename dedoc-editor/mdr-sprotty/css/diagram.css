@@ -60,3 +60,10 @@
     height: 0px;
 }
 
+#stroke-dasharray-generic {
+    stroke-dasharray: 6 3;
+}
+
+#statement {
+    
+}

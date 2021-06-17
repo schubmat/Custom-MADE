@@ -80,14 +80,21 @@ export class DRObjectView extends RectangularNodeView {
 @injectable()
 export class StatementView implements IView {
 
-    // TODO
     render(node: Readonly<MdrNode>, context: RenderingContext): VNode {
+
+        const width = node.size.width;
+        const height = node.size.height;
+
+        const trianglePath = [
+            "M", width / 2 - 15, height, 
+            "L", width / 2, height + 20, 
+            "L", width / 2 + 15, height
+        ].join(" ");
+
         return (
             <g>
-                <path d="M 30 20 C 6 20 0 40 19.2 44 C 0 52.8 21.6 72 37.2 64 C 48 80 84 80 96 64 C 120 64 120 48 105 40 C 120 24 96 8 75 16 C 60 4 36 4 30 20 Z" 
-                fill="#ffffff" stroke="#000000" stroke-miterlimit="10" pointer-events="all"
-                id="statement"
-                />
+                <rect x="0" y="0" width={width} height={height} fill="#F5F7CF" stroke="#000000" pointer-events="all"/>                
+                <path d={trianglePath} fill="#F5F7CF" />
                 { context.renderChildren(node) }
             </g>
         );
@@ -109,6 +116,7 @@ export class DecisionProblemView implements IView {
     render(node: MdrNode, context: RenderingContext, args?: object): VNode {
         const width = node.size.width;
         const height = node.size.height;
+
         return (
             <g>
                 <rect
@@ -223,13 +231,6 @@ export class GenericRelationshipView extends PolylineEdgeView {
     protected renderLine(edge: SEdge, segments: Point[], context: RenderingContext): VNode {
         const firstPoint = segments[0];
         const lastPoint = segments[segments.length - 1];
-
-        // Calculate the line for the two points.
-        /*
-        const m = (lastPoint.x - firstPoint.x) / (lastPoint.y - firstPoint.y);
-        const n = - m * firstPoint.x;
-
-        this.stepSize = */
 
         return (
             <g fill="none" stroke="black" stroke-width="4">
