@@ -30,6 +30,8 @@ export class MdrDiagram extends SGraph {
 }
 
 export class MdrNode extends RectangularNode {
+    readonly description: string = "";
+
     canConnect(routable: SRoutableElement, role: string) {
         return true;
     }

@@ -12,7 +12,7 @@ import {
     DecisionOptionView,
     DecisionProblemOrResultView, DecisionProblemView, DecisionResultView, DerivativeRelationshipView,
     DRObjectView, GenericRelationshipView, OptionRelationshipView,
-    PolylineArrowEdgeView,
+    PolylineClosedArrowEdgeView,
     StatementView,
     TriangleButtonView
 } from "./views";
@@ -31,7 +31,7 @@ const mdrDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => 
     configureModelElement(context, 'node', MdrNode, RectangularNodeView);
     configureModelElement(context, 'label', MdrLabel, SLabelView);
     configureModelElement(context, 'label:xref', MdrLabel, SLabelView);
-    configureModelElement(context, 'edge', SEdge, PolylineArrowEdgeView);
+    configureModelElement(context, 'edge', SEdge, PolylineClosedArrowEdgeView);
     configureModelElement(context, 'html', HtmlRoot, HtmlRootView);
     configureModelElement(context, 'pre-rendered', PreRenderedElement, PreRenderedView);
     configureModelElement(context, 'palette', SModelRoot, HtmlRootView);
