@@ -1,8 +1,9 @@
 import { injectable } from "inversify";
 import { Action, CreateElementAction, CreatingOnDrag, creatingOnDragFeature, EditableLabel, 
-    editLabelFeature, hoverFeedbackFeature, ManhattanEdgeRouter, popupFeature, RectangularNode, 
+    editLabelFeature, hoverFeedbackFeature, popupFeature, RectangularNode, 
     RectangularPort, SChildElement, SEdge, SGraph, SGraphFactory, SLabel, SModelElementSchema, 
     SParentElement, SRoutableElement, EdgePlacement } from "sprotty";
+import { CustomLinearRouter } from "./custom-edge-router";
 
 @injectable()
 export class MdrModelFactory extends SGraphFactory {
@@ -10,7 +11,7 @@ export class MdrModelFactory extends SGraphFactory {
     protected initializeChild(child: SChildElement, schema: SModelElementSchema, parent?: SParentElement): SChildElement {
         super.initializeChild(child, schema, parent);
         if (child instanceof SEdge) {
-            child.routerKind = ManhattanEdgeRouter.KIND;
+            child.routerKind = CustomLinearRouter.KIND;
             child.targetAnchorCorrection = Math.sqrt(5)
         } else if (child instanceof SLabel) {
             child.edgePlacement = <EdgePlacement> {

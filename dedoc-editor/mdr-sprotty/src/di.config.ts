@@ -5,7 +5,7 @@ import { boundsModule, buttonModule, configureModelElement, ConsoleLogger, defau
     openModule, overrideViewerOptions, PreRenderedElement, PreRenderedView, RectangularNodeView, SEdge, 
     selectModule, SGraphView, SLabelView, TYPES, undoRedoModule, viewportModule, decorationModule, 
     SModelRoot, edgeEditModule, SRoutingHandle, SRoutingHandleView, CreateElementCommand, labelEditModule, 
-    configureCommand, updateModule, routingModule, ManhattanEdgeRouter, edgeLayoutModule, zorderModule } from 'sprotty';
+    configureCommand, updateModule, routingModule, edgeLayoutModule, zorderModule, PolylineEdgeRouter } from 'sprotty';
 import "../css/diagram.css";
 import {
     ArgumentativeRelationshipView, ConsequenceRelationshipView,
@@ -17,14 +17,14 @@ import {
     TriangleButtonView
 } from "./views";
 import { MdrModelFactory, MdrDiagram, MdrNode, CreateTransitionPort, MdrLabel } from "./model";
-import { CustomRouter } from "./custom-edge-router";
+import { CustomLinearRouter } from "./custom-edge-router";
 
 const mdrDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     rebind(TYPES.ILogger).to(ConsoleLogger).inSingletonScope();
     rebind(TYPES.LogLevel).toConstantValue(LogLevel.warn);
     rebind(TYPES.IModelFactory).to(MdrModelFactory);
-    unbind(ManhattanEdgeRouter);
-    bind(ManhattanEdgeRouter).to(CustomRouter).inSingletonScope();
+    unbind(PolylineEdgeRouter);
+    bind(PolylineEdgeRouter).to(CustomLinearRouter).inSingletonScope();
 
     const context = { bind, unbind, isBound, rebind };
     configureModelElement(context, 'graph', MdrDiagram, SGraphView);

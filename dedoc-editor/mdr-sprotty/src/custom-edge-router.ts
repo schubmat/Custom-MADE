@@ -1,6 +1,6 @@
-import { ManhattanEdgeRouter, SRoutableElement, ManhattanRouterOptions, edgeInProgressID } from "sprotty";
+import { ManhattanEdgeRouter, SRoutableElement, ManhattanRouterOptions, edgeInProgressID, PolylineEdgeRouter, RoutedPoint } from "sprotty";
 
-export class CustomRouter extends ManhattanEdgeRouter {
+export class CustomManhattanRouter extends ManhattanEdgeRouter {
     getOptions(edge: SRoutableElement): ManhattanRouterOptions {
         const defaultOptions = super.getOptions(edge)
         return edge.id === edgeInProgressID
@@ -9,3 +9,15 @@ export class CustomRouter extends ManhattanEdgeRouter {
     }
 }
 
+export class CustomLinearRouter extends PolylineEdgeRouter {
+
+    route(edge: SRoutableElement): RoutedPoint[] {
+        // Use the result from the PolylineEdgeRouter.
+        const polyline = super.route(edge);
+        return [
+            polyline[0],
+            polyline[polyline.length - 1]
+        ]
+    } 
+
+}
