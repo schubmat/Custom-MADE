@@ -86,14 +86,14 @@ export class StatementView implements IView {
         const height = node.size.height;
 
         const trianglePath = [
-            "M", width / 2 - 15, height, 
-            "L", width / 2, height + 20, 
-            "L", width / 2 + 15, height
+            "M", width / 4 - 15, height, 
+            "L", width / 4, height + 20, 
+            "L", width / 4 + 15, height
         ].join(" ");
 
         return (
             <g>
-                <rect x="0" y="0" width={width} height={height} fill="#F5F7CF" stroke="#000000" pointer-events="all"/>                
+                <rect x="0" y="0" width={width} height={height} fill="#F5F7CF" stroke="none" pointer-events="all"/>                
                 <path d={trianglePath} fill="#F5F7CF" />
                 { context.renderChildren(node) }
             </g>
@@ -198,7 +198,7 @@ export class DecisionOptionView implements IView {
         return (
             <g>
                 <rect 
-                    x="-20" y="0" width={width} height={height}
+                    x="-20" y="0" width={width+20} height={height}
                     fill={this.color}
                 ></rect>
                 <g>
