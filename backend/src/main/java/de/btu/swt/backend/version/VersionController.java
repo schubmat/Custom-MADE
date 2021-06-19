@@ -49,7 +49,7 @@ public class VersionController {
     }
 
     @GetMapping("")
-    public ResponseEntity all(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<Version>> all(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(versionRepository.findAll().stream()
                 .filter(version -> version.getMemberships().stream()
                         .anyMatch(projectMembership -> projectMembership.getPermissions().contains(Permissions.USE)
@@ -58,7 +58,7 @@ public class VersionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity get(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
+    public ResponseEntity<?> get(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.BROWSE_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -81,7 +81,7 @@ public class VersionController {
     }
 
     @PostMapping()
-    public ResponseEntity create(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<?> create(@AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody Version newVersion) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         Project newProject = newVersion.getProject();
@@ -108,13 +108,13 @@ public class VersionController {
     }
 
     @PostMapping("/{versionId}/members")
-    public ResponseEntity addMember(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long versionId,
+    public ResponseEntity<?> addMember(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long versionId,
             @Valid @RequestBody final VersionMemberships ship) {
         if (ship.getUser() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No user specified");
         }
         long memberId = ship.getUser().getId();
-        ResponseEntity error = getPermissionsEditingError(userDetails, versionId, memberId, ship.getPermissions());
+        ResponseEntity<?> error = getPermissionsEditingError(userDetails, versionId, memberId, ship.getPermissions());
         if (error != null) {
             return error;
         }
@@ -136,7 +136,7 @@ public class VersionController {
     }
 
     @PutMapping("/{versionId}/members/{memberId}")
-    public ResponseEntity putMembersSettings(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<?> putMembersSettings(@AuthenticationPrincipal UserDetails userDetails,
             @PathVariable long versionId, @PathVariable long memberId,
             @Valid @RequestBody final VersionMemberships ship) {
 
@@ -154,7 +154,7 @@ public class VersionController {
         Permissions oldPermissions = oldShip.getPermissions();
         Permissions newPermissions = ship.getPermissions();
         if (!newPermissions.equals(oldPermissions)) {
-            ResponseEntity error = getPermissionsEditingError(userDetails, versionId, memberId, newPermissions);
+            ResponseEntity<?> error = getPermissionsEditingError(userDetails, versionId, memberId, newPermissions);
             if (error != null) {
                 return error;
             }
@@ -176,7 +176,7 @@ public class VersionController {
         return ResponseEntity.ok(newShip);
     }
 
-    private ResponseEntity getPermissionsEditingError(UserDetails userDetails, long versionId, long memberId,
+    private ResponseEntity<?> getPermissionsEditingError(UserDetails userDetails, long versionId, long memberId,
             Permissions permissions) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, versionId, Permissions.ADD_USERS)) {
@@ -206,12 +206,12 @@ public class VersionController {
     }
 
     @DeleteMapping("/{versionId}/members/{memberId}")
-    public ResponseEntity removeMember(@AuthenticationPrincipal User user, @PathVariable long versionId,
+    public ResponseEntity<?> removeMember(@AuthenticationPrincipal User user, @PathVariable long versionId,
             @PathVariable long memberId) {
         if (user.getId() == memberId) {
             return removeUser(user, versionId);
         }
-        ResponseEntity error = getPermissionsEditingError(user, versionId, memberId, null);
+        ResponseEntity<?> error = getPermissionsEditingError(user, versionId, memberId, null);
         if (error != null) {
             return error;
         }
@@ -226,7 +226,7 @@ public class VersionController {
     }
 
     @DeleteMapping("/{versionId}/members/user")
-    public ResponseEntity removeUser(@AuthenticationPrincipal User user, @PathVariable long versionId) {
+    public ResponseEntity<?> removeUser(@AuthenticationPrincipal User user, @PathVariable long versionId) {
         Version version = versionRepository.getOne(versionId);
         if (version.getOwner().getId().longValue() == user.getId().longValue()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An owner cannot leave his/her project");
@@ -240,7 +240,7 @@ public class VersionController {
     }
 
     @PostMapping("/{id}/export")
-    public ResponseEntity export(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id,
+    public ResponseEntity<?> export(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id,
             @Valid @RequestBody File[] requestedFiles) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.EXPORT_FILES)) {
@@ -264,7 +264,7 @@ public class VersionController {
     }
 
     @GetMapping("/{id}/export")
-    public ResponseEntity export(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
+    public ResponseEntity<?> export(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.EXPORT_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -285,7 +285,7 @@ public class VersionController {
     }
 
     @PostMapping("/export")
-    public ResponseEntity exportVersions(@AuthenticationPrincipal User user,
+    public ResponseEntity<?> exportVersions(@AuthenticationPrincipal User user,
             @Valid @RequestBody Version[] requestVersions) {
         List<Version> versions = Arrays.stream(requestVersions)
                 .map(version -> versionRepository.findById(version.getId()).get()).filter(Objects::nonNull)
@@ -295,7 +295,7 @@ public class VersionController {
     }
 
     @PostMapping("/{id}/files")
-    public ResponseEntity add(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id,
+    public ResponseEntity<?> add(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id,
             @Valid @RequestBody final File request) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.CHANGE_FILES)) {
@@ -323,7 +323,7 @@ public class VersionController {
     }
 
     @GetMapping("/{id}/files")
-    public ResponseEntity download(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
+    public ResponseEntity<?> download(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.BROWSE_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -334,7 +334,7 @@ public class VersionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@AuthenticationPrincipal User user, @PathVariable long id) {
+    public ResponseEntity<?> delete(@AuthenticationPrincipal User user, @PathVariable long id) {
         if (!validate(user, id, Permissions.DELETE_VERSION)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Version does not exist or user does not have permission to delete it");
@@ -355,7 +355,7 @@ public class VersionController {
     }
 
     @PostMapping("/{id}/files/upload")
-    public ResponseEntity uploadFiles(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id,
+    public ResponseEntity<?> uploadFiles(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id,
             @RequestParam("files[]") MultipartFile[] files) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.CHANGE_FILES)) {
@@ -405,7 +405,7 @@ public class VersionController {
     }
 
     @PatchMapping("/{versionId}/files")
-    public ResponseEntity setFiles(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long versionId,
+    public ResponseEntity<?> setFiles(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long versionId,
             @RequestBody File[] files) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, versionId, Permissions.CHANGE_FILES)) {
@@ -494,7 +494,7 @@ public class VersionController {
     }
 
     @DeleteMapping("/{versionId}/files")
-    public ResponseEntity deleteFiles(@AuthenticationPrincipal User user, @PathVariable long versionId,
+    public ResponseEntity<?> deleteFiles(@AuthenticationPrincipal User user, @PathVariable long versionId,
             @RequestBody File[] requestedFiles) {
         if (!validate(user, versionId, Permissions.CHANGE_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -528,7 +528,7 @@ public class VersionController {
     }
 
     @PatchMapping("{id}/validate")
-    public ResponseEntity validate(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
+    public ResponseEntity<?> validate(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.BROWSE_FILES)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -539,7 +539,7 @@ public class VersionController {
     }
 
     @PostMapping("/{id}/validate")
-    public ResponseEntity validate(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id,
+    public ResponseEntity<?> validate(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id,
             @Valid @RequestBody File[] requestedFiles) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
         if (!validate(user, id, Permissions.BROWSE_FILES)) {
@@ -562,7 +562,7 @@ public class VersionController {
     }
 
     @PatchMapping("{id}/git")
-    public ResponseEntity setGitConfig(@AuthenticationPrincipal User user, @PathVariable long id,
+    public ResponseEntity<?> setGitConfig(@AuthenticationPrincipal User user, @PathVariable long id,
             @Valid @RequestBody GitConfiguration gitConfig) {
         if (!validate(user, id, Permissions.CONFIG_GIT)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
