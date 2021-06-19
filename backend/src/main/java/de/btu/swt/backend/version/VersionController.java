@@ -258,8 +258,7 @@ public class VersionController {
                     .filter(Objects::nonNull).collect(Collectors.toList());
             return FileExport.fetchExports(files, version, user);
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("No Version with id=" + id + " found after git synchronization");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No Version with id=" + id + " found.");
         }
     }
 
@@ -279,8 +278,7 @@ public class VersionController {
             }
             return FileExport.fetchExports(new LinkedList<>(version.getFiles()), version, user);
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("No Version with id=" + id + " found after git synchronization");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No Version with id=" + id + " found.");
         }
     }
 
@@ -340,7 +338,7 @@ public class VersionController {
                     .body("Version does not exist or user does not have permission to delete it");
         }
         Version version = versionRepository.getOne(id);
-        if (version.getUsedLanguages().size() > 0) {
+        if (!version.getUsedLanguages().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("There are still projects implementing this grammar");
         }
@@ -392,14 +390,15 @@ public class VersionController {
                     .body("Request did not contain any appropriated file: file extension has to match \""
                             + version.getGrammar().getDslExtension() + "\".");
         }
-        String[] fileNames = modifiedFiles.stream().map(file -> file.getName()).toArray(String[]::new);
+        String[] fileNames = modifiedFiles.stream().map(File::getName).toArray(String[]::new);
         fileRepository.saveAll(modifiedFiles);
         version = versionRepository.getOne(version.getId());
         try {
             gitService.commitPullAndPushChanges(modifiedFiles.toArray(new File[modifiedFiles.size()]),
                     "added/edited " + String.join(", ", fileNames), user, version);
         } catch (GitException | IOException e) {
-            // TODO: handle exception
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Unable to commit, pull and push changes on git: " + e);
         }
         return ResponseEntity.ok(new VersionDTOBuilder(version).build());
     }
@@ -420,7 +419,8 @@ public class VersionController {
             try {
                 fileSystem.removeBackup();
             } catch (IOException e1) {
-                // TODO: handle exception
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Unable to remove backup from FileSystem: " + e1);
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to edit file system");
         }
@@ -444,7 +444,8 @@ public class VersionController {
             try {
                 fileSystem.removeBackup();
             } catch (IOException e) {
-                // TODO: handle exception
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Unable to remove backup from FileSystem: " + e);
             }
         }
 
@@ -456,7 +457,8 @@ public class VersionController {
             List<File> deletedByThem = gitService.getDeletedByThemFiles(version, user);
             oneSidedDeleteConflict(deletedByThem, true);
         } catch (GitException | IOException e) {
-            // TODO: handle exception
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Unable to commit, pull and push changes on git: " + e);
         }
         return ResponseEntity.ok(new VersionDTOBuilder(version).build());
     }
@@ -465,32 +467,23 @@ public class VersionController {
     private static final String LOCAL_DELETE = "// This file has been deleted on the local repository.";
     private static final String TIP = "// If you want to re-add it respectively submit your changes to the old copy, please press save. Additionally, consider removing this comment.";
 
-    private void oneSidedDeleteConflict(List<File> files, boolean deletedOnRemote) {
+    private void oneSidedDeleteConflict(List<File> files, boolean deletedOnRemote) throws IOException {
         for (File file : files) {
             String content = file.getContent();
             content = (deletedOnRemote ? REMOTE_DELETE : LOCAL_DELETE) + "\n" + TIP + "\n" + content;
-            try {
-                file.setFileContent(content);
-            } catch (IOException e) {
-                // TODO: handle exception
-            }
+            file.setFileContent(content);
         }
     }
 
     private File putFileContent(User user, long id, String newContent, long versionId) throws IOException {
-        try {
-            File file = fileRepository.getOne(id);
-            if (file.getVersion().getId() != versionId) {
-                return null;
-            }
-            file.setFileContent(newContent);
-            file.setStatus(FileStatus.UNCHECKED);
-            file.addEditor(user);
-            return file;
-        } catch (Exception e) {
-            // TODO: handle exception
+        File file = fileRepository.getOne(id);
+        if (file.getVersion().getId() != versionId) {
             return null;
         }
+        file.setFileContent(newContent);
+        file.setStatus(FileStatus.UNCHECKED);
+        file.addEditor(user);
+        return file;
     }
 
     @DeleteMapping("/{versionId}/files")
@@ -518,12 +511,18 @@ public class VersionController {
             gitService.commitPullAndPushChanges(files.toArray(new File[files.size()]),
                     "deleted " + String.join(", ", fileNames), user, version);
         } catch (GitException | IOException e) {
-            // TODO: handle exception
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Unable to commit, pull and push changes on git: " + e);
         }
 
         List<File> conflictFiles = files.stream().filter(file -> file.getStatus() == FileStatus.IN_CONFLICT)
                 .collect(Collectors.toList());
-        oneSidedDeleteConflict(conflictFiles, false);
+        try {
+            oneSidedDeleteConflict(conflictFiles, false);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Unable to delete conflict files: " + e);
+        }
         return ResponseEntity.ok(new VersionDTOBuilder(version).build());
     }
 
@@ -556,7 +555,8 @@ public class VersionController {
         try {
             gitService.commitPullAndPushChanges(files.toArray(new File[files.size()]), "added exports", user, version);
         } catch (GitException | IOException e) {
-            // TODO: handle exception
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Unable to commit, pull and push changes on git: " + e);
         }
         return ResponseEntity.ok(new VersionValidationDTO(version, erroneousFiles));
     }
@@ -581,7 +581,8 @@ public class VersionController {
                 gitService.commitPullAndPushChanges(files.toArray(new File[files.size()]),
                         "initialized with Custom-MADE", user, version);
             } catch (IOException e1) {
-                // TODO: handle exception
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Unable to commit, pull and push changes on git: " + e1);
             }
             return ResponseEntity.ok(new VersionDTOBuilder(version).build());
         } catch (IOException e) {
@@ -596,7 +597,7 @@ public class VersionController {
             Version version = versionRepository.getOne(id);
             return version.getPermissions(user).contains(actions);
         } catch (Exception e) {
-            // TODO: handle exception
+            // TODO: rethrow error to catch missing version
             return false;
         }
     }
