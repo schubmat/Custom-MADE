@@ -58,36 +58,25 @@ public class VersionController {
                         .stream()
                         .anyMatch(projectMembership ->
                                 projectMembership.getPermissions().contains(Permissions.USE)
-                                        && projectMembership.getUser().getId().equals(user.getId()))
+                                        && projectMembership.getUser().getId() == user.getId())
                 ).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity get(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
-        Optional<User> optionalUser = userRepository.findByUsername(userDetails.getUsername());
-        User user;
-        if (optionalUser.isPresent()) {
-            user = optionalUser.get();
-        } else return null;
+        User user = userRepository.findByUsername(userDetails.getUsername()).get();
         if (!validate(user, id, Permissions.BROWSE_FILES))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Version does not exist or user does not have permission to browse version");
-        Version version;
-        if (versionRepository.findById(id).isPresent()) {
-            version = versionRepository.findById(id).get();
-        } else return null;
-
+        Version version = versionRepository.findById(id).get();
         gitService.pullSynchronize(user, version);
+        version = versionRepository.findById(id).get();
         return ResponseEntity.ok(new VersionDTOBuilder(version).build());
     }
 
     @PostMapping()
     public ResponseEntity create(@AuthenticationPrincipal UserDetails userDetails,
                                  @Valid @RequestBody Version newVersion) {
-        Optional<User> optionalUser = userRepository.findByUsername(userDetails.getUsername());
-        User user;
-        if (optionalUser.isPresent()) {
-            user = optionalUser.get();
-        } else return null;
+        User user = userRepository.findByUsername(userDetails.getUsername()).get();
         Project newProject = newVersion.getProject();
         if (newProject == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -175,17 +164,13 @@ public class VersionController {
     }
 
     private ResponseEntity getPermissionsEditingError(UserDetails userDetails, long versionId, long memberId, Permissions permissions) {
-        Optional<User> optionalUser = userRepository.findByUsername(userDetails.getUsername());
-        User user;
-        if (optionalUser.isPresent()) {
-            user = optionalUser.get();
-        } else return null;
+        User user = userRepository.findByUsername(userDetails.getUsername()).get();
         if (!validate(user, versionId, Permissions.ADD_USERS))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Version does not exists or user has no permission to add/remover members to this project");
         User addedUser = userRepository.getOne(memberId);
         if (addedUser == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Specified user does not exist");
-        if (addedUser.getId().equals(user.getId()) && permissions != null)
+        if (addedUser.getId() == user.getId() && permissions != null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User cannot edit his/her own permissions");
         Version version = versionRepository.getOne(versionId);
         Permissions currentPermissions = version.getPermissions(addedUser);
