@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import javax.validation.Valid;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,7 +43,11 @@ public class ProjectController {
 
     @GetMapping("/{level}")
     public ResponseEntity all(@AuthenticationPrincipal UserDetails userDetails, @PathVariable int level) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        Optional<User> opt = userRepository.findByUsername(userDetails.getUsername());
+        if (!opt.isPresent())
+            return null;
+        User user = opt.get();
+
         ProjectLevel projectLevel = ProjectLevel.values()[level];
         return ResponseEntity.ok(projectRepository.findByLevel(projectLevel).stream()
                 .map(project -> new ProjectDTOBuilder(project, user).build())
@@ -52,7 +57,11 @@ public class ProjectController {
     @PostMapping
     public ResponseEntity create(@AuthenticationPrincipal UserDetails userDetails,
                                @Valid @RequestBody Project newProject) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        Optional<User> opt = userRepository.findByUsername(userDetails.getUsername());
+        if (!opt.isPresent())
+            return null;
+        User user = opt.get();
+
         if (projectRepository.findByName(newProject.getName()).size() >= 1) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Name has already been taken.");
@@ -67,7 +76,11 @@ public class ProjectController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable long projectId,
             @Valid @RequestBody final Version request) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        Optional<User> opt = userRepository.findByUsername(userDetails.getUsername());
+        if (!opt.isPresent())
+            return null;
+
+        User user = opt.get();
         Optional<Project> projectOptional = projectRepository.findById(projectId);
         if (!projectOptional.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

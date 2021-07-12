@@ -84,6 +84,7 @@ class LspInstance {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }
