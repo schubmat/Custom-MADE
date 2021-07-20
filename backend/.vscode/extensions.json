@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "vscjava.vscode-java-pack",
+        "gabrielbb.vscode-lombok",
+        "sonarsource.sonarlint-vscode",
+        "wayou.vscode-todo-highlight"
+    ]
+}

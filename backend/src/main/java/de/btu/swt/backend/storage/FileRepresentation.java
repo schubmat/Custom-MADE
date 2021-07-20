@@ -32,10 +32,12 @@ public interface FileRepresentation {
             dir.toFile().mkdirs();
             file.createNewFile();
         }
-        FileWriter fileWriter = new FileWriter(file);
-        fileWriter.write(fileContent);
-        fileWriter.flush();
-        fileWriter.close();
+
+        // There is no need for closing the writer, if this syntax is used.
+        try (FileWriter fileWriter = new FileWriter(file)) {
+            fileWriter.write(fileContent);
+            fileWriter.flush();
+        }
     }
 
     @JsonIgnore
