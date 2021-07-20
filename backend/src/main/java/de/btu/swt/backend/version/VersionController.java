@@ -158,27 +158,33 @@ public class VersionController {
         version.editMember(addedMember, ship);
         version = versionRepository.save(version);
         VersionMemberships newShip = version.getMembership(addedMember.getUsername());
-        if (newShip == null)
+        if (newShip == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to edit settings");
+        }
         return ResponseEntity.ok(newShip);
     }
 
     private ResponseEntity getPermissionsEditingError(UserDetails userDetails, long versionId, long memberId, Permissions permissions) {
         User user = userRepository.findByUsername(userDetails.getUsername()).get();
-        if (!validate(user, versionId, Permissions.ADD_USERS))
+        if (!validate(user, versionId, Permissions.ADD_USERS)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Version does not exists or user has no permission to add/remover members to this project");
+        }
         User addedUser = userRepository.getOne(memberId);
-        if (addedUser == null)
+        if (addedUser == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Specified user does not exist");
-        if (addedUser.getId() == user.getId() && permissions != null)
+        }
+        if (addedUser.getId() == user.getId() && permissions != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User cannot edit his/her own permissions");
+        }
         Version version = versionRepository.getOne(versionId);
         Permissions currentPermissions = version.getPermissions(addedUser);
         Permissions userPermissions = version.getPermissions(user);
-        if (!userPermissions.isGreaterThan(currentPermissions))
+        if (!userPermissions.isGreaterThan(currentPermissions)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is not allowed to change these permissions");
-        if (permissions != null && !userPermissions.isGreaterThan(permissions))
+        }
+        if (permissions != null && !userPermissions.isGreaterThan(permissions)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is not allowed to give these permissions");
+        } 
         return null;
     }
 
@@ -186,11 +192,13 @@ public class VersionController {
     public ResponseEntity removeMember(@AuthenticationPrincipal User user,
                                        @PathVariable long versionId,
                                        @PathVariable long memberId) {
-        if (user.getId() == memberId)
+        if (user.getId() == memberId) {
             return removeUser(user, versionId);
+        }
         ResponseEntity error = getPermissionsEditingError(user, versionId, memberId, null);
-        if (error != null)
+        if (error != null) {
             return error;
+        }
         User removedMember = userRepository.getOne(memberId);
         Version version = versionRepository.getOne(versionId);
         VersionMemberships membership = version.removeUser(removedMember);
@@ -339,8 +347,7 @@ public class VersionController {
             if (newFile == null) {
                 newFile = File.create(fileName, version, user);
                 newFile = fileRepository.save(newFile);
-            }
-            else {
+            } else {
                 newFile.setStatus(FileStatus.UNCHECKED);
             }
             storage.store(file, newFile.getDir(), newFile.getFileName());
