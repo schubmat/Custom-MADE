@@ -11,7 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.Option;
 import java.io.File;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,7 +30,11 @@ public class GitAccountController {
 
     @GetMapping("")
     public ResponseEntity all(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        Optional<User> opt = userRepository.findByUsername(userDetails.getUsername());
+        if (!opt.isPresent())
+            return null;
+
+        User user = opt.get();
         return ResponseEntity.ok(
                 gitRepository.findAll().stream()
                         .filter(g -> validate(user, g)).collect(Collectors.toList())
@@ -37,7 +43,11 @@ public class GitAccountController {
 
     @GetMapping("/{id}/branches")
     public ResponseEntity getBranches(@AuthenticationPrincipal User user, @PathVariable long id, @RequestParam final String subUrl) {
-        GitAccount account = gitRepository.findById(id).get();
+        Optional<GitAccount> opt = gitRepository.findById(id);
+        if (!opt.isPresent())
+            return null;
+
+        GitAccount account = opt.get();
         if (!validate(user, account))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("GitAccount does not exist or user does not have access rights");
         return ResponseEntity.ok(account.getBranches(subUrl));
@@ -45,7 +55,11 @@ public class GitAccountController {
 
     @GetMapping("/{id}/dirs")
     public ResponseEntity getDirectories(@AuthenticationPrincipal User user, @PathVariable long id, @RequestParam final String subUrl, @RequestParam final String branch) {
-        GitAccount account = gitRepository.findById(id).get();
+        Optional<GitAccount> opt = gitRepository.findById(id);
+        if (!opt.isPresent())
+            return null;
+
+        GitAccount account = opt.get();
         if (!validate(user, account))
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("GitAccount does not exist or user does not have access rights");
         String[] dirs = account.getDirs(subUrl, branch);
@@ -60,9 +74,11 @@ public class GitAccountController {
                                       @RequestParam("file") MultipartFile sshKey,
                                       @RequestParam String plattformUrl)  {
 
-        User user = userRepository.findByUsername(userDetails.getUsername()).get();
+        Optional<User> opt = userRepository.findByUsername(userDetails.getUsername());
+        if (!opt.isPresent())
+            return null;
 
-
+        User user = opt.get();
         GitAccount newAccount = GitAccount.builder()
                 .isPublic(false)
                 .creator(user)
@@ -94,6 +110,7 @@ public class GitAccountController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
 
+    // TODO Parameter user never used.
     private boolean validate(User user, GitAccount account) {
         if (account == null)
             return false;
