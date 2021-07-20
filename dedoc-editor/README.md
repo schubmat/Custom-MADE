@@ -5,7 +5,7 @@ for putting up the IDE (with Theia) and add visual support (with Sprotty).
 ## Software Versions
 The following versions were used while developing this solution.
 ```
-node 10.11.0
+node 11.15.0
 npm 7.16.0
 yarn 1.22.5
 nvm 0.35.1
@@ -19,8 +19,8 @@ Install [nvm](https://github.com/creationix/nvm#install-script).
 
 Install npm and node.
 
-    nvm install 10.11.0
-    nvm use 10.11.0
+    nvm install 11.15.0
+    nvm use 11.15.0
 
 Install yarn.
 
