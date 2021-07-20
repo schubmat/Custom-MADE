@@ -1,5 +1,15 @@
-# mdr-dsl
-The example of how to build the Theia-based applications with the mdr-dsl.
+# Visualisation of a Domain-Specfic Language
+This is the IDE which is supposed to visualize a FlexDRMetaModel-based DSL. It uses Theia (and Sprotty)
+for putting up the IDE (with Theia) and add visual support (with Sprotty).
+
+## Software Versions
+The following versions were used while developing this solution.
+```
+node 10.11.0
+npm 7.16.0
+yarn 1.22.5
+nvm 0.35.1
+```
 
 ## Getting started
 
@@ -9,12 +19,28 @@ Install [nvm](https://github.com/creationix/nvm#install-script).
 
 Install npm and node.
 
-    nvm install 8
-    nvm use 8
+    nvm install 10.11.0
+    nvm use 10.11.0
 
 Install yarn.
 
     npm install -g yarn
+
+## Quickstart
+To run the software, simply execute
+```shell
+bash ./build_and_run_theia.sh
+```
+The shell file uses the commands below.
+
+### Adding a custom language server
+For using a language, Theia needs a language server file, it can start (typically a .jar file). The file `àssemble_custommade.sh` is
+responsible for copying a freshly compiled language server to Theia. To do so, **have a look in the file and
+configure its variables**. Afterwards, one can run:
+```shell
+bash ./assemble_custommade.sh
+```
+The language server, which is used for development is referenced [in this repository](https://github.com/rrcomtech/Visualization_of_DSL_Families).
 
 ## Running the browser example
 
@@ -22,7 +48,7 @@ Install yarn.
     cd browser-app
     yarn start
 
-Open http://localhost:3000 in the browser.
+Open http://localhost:3001 in the browser.
 
 ## Running the Electron example
 
@@ -61,13 +87,3 @@ Start watching of the electron example.
     yarn watch
 
 Launch `Start Electron Backend` configuration from VS code.
-
-## Publishing mdr-dsl
-
-Create a npm user and login to the npm registry, [more on npm publishing](https://docs.npmjs.com/getting-started/publishing-npm-packages).
-
-    npm login
-
-Publish packages with lerna to update versions properly across local packages, [more on publishing with lerna](https://github.com/lerna/lerna#publish).
-
-    npx lerna publish

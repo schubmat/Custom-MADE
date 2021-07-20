@@ -67,11 +67,10 @@ export class DRObjectView extends RectangularNodeView {
         const width = node.size.width;
         const height = node.size.height;
         return (
-            <g>
+            <g className="textinside">
                 <rect
                     x="0" y="0" width={width} height={height}
-                ></rect>
-                {context.renderChildren(node)}
+                > {context.renderChildren(node)} </rect>                
             </g>
         );
     }
