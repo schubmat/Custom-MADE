@@ -95,7 +95,7 @@ public class FileExport {
         Deque<ErroneousFile> result = new LinkedList<>();
         List<de.btu.swt.backend.file.File> exportList = new LinkedList<>();
         for (de.btu.swt.backend.file.File file : files) {
-            if (file.getVersion().getId() != version.getId())
+            if (!file.getVersion().getId().equals(version.getId()))
                 continue;
             try {
                 exportList.clear();
