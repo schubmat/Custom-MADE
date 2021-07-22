@@ -40,7 +40,7 @@ const mdrDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => 
     configureModelElement(context, 'port', CreateTransitionPort, TriangleButtonView)
 
     // FlexDRMetaModel Configuration
-    configureModelElement(context, 'drobject', MdrDiagram, DRObjectView);
+    configureModelElement(context, 'drobject', MdrNode, DRObjectView);
     configureModelElement(context, 'statement', MdrNode, StatementView);
     configureModelElement(context, 'decision_problem_or_result', MdrNode, DecisionProblemOrResultView);
     configureModelElement(context, 'decision_problem', MdrNode, DecisionProblemView);

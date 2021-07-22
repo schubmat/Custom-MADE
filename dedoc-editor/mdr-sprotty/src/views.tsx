@@ -63,17 +63,7 @@ export class TriangleButtonView implements IView {
 // Structural Elements
 @injectable()
 export class DRObjectView extends RectangularNodeView {
-    render(node: MdrNode, context: RenderingContext, args?: object): VNode {
-        const width = node.size.width;
-        const height = node.size.height;
-        return (
-            <g className="textinside">
-                <rect
-                    x="0" y="0" width={width} height={height}
-                > {context.renderChildren(node)} </rect>                
-            </g>
-        );
-    }
+
 }
 
 @injectable()
@@ -92,7 +82,7 @@ export class StatementView implements IView {
 
         return (
             <g>
-                <rect x="0" y="0" width={width} height={height} fill="#F5F7CF" stroke="none" pointer-events="all"/>                
+                <rect x="0" y="0" width={width} height={height} fill="#F5F7CF" stroke="none" pointer-events="all"/>
                 <path d={trianglePath} fill="#F5F7CF" />
                 { context.renderChildren(node) }
             </g>
