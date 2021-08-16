@@ -1,76 +1,65 @@
 #!/bin/bash
 
-if [[ `screen -ls | grep -e dedoc -e backend` ]]; then
-	screen -ls | grep -e dedoc -e backend | cut -d. -f1 | awk '{print $1}' | xargs kill;
+if [[ `screen -ls | grep -e Custom-MADE ` ]]; then
+	screen -ls | grep -e Custom-MADE | cut -d. -f1 | awk '{print $1}' | xargs kill;
 fi
 
 # ------------------------------------------------------------
 # ------------------------------------------------------------
-#
-#  ██████   █████   ██████ ██   ██ ███████ ███    ██ ██████  
-#  ██   ██ ██   ██ ██      ██  ██  ██      ████   ██ ██   ██ 
-#  ██████  ███████ ██      █████   █████   ██ ██  ██ ██   ██ 
-#  ██   ██ ██   ██ ██      ██  ██  ██      ██  ██ ██ ██   ██ 
-#  ██████  ██   ██  ██████ ██   ██ ███████ ██   ████ ██████  
-#                                      
+#   ______       _        ______  ___  ____  ________ ____  _____ ______    
+#  |_   _ \     / \     .' ___  ||_  ||_  _||_   __  |_   \|_   _|_   _ `.  
+#    | |_) |   / _ \   / .'   \_|  | |_/ /    | |_ \_| |   \ | |   | | `. \ 
+#    |  __'.  / ___ \  | |         |  __'.    |  _| _  | |\ \| |   | |  | | 
+#   _| |__) |/ /   \ \_\ `.___.'\ _| |  \ \_ _| |__/ |_| |_\   |_ _| |_.' / 
+#  |_______/____| |____|`.____ .'|____||____|________|_____|\____|______.'  
+#                                        
 # ------------------------------------------------------------
 # ------------------------------------------------------------
 #
-# start spring backend and set JAVA_HOME if needed#
+# start spring backend 
 
 cd backend
-
-if [[ $1 == "noclean" ]]; then
- 	if [[ $2 == "server" ]]; then
-		screen -dmS spring-backend bash -c "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.1.13-3.el7_6.x86_64; mvn compile process-classes exec:java"
-	elif [[ $2 == "deb" ]]; then
-		screen -dmS spring-backend bash -c "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64; mvn compile process-classes exec:java"
-	else
-		screen -dmS spring-backend bash -c "mvn compile process-classes exec:java"
-	fi	
-elif [[ $1 == "server" ]]; then
-	screen -dmS spring-backend bash -c "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.1.13-3.el7_6.x86_64; mvn clean compile process-classes exec:java"
-elif [[ $1 == "deb" ]]; then
-	screen -dmS spring-backend bash -c "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64; mvn clean compile process-classes exec:java"
-else
-	screen -dmS spring-backend bash -c "mvn clean compile process-classes exec:java"
-fi
+	if [[ $1 == "no-clean" ]]; then
+		screen -dmS Custom-MADE-Backend bash -c "mvn compile process-classes exec:java"
+	else 
+		screen -dmS Custom-MADE-Backend bash -c "mvn clean compile process-classes exec:java"
+	fi
 cd ..
 
 # ------------------------------------------------------------
 # ------------------------------------------------------------
-#
-#   ██████ ███    ███     ██     ██ ███████ ██████  
-#  ██      ████  ████     ██     ██ ██      ██   ██ 
-#  ██      ██ ████ ██     ██  █  ██ █████   ██████  
-#  ██      ██  ██  ██     ██ ███ ██ ██      ██   ██ 
-#   ██████ ██      ██      ███ ███  ███████ ██████  
-#                                                                                                                               
+#     ______  ____    ____   ____      ____ ________ ______    
+#   .' ___  ||_   \  /   _| |_  _|    |_  _|_   __  |_   _ \   
+#  / .'   \_|  |   \/   |     \ \  /\  / /   | |_ \_| | |_) |  
+#  | |         | |\  /| |      \ \/  \/ /    |  _| _  |  __'.  
+#  \ `.___.'\ _| |_\/_| |_      \  /\  /    _| |__/ |_| |__) | 
+#   `.____ .'|_____||_____|      \/  \/    |________|_______/  
+#  
 # ------------------------------------------------------------
 # ------------------------------------------------------------
 #
 
 
-# start dedoc-web (react app)
+# start the web front-end of Custom-MADE (react app)
 cd dedoc-web
- screen -dmS dedoc-react-web bash -c "npm install && npm run start"
+	screen -dmS Custom-MADE-Web-UI bash -c "npm install && npm run start"
 cd ..
 
 
 # ------------------------------------------------------------
 # ------------------------------------------------------------
-#
-#   ██████ ███    ███     ███████ ██████  ██ ████████  ██████  ██████  
-#  ██      ████  ████     ██      ██   ██ ██    ██    ██    ██ ██   ██ 
-#  ██      ██ ████ ██     █████   ██   ██ ██    ██    ██    ██ ██████  
-#  ██      ██  ██  ██     ██      ██   ██ ██    ██    ██    ██ ██   ██ 
-#   ██████ ██      ██     ███████ ██████  ██    ██     ██████  ██   ██ 
+#     ______  ____    ____   ________ ______   _____ _________   ___   _______     
+#   .' ___  ||_   \  /   _| |_   __  |_   _ `.|_   _|  _   _  |.'   `.|_   __ \    
+#  / .'   \_|  |   \/   |     | |_ \_| | | `. \ | | |_/ | | \_/  .-.  \ | |__) |   
+#  | |         | |\  /| |     |  _| _  | |  | | | |     | |   | |   | | |  __ /    
+#  \ `.___.'\ _| |_\/_| |_   _| |__/ |_| |_.' /_| |_   _| |_  \  `-'  /_| |  \ \_  
+#   `.____ .'|_____||_____| |________|______.'|_____| |_____|  `.___.'|____| |___| 
 #                                                                                                                                                  
 # ------------------------------------------------------------
 # ------------------------------------------------------------
 #
 
-# start dedoc-editor (language client)
+# start monaco editor employed as LSP Client (language client)
 cd dedoc-editor
-screen -dmS dedoc-monaco-editor bash -c "npm install && npm install vscode-languageserver-protocol@3.15.3 && npm run start"
+	screen -dmS Custom-MADE-Editor bash -c "npm install && npm run start"
 cd ..

@@ -15,7 +15,11 @@ if [ ! -d "xtext-lsp" ] && [ ! command == "killAll" ]; then
 		if [ ! -d "xtext-lsp" ]; then
 			echo "# cloning LSP environment"
 
-			if [[ `git clone git@git.informatik.tu-cottbus.de:schubmat/xtext-languageserver.git xtext-lsp` ]]; then
+			# echo "### PWD ### -- `pwd`" > tmp.txt
+
+			# extract the repository URL of the repo that's hosting the XText DSLs to be processed
+			GIT_LANGUAGE_REPOSITORY=`cat langauge-repository.git.cnf | grep -v "#"`
+			if [[ `git clone ${GIT_LANGUAGE_REPOSITORY} xtext-lsp` ]]; then
 				echo "ERR: Cloning git repository failed. Exiting!"
 				exit 1;
 			fi

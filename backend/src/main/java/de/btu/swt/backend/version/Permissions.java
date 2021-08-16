@@ -20,7 +20,9 @@ public class Permissions implements Serializable {
     public static final Permissions MAINTAINER = Permissions.builder().canBrowseFiles(true).canChangeFiles(true).canExportFiles(true).canUseAsModel(true).canAddUsers(true).canDeleteVersion(true).canSetGitRepo(true).build();
     public static final Permissions CONTRIBUTOR = Permissions.builder().canBrowseFiles(true).canChangeFiles(true).canExportFiles(true).canUseAsModel(true).build();
     public static final Permissions REPORTER = Permissions.builder().canBrowseFiles(true).canExportFiles(true).canUseAsModel(true).build();
-    public static final Permissions STRANGER = Permissions.builder().canUseAsModel(true).build();
+    public static final Permissions STRANGER_ON_PRIVATE = Permissions.builder().canUseAsModel(true).build();
+    public static final Permissions STRANGER_ON_PUBLIC = Permissions.builder().canBrowseFiles(true).canUseAsModel(true).build();
+
 
     //actions
     public static final Permissions EMPTY = Permissions.builder().build();
@@ -63,20 +65,29 @@ public class Permissions implements Serializable {
     }
 
     @JsonIgnore
-    public boolean equals(Permissions other) {
-        return this.canBrowseFiles == other.canBrowseFiles
-                && this.canChangeFiles == other.canChangeFiles
-                && this.canExportFiles == other.canExportFiles
-                && this.canAddUsers == other.canAddUsers
-                && this.canDeleteVersion == other.canDeleteVersion
-                && this.canUseAsModel == other.canUseAsModel
-                && this.canSetGitRepo == other.canSetGitRepo
-                && this.untouchable == other.untouchable;
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+        Permissions otherPermission = (Permissions) other;
+        return this.canBrowseFiles == otherPermission.canBrowseFiles
+            && this.canChangeFiles == otherPermission.canChangeFiles
+            && this.canExportFiles == otherPermission.canExportFiles
+            && this.canAddUsers == otherPermission.canAddUsers
+            && this.canDeleteVersion == otherPermission.canDeleteVersion
+            && this.canUseAsModel == otherPermission.canUseAsModel
+            && this.canSetGitRepo == otherPermission.canSetGitRepo
+            && this.untouchable == otherPermission.untouchable;
     }
 
     @JsonIgnore
     public boolean isGreaterThan(Permissions other) {
-        return !this.equals(other) && this.contains(other);
+        return !this.equals(other) 
+            && this.contains(other);
     }
 
     @JsonIgnore

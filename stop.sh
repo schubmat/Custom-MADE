@@ -2,8 +2,8 @@
 
 if [[ ! $1  ]]; then
 
-	if [[ `screen -ls | grep -e web -e backend -e editor -e LSP-` ]]; then
-		screen -ls | grep -e dedoc -e backend  -e editor -e LSP- | cut -d. -f1 | awk '{print $1}' | xargs kill;
+	if [[ `screen -ls | grep -e Custom-MADE -e LSP-` ]]; then
+		screen -ls | grep -e Custom-MADE -e LSP- | cut -d. -f1 | awk '{print $1}' | xargs kill;
 	fi
 
 else 

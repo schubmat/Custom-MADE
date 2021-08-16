@@ -14,6 +14,10 @@ Documenting decisions helps to preserve knowledge over a long time to diminish s
 * **Clone** the project
 * **Enter** the project
 * **Run** `bash run.sh` and it will start the application in three screens. 
+  * A website will open up. You might need to **wait** until all background processes finished starting up. If login attempts do still fail, just wait a little and retry. As soon as the login is successful, the background processes finished starting up.
+  * **Login** as 
+    * *user:* `user`
+    * *password:* `password`
   * You can view more information about the currently running screens with `screen -x`. Enter one of them with `screen -x NNNN` where `NNNN` is the listed pid of the desired screen. 
   * Over time more screens should pop up which run an instance of a language server each. 
 * **Stop** the project and close everything with `bash stop.sh`.
@@ -33,11 +37,15 @@ For successful compilation and execution, the following software is required:
   * Screen version 4.08 has been tested and is working
 * `maven` -- **Apache Maven**
   * for compiling the _Xtext_ grammars
-  * validating and transforming _DSLs_
+  * for validating and transforming _DSLs_
+* `gradle` -- **Gradle build tool**
+  * for compiling the _Xtext_ grammars and the connected _Language Server_
 * `java` -- **Java Programming Language**
-  * JDK 11 and JDK 13 have been tested
+  * Custom-MADE currently requires **JDK 11**! More recent JDK versions are not supported as of now.  
 * `npm` -- **Node Package Manager**
   * Used to compile the ReactJS front-end
+* `git` -- **Git -- distributed version control system**
+  * Custom-MADE employs _git_ to manage the available languages and allows for connecting projects to existing git repositories
 <!-- * `node.js` -- **Node Package Manager**
   * Used to compile the ReactJS front-end
  -->

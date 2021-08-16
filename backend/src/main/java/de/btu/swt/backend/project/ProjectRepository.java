@@ -8,4 +8,6 @@ import java.util.List;
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     List<Project> findByName(String name);
+    List<Project> findByLevel(ProjectLevel level);
+
 }

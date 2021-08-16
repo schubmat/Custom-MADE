@@ -94,7 +94,7 @@ public class FileController {
 
     private boolean hasPermissions(User user, long fileId, Permissions actions) {
         File file = fileRepository.getOne(fileId);
-        if (file == null)
+        if (file.getContent().equals(""))
             return false;
         return file.getVersion().getPermissions(user).contains(actions);
     }
