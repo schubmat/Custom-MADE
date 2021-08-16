@@ -94,6 +94,29 @@ public class Permissions implements Serializable {
     public static boolean isKnown(Permissions requested) {
         return requested.equals(OWNER) || requested.equals(MAINTAINER) || requested.equals(CONTRIBUTOR) || requested.equals(REPORTER);
     }
+
+    /**
+     * See:
+     * https://javarevisited.blogspot.com/2011/10/override-hashcode-in-java-example.html
+     * (General contracts for hashCodes)
+     */
+    public int hashCode() {
+        String res = "";
+        res = res + this.canBrowseFiles
+                + this.canAddUsers
+                + this.canChangeFiles
+                + this.canExportFiles
+                + this.canDeleteVersion
+                + this.canSetGitRepo
+                + this.canUseAsModel
+                + this.untouchable;
+
+        try {
+            return Integer.parseInt(res);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
 }
 
 

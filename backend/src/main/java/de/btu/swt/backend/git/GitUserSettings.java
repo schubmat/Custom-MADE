@@ -24,29 +24,24 @@ public class GitUserSettings {
     @NonNull
     private String email;
 
-    public boolean equals(GitUserSettings other) {
-        return name.equals(other.name) && email.equals(other.email);
-    }
-
-    /**
-     * This method is present, to not overload the "equals" function without
-     * overriding the function Object.equals(Object o) from the Object class.
-     */
-    @Override
     public boolean equals(Object o) {
         if (o instanceof GitUserSettings) {
-            return equals(o);
+            GitUserSettings settings = (GitUserSettings) o;
+            return this.name.equals(settings.getName()) && this.email.equals(settings.getEmail());
         }
         return false;
     }
 
-    /**
-     * When overriding the "equals", the hash code function should be overwritten
-     * too. See Sonarlint for more.
-     */
-    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    public String getEmail() {
+        return this.email;
+    }
+
     public int hashCode() {
-        return Objects.hash(this);
+        return this.name.hashCode() + this.email.hashCode();
     }
 
 }
