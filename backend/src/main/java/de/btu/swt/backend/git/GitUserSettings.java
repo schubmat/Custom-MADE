@@ -40,4 +40,8 @@ public class GitUserSettings {
         return this.email;
     }
 
+    public int hashCode() {
+        return this.name.hashCode() + this.email.hashCode();
+    }
+
 }
