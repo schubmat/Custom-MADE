@@ -11,14 +11,14 @@ var mdrDiagramModule = new inversify_1.ContainerModule(function (bind, unbind, i
     rebind(sprotty_1.TYPES.ILogger).to(sprotty_1.ConsoleLogger).inSingletonScope();
     rebind(sprotty_1.TYPES.LogLevel).toConstantValue(sprotty_1.LogLevel.warn);
     rebind(sprotty_1.TYPES.IModelFactory).to(model_1.MdrModelFactory);
-    unbind(sprotty_1.ManhattanEdgeRouter);
-    bind(sprotty_1.ManhattanEdgeRouter).to(custom_edge_router_1.CustomRouter).inSingletonScope();
+    unbind(sprotty_1.PolylineEdgeRouter);
+    bind(sprotty_1.PolylineEdgeRouter).to(custom_edge_router_1.CustomLinearRouter).inSingletonScope();
     var context = { bind: bind, unbind: unbind, isBound: isBound, rebind: rebind };
     sprotty_1.configureModelElement(context, 'graph', model_1.MdrDiagram, sprotty_1.SGraphView);
     sprotty_1.configureModelElement(context, 'node', model_1.MdrNode, sprotty_1.RectangularNodeView);
     sprotty_1.configureModelElement(context, 'label', model_1.MdrLabel, sprotty_1.SLabelView);
     sprotty_1.configureModelElement(context, 'label:xref', model_1.MdrLabel, sprotty_1.SLabelView);
-    sprotty_1.configureModelElement(context, 'edge', sprotty_1.SEdge, views_1.PolylineArrowEdgeView);
+    sprotty_1.configureModelElement(context, 'edge', sprotty_1.SEdge, views_1.PolylineClosedArrowEdgeView);
     sprotty_1.configureModelElement(context, 'html', sprotty_1.HtmlRoot, sprotty_1.HtmlRootView);
     sprotty_1.configureModelElement(context, 'pre-rendered', sprotty_1.PreRenderedElement, sprotty_1.PreRenderedView);
     sprotty_1.configureModelElement(context, 'palette', sprotty_1.SModelRoot, sprotty_1.HtmlRootView);
@@ -26,7 +26,7 @@ var mdrDiagramModule = new inversify_1.ContainerModule(function (bind, unbind, i
     sprotty_1.configureModelElement(context, 'volatile-routing-point', sprotty_1.SRoutingHandle, sprotty_1.SRoutingHandleView);
     sprotty_1.configureModelElement(context, 'port', model_1.CreateTransitionPort, views_1.TriangleButtonView);
     // FlexDRMetaModel Configuration
-    sprotty_1.configureModelElement(context, 'drobject', model_1.MdrDiagram, views_1.DRObjectView);
+    sprotty_1.configureModelElement(context, 'drobject', model_1.MdrNode, views_1.DRObjectView);
     sprotty_1.configureModelElement(context, 'statement', model_1.MdrNode, views_1.StatementView);
     sprotty_1.configureModelElement(context, 'decision_problem_or_result', model_1.MdrNode, views_1.DecisionProblemOrResultView);
     sprotty_1.configureModelElement(context, 'decision_problem', model_1.MdrNode, views_1.DecisionProblemView);

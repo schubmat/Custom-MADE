@@ -21,6 +21,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 var inversify_1 = require("inversify");
 var sprotty_1 = require("sprotty");
+var custom_edge_router_1 = require("./custom-edge-router");
 var MdrModelFactory = /** @class */ (function (_super) {
     __extends(MdrModelFactory, _super);
     function MdrModelFactory() {
@@ -29,7 +30,7 @@ var MdrModelFactory = /** @class */ (function (_super) {
     MdrModelFactory.prototype.initializeChild = function (child, schema, parent) {
         _super.prototype.initializeChild.call(this, child, schema, parent);
         if (child instanceof sprotty_1.SEdge) {
-            child.routerKind = sprotty_1.ManhattanEdgeRouter.KIND;
+            child.routerKind = custom_edge_router_1.CustomLinearRouter.KIND;
             child.targetAnchorCorrection = Math.sqrt(5);
         }
         else if (child instanceof sprotty_1.SLabel) {
@@ -60,7 +61,9 @@ exports.MdrDiagram = MdrDiagram;
 var MdrNode = /** @class */ (function (_super) {
     __extends(MdrNode, _super);
     function MdrNode() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.description = "";
+        return _this;
     }
     MdrNode.prototype.canConnect = function (routable, role) {
         return true;

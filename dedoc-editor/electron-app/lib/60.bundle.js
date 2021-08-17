@@ -720,19 +720,35 @@ var __assign = (this && this.__assign) || function () {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var sprotty_1 = __webpack_require__(/*! sprotty */ "../node_modules/sprotty/lib/index.js");
-var CustomRouter = /** @class */ (function (_super) {
-    __extends(CustomRouter, _super);
-    function CustomRouter() {
+var CustomManhattanRouter = /** @class */ (function (_super) {
+    __extends(CustomManhattanRouter, _super);
+    function CustomManhattanRouter() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CustomRouter.prototype.getOptions = function (edge) {
+    CustomManhattanRouter.prototype.getOptions = function (edge) {
         var defaultOptions = _super.prototype.getOptions.call(this, edge);
         return edge.id === sprotty_1.edgeInProgressID
             ? __assign(__assign({}, defaultOptions), { standardDistance: 1 }) : defaultOptions;
     };
-    return CustomRouter;
+    return CustomManhattanRouter;
 }(sprotty_1.ManhattanEdgeRouter));
-exports.CustomRouter = CustomRouter;
+exports.CustomManhattanRouter = CustomManhattanRouter;
+var CustomLinearRouter = /** @class */ (function (_super) {
+    __extends(CustomLinearRouter, _super);
+    function CustomLinearRouter() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    CustomLinearRouter.prototype.route = function (edge) {
+        // Use the result from the PolylineEdgeRouter.
+        var polyline = _super.prototype.route.call(this, edge);
+        return [
+            polyline[0],
+            polyline[polyline.length - 1]
+        ];
+    };
+    return CustomLinearRouter;
+}(sprotty_1.PolylineEdgeRouter));
+exports.CustomLinearRouter = CustomLinearRouter;
 
 
 /***/ }),
@@ -758,14 +774,14 @@ var mdrDiagramModule = new inversify_1.ContainerModule(function (bind, unbind, i
     rebind(sprotty_1.TYPES.ILogger).to(sprotty_1.ConsoleLogger).inSingletonScope();
     rebind(sprotty_1.TYPES.LogLevel).toConstantValue(sprotty_1.LogLevel.warn);
     rebind(sprotty_1.TYPES.IModelFactory).to(model_1.MdrModelFactory);
-    unbind(sprotty_1.ManhattanEdgeRouter);
-    bind(sprotty_1.ManhattanEdgeRouter).to(custom_edge_router_1.CustomRouter).inSingletonScope();
+    unbind(sprotty_1.PolylineEdgeRouter);
+    bind(sprotty_1.PolylineEdgeRouter).to(custom_edge_router_1.CustomLinearRouter).inSingletonScope();
     var context = { bind: bind, unbind: unbind, isBound: isBound, rebind: rebind };
     sprotty_1.configureModelElement(context, 'graph', model_1.MdrDiagram, sprotty_1.SGraphView);
     sprotty_1.configureModelElement(context, 'node', model_1.MdrNode, sprotty_1.RectangularNodeView);
     sprotty_1.configureModelElement(context, 'label', model_1.MdrLabel, sprotty_1.SLabelView);
     sprotty_1.configureModelElement(context, 'label:xref', model_1.MdrLabel, sprotty_1.SLabelView);
-    sprotty_1.configureModelElement(context, 'edge', sprotty_1.SEdge, views_1.PolylineArrowEdgeView);
+    sprotty_1.configureModelElement(context, 'edge', sprotty_1.SEdge, views_1.PolylineClosedArrowEdgeView);
     sprotty_1.configureModelElement(context, 'html', sprotty_1.HtmlRoot, sprotty_1.HtmlRootView);
     sprotty_1.configureModelElement(context, 'pre-rendered', sprotty_1.PreRenderedElement, sprotty_1.PreRenderedView);
     sprotty_1.configureModelElement(context, 'palette', sprotty_1.SModelRoot, sprotty_1.HtmlRootView);
@@ -773,7 +789,7 @@ var mdrDiagramModule = new inversify_1.ContainerModule(function (bind, unbind, i
     sprotty_1.configureModelElement(context, 'volatile-routing-point', sprotty_1.SRoutingHandle, sprotty_1.SRoutingHandleView);
     sprotty_1.configureModelElement(context, 'port', model_1.CreateTransitionPort, views_1.TriangleButtonView);
     // FlexDRMetaModel Configuration
-    sprotty_1.configureModelElement(context, 'drobject', model_1.MdrDiagram, views_1.DRObjectView);
+    sprotty_1.configureModelElement(context, 'drobject', model_1.MdrNode, views_1.DRObjectView);
     sprotty_1.configureModelElement(context, 'statement', model_1.MdrNode, views_1.StatementView);
     sprotty_1.configureModelElement(context, 'decision_problem_or_result', model_1.MdrNode, views_1.DecisionProblemOrResultView);
     sprotty_1.configureModelElement(context, 'decision_problem', model_1.MdrNode, views_1.DecisionProblemView);
@@ -868,6 +884,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 var inversify_1 = __webpack_require__(/*! inversify */ "../node_modules/inversify/lib/inversify.js");
 var sprotty_1 = __webpack_require__(/*! sprotty */ "../node_modules/sprotty/lib/index.js");
+var custom_edge_router_1 = __webpack_require__(/*! ./custom-edge-router */ "../mdr-sprotty/lib/custom-edge-router.js");
 var MdrModelFactory = /** @class */ (function (_super) {
     __extends(MdrModelFactory, _super);
     function MdrModelFactory() {
@@ -876,7 +893,7 @@ var MdrModelFactory = /** @class */ (function (_super) {
     MdrModelFactory.prototype.initializeChild = function (child, schema, parent) {
         _super.prototype.initializeChild.call(this, child, schema, parent);
         if (child instanceof sprotty_1.SEdge) {
-            child.routerKind = sprotty_1.ManhattanEdgeRouter.KIND;
+            child.routerKind = custom_edge_router_1.CustomLinearRouter.KIND;
             child.targetAnchorCorrection = Math.sqrt(5);
         }
         else if (child instanceof sprotty_1.SLabel) {
@@ -907,7 +924,9 @@ exports.MdrDiagram = MdrDiagram;
 var MdrNode = /** @class */ (function (_super) {
     __extends(MdrNode, _super);
     function MdrNode() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.description = "";
+        return _this;
     }
     MdrNode.prototype.canConnect = function (routable, role) {
         return true;
@@ -979,27 +998,48 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var snabbdom_jsx_1 = __webpack_require__(/*! snabbdom-jsx */ "../node_modules/snabbdom-jsx/snabbdom-jsx.js");
 var sprotty_1 = __webpack_require__(/*! sprotty */ "../node_modules/sprotty/lib/index.js");
 var inversify_1 = __webpack_require__(/*! inversify */ "../node_modules/inversify/lib/inversify.js");
-var PolylineArrowEdgeView = /** @class */ (function (_super) {
-    __extends(PolylineArrowEdgeView, _super);
-    function PolylineArrowEdgeView() {
+var PolylineClosedArrowEdgeView = /** @class */ (function (_super) {
+    __extends(PolylineClosedArrowEdgeView, _super);
+    function PolylineClosedArrowEdgeView() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    PolylineArrowEdgeView.prototype.renderAdditionals = function (edge, segments, context) {
+    PolylineClosedArrowEdgeView.prototype.renderAdditionals = function (edge, segments, context) {
         var p1 = segments[segments.length - 2];
         var p2 = segments[segments.length - 1];
         return [
             snabbdom_jsx_1.svg("path", { "class-sprotty-edge-arrow": true, d: "M 6,-3 L 0,0 L 6,3 Z", transform: "rotate(" + this.angle(p2, p1) + " " + p2.x + " " + p2.y + ") translate(" + p2.x + " " + p2.y + ")" })
         ];
     };
-    PolylineArrowEdgeView.prototype.angle = function (x0, x1) {
+    PolylineClosedArrowEdgeView.prototype.angle = function (x0, x1) {
         return sprotty_1.toDegrees(Math.atan2(x1.y - x0.y, x1.x - x0.x));
     };
-    PolylineArrowEdgeView = __decorate([
+    PolylineClosedArrowEdgeView = __decorate([
         inversify_1.injectable()
-    ], PolylineArrowEdgeView);
-    return PolylineArrowEdgeView;
+    ], PolylineClosedArrowEdgeView);
+    return PolylineClosedArrowEdgeView;
 }(sprotty_1.PolylineEdgeView));
-exports.PolylineArrowEdgeView = PolylineArrowEdgeView;
+exports.PolylineClosedArrowEdgeView = PolylineClosedArrowEdgeView;
+var PolylineOpenArrowEdgeView = /** @class */ (function (_super) {
+    __extends(PolylineOpenArrowEdgeView, _super);
+    function PolylineOpenArrowEdgeView() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    PolylineOpenArrowEdgeView.prototype.renderAdditionals = function (edge, segments, context) {
+        var p1 = segments[segments.length - 2];
+        var p2 = segments[segments.length - 1];
+        return [
+            snabbdom_jsx_1.svg("path", { "class-sprotty-edge-arrow": true, d: "M 6,-3 L 0,0 L 6,3 M 6,-3 Z", fill: "white", stroke: "black", transform: "rotate(" + this.angle(p2, p1) + " " + p2.x + " " + p2.y + ") translate(" + p2.x + " " + p2.y + ")" })
+        ];
+    };
+    PolylineOpenArrowEdgeView.prototype.angle = function (x0, x1) {
+        return sprotty_1.toDegrees(Math.atan2(x1.y - x0.y, x1.x - x0.x));
+    };
+    PolylineOpenArrowEdgeView = __decorate([
+        inversify_1.injectable()
+    ], PolylineOpenArrowEdgeView);
+    return PolylineOpenArrowEdgeView;
+}(sprotty_1.PolylineEdgeView));
+exports.PolylineOpenArrowEdgeView = PolylineOpenArrowEdgeView;
 var TriangleButtonView = /** @class */ (function () {
     function TriangleButtonView() {
     }
@@ -1031,9 +1071,17 @@ var StatementView = /** @class */ (function () {
     function StatementView() {
     }
     StatementView.prototype.render = function (node, context) {
-        return snabbdom_jsx_1.svg("g", null,
-            snabbdom_jsx_1.svg("rect", { x: "0", y: "0", width: Math.max(node.size.width, 0), height: Math.max(node.size.height, 0), style: { fill: "skyblue" } }),
-            context.renderChildren(node));
+        var width = node.size.width;
+        var height = node.size.height;
+        var trianglePath = [
+            "M", width / 4 - 15, height,
+            "L", width / 4, height + 20,
+            "L", width / 4 + 15, height
+        ].join(" ");
+        return (snabbdom_jsx_1.svg("g", null,
+            snabbdom_jsx_1.svg("rect", { x: "0", y: "0", width: width, height: height, fill: "#F5F7CF", stroke: "none", "pointer-events": "all" }),
+            snabbdom_jsx_1.svg("path", { d: trianglePath, fill: "#F5F7CF" }),
+            context.renderChildren(node)));
     };
     StatementView = __decorate([
         inversify_1.injectable()
@@ -1045,7 +1093,7 @@ var DecisionProblemOrResultView = /** @class */ (function () {
     function DecisionProblemOrResultView() {
     }
     DecisionProblemOrResultView.prototype.render = function (node, context, args) {
-        return getTwoPartedNode("Decision Option", node, context);
+        return getTwoPartedNode("DecisionProbOrRes", node, context);
     };
     DecisionProblemOrResultView = __decorate([
         inversify_1.injectable()
@@ -1055,9 +1103,22 @@ var DecisionProblemOrResultView = /** @class */ (function () {
 exports.DecisionProblemOrResultView = DecisionProblemOrResultView;
 var DecisionProblemView = /** @class */ (function () {
     function DecisionProblemView() {
+        this.color = "#DAE8FC";
     }
     DecisionProblemView.prototype.render = function (node, context, args) {
-        return getTwoPartedNode("Decision Problem", node, context);
+        var width = node.size.width;
+        var height = node.size.height;
+        return (snabbdom_jsx_1.svg("g", null,
+            snabbdom_jsx_1.svg("rect", { x: "0", y: "0", width: width, height: height, fill: this.color }),
+            snabbdom_jsx_1.svg("g", { transform: "translate(-15,0)" },
+                snabbdom_jsx_1.svg("rect", { id: "svg_2", height: "3", width: "20", y: "0", x: "0", stroke: "#000", fill: "#000000" }),
+                snabbdom_jsx_1.svg("rect", { id: "svg_3", height: "13", width: "3", y: "0", x: "0", stroke: "#000", fill: "#000000" }),
+                snabbdom_jsx_1.svg("rect", { id: "svg_4", height: "20", width: "3", y: "0", x: "17", stroke: "#000", fill: "#000000" }),
+                snabbdom_jsx_1.svg("rect", { id: "svg_5", height: "3", width: "20", y: "18", x: "0", stroke: "#000", fill: "#000000" }),
+                snabbdom_jsx_1.svg("rect", { id: "svg_6", height: "15", width: "3", y: "18", x: "0", stroke: "#000", fill: "#000000" }),
+                snabbdom_jsx_1.svg("rect", { id: "svg_7", height: "3", width: "20", y: "30", x: "0", stroke: "#000", fill: "#000000" }),
+                snabbdom_jsx_1.svg("rect", { id: "svg_8", height: "3", width: "3", y: "37", x: "8.6", stroke: "#000", fill: "#000000" })),
+            context.renderChildren(node)));
     };
     DecisionProblemView = __decorate([
         inversify_1.injectable()
@@ -1067,9 +1128,25 @@ var DecisionProblemView = /** @class */ (function () {
 exports.DecisionProblemView = DecisionProblemView;
 var DecisionResultView = /** @class */ (function () {
     function DecisionResultView() {
+        this.color = "#D5E8D4";
+        this.decoratorBoxBorderColor = "#97D077";
+        this.decoratorBoxSize = 8;
     }
     DecisionResultView.prototype.render = function (node, context, args) {
-        return getTwoPartedNode("Decision Result", node, context);
+        var width = node.size.width;
+        var height = node.size.height;
+        return (snabbdom_jsx_1.svg("g", null,
+            snabbdom_jsx_1.svg("rect", { x: "-23", y: "-3", width: width + 26, height: height + 6, fill: this.color, stroke: this.decoratorBoxBorderColor }),
+            snabbdom_jsx_1.svg("rect", { x: "-20", y: "0", width: width + 20, height: height, fill: this.color, stroke: this.decoratorBoxBorderColor }),
+            snabbdom_jsx_1.svg("g", null,
+                snabbdom_jsx_1.svg("rect", { height: this.decoratorBoxSize, width: this.decoratorBoxSize, y: "3", x: -20 + this.decoratorBoxSize, fill: this.color, stroke: this.decoratorBoxBorderColor }),
+                snabbdom_jsx_1.svg("rect", { height: this.decoratorBoxSize, width: this.decoratorBoxSize, y: 3 + this.decoratorBoxSize + 2, x: -20 + this.decoratorBoxSize, fill: this.color, stroke: this.decoratorBoxBorderColor }),
+                snabbdom_jsx_1.svg("rect", { height: this.decoratorBoxSize, width: this.decoratorBoxSize, y: 3 + this.decoratorBoxSize * 2 + 4, x: -20 + this.decoratorBoxSize, fill: this.color, stroke: this.decoratorBoxBorderColor })
+            // The tick.
+            ,
+                "// The tick.",
+                snabbdom_jsx_1.svg("path", { d: "M-12 8 L-9 11 L-4 3 M-12 8 Z", fill: "none", stroke: "black" })),
+            context.renderChildren(node)));
     };
     DecisionResultView = __decorate([
         inversify_1.injectable()
@@ -1079,9 +1156,20 @@ var DecisionResultView = /** @class */ (function () {
 exports.DecisionResultView = DecisionResultView;
 var DecisionOptionView = /** @class */ (function () {
     function DecisionOptionView() {
+        this.color = "#D5E8D4";
+        this.decoratorBoxBorderColor = "#97D077";
+        this.decoratorBoxSize = 8;
     }
     DecisionOptionView.prototype.render = function (node, context, args) {
-        return getTwoPartedNode("Decision Option", node, context);
+        var width = node.size.width;
+        var height = node.size.height;
+        return (snabbdom_jsx_1.svg("g", null,
+            snabbdom_jsx_1.svg("rect", { x: "-20", y: "0", width: width + 20, height: height, fill: this.color }),
+            snabbdom_jsx_1.svg("g", null,
+                snabbdom_jsx_1.svg("rect", { height: this.decoratorBoxSize, width: this.decoratorBoxSize, y: "3", x: -20 + this.decoratorBoxSize, fill: this.color, stroke: this.decoratorBoxBorderColor }),
+                snabbdom_jsx_1.svg("rect", { height: this.decoratorBoxSize, width: this.decoratorBoxSize, y: 3 + this.decoratorBoxSize + 2, x: -20 + this.decoratorBoxSize, fill: this.color, stroke: this.decoratorBoxBorderColor }),
+                snabbdom_jsx_1.svg("rect", { height: this.decoratorBoxSize, width: this.decoratorBoxSize, y: 3 + this.decoratorBoxSize * 2 + 4, x: -20 + this.decoratorBoxSize, fill: this.color, stroke: this.decoratorBoxBorderColor })),
+            context.renderChildren(node)));
     };
     DecisionOptionView = __decorate([
         inversify_1.injectable()
@@ -1089,20 +1177,19 @@ var DecisionOptionView = /** @class */ (function () {
     return DecisionOptionView;
 }());
 exports.DecisionOptionView = DecisionOptionView;
-// Connection Elements
+// Connection Elements         // </g><line  stroke="#5184AF" stroke-width="5" stroke-linecap="butt" stroke-dasharray="10,5" fill="none" />
 var GenericRelationshipView = /** @class */ (function (_super) {
     __extends(GenericRelationshipView, _super);
     function GenericRelationshipView() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.stepSize = 2;
+        return _this;
     }
     GenericRelationshipView.prototype.renderLine = function (edge, segments, context) {
         var firstPoint = segments[0];
-        var path = "M " + firstPoint.x + "," + firstPoint.y;
-        for (var i = 1; i < segments.length; i++) {
-            var p = segments[i];
-            path += " L " + p.x + "," + p.y;
-        }
-        return snabbdom_jsx_1.svg("path", { d: path, stroke: "green" });
+        var lastPoint = segments[segments.length - 1];
+        return (snabbdom_jsx_1.svg("g", { fill: "none", stroke: "black", "stroke-width": "4" },
+            snabbdom_jsx_1.svg("line", { x1: firstPoint.x, x2: lastPoint.x, y1: firstPoint.y, y2: lastPoint.y, stroke: "black", id: "stroke-dasharray-generic" })));
     };
     GenericRelationshipView = __decorate([
         inversify_1.injectable()
@@ -1130,86 +1217,36 @@ var DerivativeRelationshipView = /** @class */ (function (_super) {
         inversify_1.injectable()
     ], DerivativeRelationshipView);
     return DerivativeRelationshipView;
-}(PolylineArrowEdgeView));
+}(PolylineClosedArrowEdgeView));
 exports.DerivativeRelationshipView = DerivativeRelationshipView;
 var ConsequenceRelationshipView = /** @class */ (function (_super) {
     __extends(ConsequenceRelationshipView, _super);
     function ConsequenceRelationshipView() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.gap = 10;
-        return _this;
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    // Draw a double stroke line
-    ConsequenceRelationshipView.prototype.renderLine = function (edge, segments, context) {
-        console.log("Rendering Line.");
-        var firstPoint = segments[0];
-        var path = "M " + (firstPoint.x + 1) + "," + firstPoint.y;
-        for (var i = 1; i < segments.length; i++) {
-            var p = segments[i];
-            path += " L " + p.x + "," + p.y;
-            if (segments[i - 1].x === segments[i].x) {
-                // A horizontal line.
-                console.log("Horizontal part!");
-                var lastPoint = segments[i - 1];
-                var currPoint = segments[i];
-                // Draw second line slightly to the side of the current line.
-                path += " M " + lastPoint.x + "," + (lastPoint.y + this.gap) + " L " + currPoint.x + "," + (currPoint.y + this.gap);
-            }
-            else {
-                // A vertical line.
-                console.log("Vertical part!");
-                var lastPoint = segments[i - 1];
-                var currPoint = segments[i];
-                path += " M " + (lastPoint.x + this.gap) + "," + lastPoint.y + " L " + (currPoint.x + this.gap) + "," + currPoint.y;
-            }
-            // Move back
-            path += " M " + p.x + "," + p.y;
-        }
-        return snabbdom_jsx_1.svg("path", { d: path });
-    };
     ConsequenceRelationshipView = __decorate([
         inversify_1.injectable()
     ], ConsequenceRelationshipView);
     return ConsequenceRelationshipView;
-}(sprotty_1.PolylineEdgeView));
+}(PolylineOpenArrowEdgeView));
 exports.ConsequenceRelationshipView = ConsequenceRelationshipView;
 var OptionRelationshipView = /** @class */ (function (_super) {
     __extends(OptionRelationshipView, _super);
-    /**
-     * Copied from the sprotty library @PolylineEdgeView and changed a bit.
-     *
-     * For reference on svg paths: https://developer.mozilla.org/de/docs/Web/SVG/Tutorial/Paths.
-     */
     function OptionRelationshipView() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    // @Override
-    OptionRelationshipView.prototype.renderLine = function (edge, segments, context) {
-        var firstPoint = segments[0];
-        // Defines an aggregation arrow head at the beginning of the line.
-        // Move to the beginning of the line.
-        var path = "M " + firstPoint.x + "," + firstPoint.y;
-        // Draw the rhombus.
-        path = path + (" L " + (firstPoint.x + 3) + " " + (firstPoint.y + 5));
-        path = path + (" L " + firstPoint.x + " " + (firstPoint.y + 10));
-        path = path + (" L " + (firstPoint.x - 3) + " " + (firstPoint.y + 5));
-        path = path + (" L " + firstPoint.x + " " + firstPoint.y);
-        path = path + (" M " + firstPoint.x + " " + (firstPoint.y + 10));
-        // Draw the rest of the line.
-        for (var i = 1; i < segments.length; i++) {
-            var p = segments[i];
-            path += " L " + p.x + "," + p.y;
-        }
-        // Put the line into a path.
-        return snabbdom_jsx_1.svg("path", { d: path, "stroke-width": "1" });
+    OptionRelationshipView.prototype.renderAdditionals = function (edge, segments, context) {
+        var leftPointX = segments[0].x + 10;
+        var rightPointX = segments[0].x - 10;
+        var leftPointY = segments[0].y;
+        var arc = "M " + leftPointX + " " + leftPointY + " A 10 10 0 1 1 " + rightPointX + " " + leftPointY;
+        return [
+            snabbdom_jsx_1.svg("g", { fill: "none", stroke: "black" },
+                snabbdom_jsx_1.svg("path", { d: arc }))
+        ];
     };
     OptionRelationshipView = __decorate([
         inversify_1.injectable()
-        /**
-         * Copied from the sprotty library @PolylineEdgeView and changed a bit.
-         *
-         * For reference on svg paths: https://developer.mozilla.org/de/docs/Web/SVG/Tutorial/Paths.
-         */
     ], OptionRelationshipView);
     return OptionRelationshipView;
 }(sprotty_1.PolylineEdgeView));
@@ -1240,7 +1277,7 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 
 // module
-exports.push([module.i, ".sprotty-node {\n    fill: lightblue\n}\n\n.sprotty-node.selected {\n    stroke-width: 2;\n    stroke: #0070be;\n}\n\n.sprotty-label {\n    fill: black;\n    stroke-width: 0;\n}\n\n.sprotty-button {\n    fill: #B4B4B488;\n}\n\n.sprotty-edge .sprotty-label {\n    fill: var(--theia-foreground);\n}\n\n.sprotty-edge {\n    fill:none;\n    stroke: var(--theia-foreground);\n    stroke-width: 2px;\n}\n\n.sprotty-edge-arrow {\n    fill:#B4B4B4;\n}\n\n.sprotty-edge > .sprotty-routing-handle {\n    r: 5px;\n    fill: #888;\n    stroke: none;\n    z-index: 1000;\n}\n\n.sprotty-edge > .sprotty-routing-handle[data-kind='line'] {\n    opacity: 0.35;\n}\n\n.sprotty-edge > .sprotty-routing-handle.selected {\n    fill: #0070be;\n}\n\n.sprotty-edge > .sprotty-routing-handle.mouseover {\n    stroke: #0191f8;\n    stroke-width: 1;\n}\n\n.sprotty-edge.mouseover:not(.selected) {\n    stroke-width: 3px;\n}\n\n.sprotty-hidden {\n    font-size: var(--theia-ui-font-size1);\n    width: 0px;\n    height: 0px;\n}\n\n", ""]);
+exports.push([module.i, ".sprotty-node {\n    fill: lightblue\n}\n\n.sprotty-node.selected {\n    stroke-width: 2;\n    stroke: #0070be;\n}\n\n.sprotty-label {\n    fill: black;\n    stroke-width: 0;\n}\n\n.sprotty-button {\n    fill: #B4B4B488;\n}\n\n.sprotty-edge .sprotty-label {\n    fill: var(--theia-foreground);\n}\n\n.sprotty-edge {\n    fill:none;\n    stroke: var(--theia-foreground);\n    stroke-width: 2px;\n}\n\n.sprotty-edge-arrow {\n    fill:#B4B4B4;\n}\n\n.sprotty-edge > .sprotty-routing-handle {\n    r: 5px;\n    fill: #888;\n    stroke: none;\n    z-index: 1000;\n}\n\n.sprotty-edge > .sprotty-routing-handle[data-kind='line'] {\n    opacity: 0.35;\n}\n\n.sprotty-edge > .sprotty-routing-handle.selected {\n    fill: #0070be;\n}\n\n.sprotty-edge > .sprotty-routing-handle.mouseover {\n    stroke: #0191f8;\n    stroke-width: 1;\n}\n\n.sprotty-edge.mouseover:not(.selected) {\n    stroke-width: 3px;\n}\n\n.sprotty-hidden {\n    font-size: var(--theia-ui-font-size1);\n    width: 0px;\n    height: 0px;\n}\n\n#stroke-dasharray-generic {\n    stroke-dasharray: 6 3;\n}", ""]);
 
 // exports
 

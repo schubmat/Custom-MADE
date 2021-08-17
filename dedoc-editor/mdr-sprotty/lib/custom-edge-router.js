@@ -25,17 +25,33 @@ var __assign = (this && this.__assign) || function () {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var sprotty_1 = require("sprotty");
-var CustomRouter = /** @class */ (function (_super) {
-    __extends(CustomRouter, _super);
-    function CustomRouter() {
+var CustomManhattanRouter = /** @class */ (function (_super) {
+    __extends(CustomManhattanRouter, _super);
+    function CustomManhattanRouter() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    CustomRouter.prototype.getOptions = function (edge) {
+    CustomManhattanRouter.prototype.getOptions = function (edge) {
         var defaultOptions = _super.prototype.getOptions.call(this, edge);
         return edge.id === sprotty_1.edgeInProgressID
             ? __assign(__assign({}, defaultOptions), { standardDistance: 1 }) : defaultOptions;
     };
-    return CustomRouter;
+    return CustomManhattanRouter;
 }(sprotty_1.ManhattanEdgeRouter));
-exports.CustomRouter = CustomRouter;
+exports.CustomManhattanRouter = CustomManhattanRouter;
+var CustomLinearRouter = /** @class */ (function (_super) {
+    __extends(CustomLinearRouter, _super);
+    function CustomLinearRouter() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    CustomLinearRouter.prototype.route = function (edge) {
+        // Use the result from the PolylineEdgeRouter.
+        var polyline = _super.prototype.route.call(this, edge);
+        return [
+            polyline[0],
+            polyline[polyline.length - 1]
+        ];
+    };
+    return CustomLinearRouter;
+}(sprotty_1.PolylineEdgeRouter));
+exports.CustomLinearRouter = CustomLinearRouter;
 //# sourceMappingURL=custom-edge-router.js.map

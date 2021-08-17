@@ -6,6 +6,7 @@ export declare class MdrDiagram extends SGraph {
     hasFeature(feature: symbol): boolean;
 }
 export declare class MdrNode extends RectangularNode {
+    readonly description: string;
     canConnect(routable: SRoutableElement, role: string): boolean;
 }
 export declare class CreateTransitionPort extends RectangularPort implements CreatingOnDrag {
