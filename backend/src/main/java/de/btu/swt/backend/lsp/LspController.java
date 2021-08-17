@@ -42,6 +42,7 @@ public class LspController {
 
     @Bean
     CommandLineRunner afterDataInitialize(LspRepository lspRepository) {
+        return null;/*
         buildLspBinaries();
         return args -> {
             log.info("afterDataInitialize");
@@ -49,7 +50,7 @@ public class LspController {
             for (LanguageServer lsp : lsps) {
                 startLspInstance(lsp);
             }
-        };
+        };*/
     }
 
     private void buildLspBinaries() {

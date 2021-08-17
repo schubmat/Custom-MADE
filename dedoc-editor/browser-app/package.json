@@ -1,0 +1,40 @@
+{
+  "private": true,
+  "name": "browser-app",
+  "version": "0.0.0",
+  "dependencies": {
+    "@theia/callhierarchy": "1.0.0",
+    "@theia/core": "1.0.0",
+    "@theia/editor": "1.0.0",
+    "@theia/editor-preview": "1.0.0",
+    "@theia/keymaps": "1.0.0",
+    "@theia/languages": "1.0.0",
+    "@theia/markers": "1.0.0",
+    "@theia/messages": "1.0.0",
+    "@theia/monaco": "1.0.0",
+    "@theia/plugin-dev": "1.0.0",
+    "@theia/plugin-ext": "1.0.0",
+    "@theia/plugin-ext-vscode": "1.0.0",
+    "@theia/plugin-metrics": "1.0.0",
+    "@theia/preferences": "1.0.0",
+    "@theia/preview": "1.0.0",
+    "@theia/process": "1.0.0",
+    "@theia/task": "1.0.0",
+    "@theia/userstorage": "1.0.0",
+    "@theia/variable-resolver": "1.0.0",
+    "@theia/vsx-registry": "1.0.0",
+    "mdr-dsl": "0.0.0"
+  },
+  "devDependencies": {
+    "@theia/cli": "1.0.0"
+  },
+  "scripts": {
+    "prepare": "theia build --mode development",    
+    "start": "theia start --port 3001",
+    "watch": "theia build --watch --mode development",
+    "start:debug": "node --inspect ./src-gen/backend/main.js --root-dir=../../workspace --MDR_LSP=5008 --port=8080 --loglevel=debug"
+  },
+  "theia": {
+    "target": "browser"
+  }
+}
