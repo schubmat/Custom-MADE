@@ -63,30 +63,42 @@ export class Permissions {
         this.untouchable = isUntouchable;
     }
 
-    public static contains(obj: Permissions, necessary: Permissions): boolean {
-        return (obj.canBrowseFiles || !necessary.canBrowseFiles)
-            && (obj.canChangeFiles || !necessary.canChangeFiles)
-            && (obj.canExportFiles || !necessary.canExportFiles)
-            && (obj.canAddUsers || !necessary.canAddUsers)
-            && (obj.canDeleteVersion || !necessary.canDeleteVersion)
-            && (obj.canUseAsModel || !necessary.canUseAsModel)
-            && (obj.canSetGitRepo || !necessary.canSetGitRepo)
-            && (obj.untouchable || !necessary.untouchable);
+    public isGreaterThan(other: Permissions): boolean {
+        return this.contains(other) && !this.equals(other);
     }
 
-    public static equals(thiss: Permissions, other: Permissions): boolean {
-        return thiss.canBrowseFiles === other.canBrowseFiles &&
-            thiss.canChangeFiles === other.canChangeFiles &&
-            thiss.canExportFiles === other.canExportFiles &&
-            thiss.canAddUsers === other.canAddUsers &&
-            thiss.canDeleteVersion === other.canDeleteVersion &&
-            thiss.canUseAsModel === other.canUseAsModel &&
-            thiss.canSetGitRepo === other.canSetGitRepo &&
-            thiss.untouchable === other.untouchable;
+    public equals(other: Permissions): boolean {
+        return this.canBrowseFiles === other.canBrowseFiles &&
+        this.canChangeFiles === other.canChangeFiles &&
+        this.canExportFiles === other.canExportFiles &&
+        this.canAddUsers === other.canAddUsers &&
+        this.canDeleteVersion === other.canDeleteVersion &&
+        this.canUseAsModel === other.canUseAsModel &&
+        this.canSetGitRepo === other.canSetGitRepo &&
+        this.untouchable === other.untouchable;
     }
 
-    public static isGreaterThan(thiss: Permissions, other: Permissions): boolean {
-        return Permissions.contains(thiss, other) && !Permissions.equals(thiss, other);
+    public contains(necessary: Permissions): boolean {
+        return (this.canBrowseFiles || !necessary.canBrowseFiles)
+        && (this.canChangeFiles || !necessary.canChangeFiles)
+        && (this.canExportFiles || !necessary.canExportFiles)
+        && (this.canAddUsers || !necessary.canAddUsers)
+        && (this.canDeleteVersion || !necessary.canDeleteVersion)
+        && (this.canUseAsModel || !necessary.canUseAsModel)
+        && (this.canSetGitRepo || !necessary.canSetGitRepo)
+        && (this.untouchable || !necessary.untouchable);
+    }
+
+    public static isGreaterThan(sourceObject: Permissions, otherObject: Permissions): boolean {
+        sourceObject.isGreaterThan(otherObject);
+    }
+
+    public static equals(sourceObject: Permissions, otherObject: Permissions): boolean {
+        return sourceObject.equals(otherObject);
+    }
+
+    public static contains(sourceObject: Permissions, otherObject: Permissions): boolean {
+        return sourceObject.contains(otherObject);
     }
 }
 
