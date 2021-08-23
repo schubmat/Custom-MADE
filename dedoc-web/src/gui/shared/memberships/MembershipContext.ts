@@ -22,7 +22,8 @@ export const useMembershipContext = () => {
         const username = auth.user.username;
         return username != context.user.username &&
             usersPermissions.canAddUsers &&
-            Permissions.isGreaterThan(usersPermissions, context.permissions);
+            Permissions.isGreaterThan(usersPermissions.getEntity(), context.permissions.getEntity());
+            // usersPermissions.isGreaterThan(context.permissions.getEntity());
     };
 
     return {membership: context, canUserEdit};
