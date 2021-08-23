@@ -56,7 +56,7 @@ const AddMemberForm = (props: FormComponentProps) => {
                 rules: [{required: true, message: 'Please select a role'}],
             })(
                 <PermissionSelect
-                    usersPermissions={usersPermissions}
+                    usersPermissions={usersPermissions.getEntity()}
                     onSelect={p => props.form.setFieldsValue({permissions: p})}
                 />
             )}

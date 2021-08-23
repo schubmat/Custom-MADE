@@ -90,7 +90,7 @@ export class Permissions {
     }
 
     public static isGreaterThan(sourceObject: Permissions, otherObject: Permissions): boolean {
-        sourceObject.isGreaterThan(otherObject);
+        return sourceObject.isGreaterThan(otherObject);
     }
 
     public static equals(sourceObject: Permissions, otherObject: Permissions): boolean {
