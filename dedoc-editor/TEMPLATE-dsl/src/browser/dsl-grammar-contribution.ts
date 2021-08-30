@@ -9,13 +9,13 @@ export class MdrGrammarContribution implements LanguageGrammarDefinitionContribu
         monaco.languages.register({
             id: MDR_LANGUAGE_SERVER_ID,
             aliases: [
-                MDR_LANGUAGE_SERVER_NAME, MDR_LANGUAGE_SERVER_ID
+                MDR_LANGUAGE_SERVER_NAME, MDR_LANGUAGE_SERVER_ID, 'MYDSL'
             ],
             extensions: [
                 MDR_LANGUAGE_FILE_EXTENSION,
             ],
             mimetypes: [
-                'text/dsl'
+                'application/myDsl'
             ]
         });
         monaco.languages.setLanguageConfiguration(MDR_LANGUAGE_SERVER_ID, this.configuration);
