@@ -23,7 +23,7 @@
     "@theia/userstorage": "1.0.0",
     "@theia/variable-resolver": "1.0.0",
     "@theia/vsx-registry": "1.0.0",
-    "mdr-dsl": "0.0.0"
+    "TEMPLATE-dsl": "0.0.0"
   },
   "devDependencies": {
     "@theia/cli": "1.0.0"

@@ -9,6 +9,6 @@
     "lerna": "2.4.0"
   },
   "workspaces": [
-    "mdr-sprotty", "mdr-dsl", "browser-app", "electron-app"
+    "mdr-sprotty", "TEMPLATE-dsl", "browser-app"
   ]
 }
