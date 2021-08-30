@@ -7,7 +7,7 @@ import { createSocketConnection } from 'vscode-ws-jsonrpc/lib/server';
 import { MDR_LANGUAGE_SERVER_ID, MDR_LANGUAGE_SERVER_NAME } from '../common';
 
 const EXECUTABLE_NAME = isWindows ? 'mydsl-socket.bat' : 'mydsl-socket';
-const EXECUTABLE_PATH = resolve(join(__dirname, '..', '..', '..', '..', 'backend', 'target', 'xtext-lsp', 'LSP_BUILDS', 'TEMPLATE-LANGUAGE_NAME', 'bin', EXECUTABLE_NAME));
+const EXECUTABLE_PATH = resolve(join(__dirname, '..', '..', '..', '..', 'ls', 'bin', EXECUTABLE_NAME));
 
 @injectable()
 export class MdrLanguageServerContribution extends BaseLanguageServerContribution {
