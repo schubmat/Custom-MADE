@@ -102,8 +102,7 @@ public class FileController {
             System.err.println("File with fileId \'" + fileId + "\' not found in repository.");
             return false;
         }
-        // if (file.getContent().equals(""))
-        //     return false;
+
         return file.getVersion().getPermissions(user).contains(actions);
     }
 
