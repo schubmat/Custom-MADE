@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import javax.persistence.EntityNotFoundException;
 
 import java.io.IOException;
 import java.util.Deque;
@@ -93,9 +94,15 @@ public class FileController {
     }
 
     private boolean hasPermissions(User user, long fileId, Permissions actions) {
-        File file = fileRepository.getOne(fileId);
-        if (file.getContent().equals(""))
+        File file; 
+
+        try {
+            file = fileRepository.getOne(fileId);
+        } catch (EntityNotFoundException e) {
+            System.err.println("File with fileId \'" + fileId + "\' not found in repository.");
             return false;
+        }
+
         return file.getVersion().getPermissions(user).contains(actions);
     }
 
