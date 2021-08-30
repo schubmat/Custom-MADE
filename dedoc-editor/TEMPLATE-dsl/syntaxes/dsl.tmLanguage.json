@@ -1,6 +1,6 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-	"name": "MDR-DSL",
+	"name": "TEMPLATE-dsl",
 	"patterns": [
 		{
 			"include": "#keywords"
@@ -14,23 +14,23 @@
 	],
 	"repository": {
 		"keywords": {
-			"name": "constant.language.mdr",
+			"name": "constant.language.dsl",
 			"patterns": [{
-				"name": "constant.language.mdr",
+				"name": "constant.language.dsl",
 				"match": "\\b(Title:|User story:|Summary:|Considered alternatives:|We chose:|Because:)\\b"
 			}]
 		},
 		"strings": {
-			"name": "string.quoted.double.mdr",
+			"name": "string.quoted.double.dsl",
 			"begin": "\"",
 			"end": "\"",
 			"patterns": [
 				{
-					"name": "constant.character.escape.mdr",
+					"name": "constant.character.escape.dsl",
 					"match": "\\\\."
 				}
 			]
 		}
 	},
-	"scopeName": "source.mdr"
+	"scopeName": "source.dsl"
 }

@@ -6,7 +6,7 @@ import { CodeActionPalettePopupProvider, CodeActionProvider, CompletionLabelEdit
     RenameLabelEditor, TheiaDiagramServer, TheiaKeyTool, WorkspaceEditCommand, EditDiagramLocker } from "sprotty-theia";
 import { createStateDiagramContainer } from 'mdr-sprotty/lib/di.config';
 import { PaletteButtonView } from 'mdr-sprotty/lib/html-views';
-import { MdrDiagramServer } from "./mdr-diagram-server";
+import { MdrDiagramServer } from "./diagram-server";
 import "sprotty-theia/css/theia-sprotty.css"
 export const MDR_DIAGRAM_TYPE = 'flex-dr-based-diagram';
 

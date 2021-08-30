@@ -3,8 +3,8 @@ import { EditorManager } from '@theia/editor/lib/browser';
 import { MonacoWorkspace } from '@theia/monaco/lib/browser/monaco-workspace';
 import { inject, injectable } from 'inversify';
 import { DiagramManager, LSTheiaSprottyConnector, TheiaFileSaver, TheiaSprottyConnector } from 'sprotty-theia';
-import { MDR_DIAGRAM_TYPE } from './mdr-diagram-configuration';
-import { MdrDiagramLanguageClient } from './mdr-diagram-language-client';
+import { MDR_DIAGRAM_TYPE } from './diagram-configuration';
+import { MdrDiagramLanguageClient } from './diagram-language-client';
 
 @injectable()
 export class MdrDiagramManager extends DiagramManager {

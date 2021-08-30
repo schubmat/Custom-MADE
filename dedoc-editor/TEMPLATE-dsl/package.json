@@ -1,5 +1,5 @@
 {
-  "name": "mdr-dsl",
+  "name": "TEMPLATE-dsl",
   "keywords": [
     "theia-extension"
   ],
@@ -30,8 +30,8 @@
   },
   "theiaExtensions": [
     {
-      "frontend": "lib/browser/mdr-dsl-frontend-module",
-      "backend": "lib/node/mdr-dsl-backend-module"
+      "frontend": "lib/browser/dsl-frontend-module",
+      "backend": "lib/node/dsl-backend-module"
     }
   ]
 }

@@ -15,13 +15,13 @@ export class MdrGrammarContribution implements LanguageGrammarDefinitionContribu
                 MDR_LANGUAGE_FILE_EXTENSION,
             ],
             mimetypes: [
-                'text/mdr'
+                'text/dsl'
             ]
         });
         monaco.languages.setLanguageConfiguration(MDR_LANGUAGE_SERVER_ID, this.configuration);
 
-        const mdrGrammar = require('../../syntaxes/mdr.tmLanguage.json');
-        registry.registerTextmateGrammarScope('source.mdr', {
+        const mdrGrammar = require('../../syntaxes/dsl.tmLanguage.json');
+        registry.registerTextmateGrammarScope('source.dsl', {
             async getGrammarDefinition() {
                 return {
                     format: 'json',
@@ -29,7 +29,7 @@ export class MdrGrammarContribution implements LanguageGrammarDefinitionContribu
                 };
             }
         });
-        registry.mapLanguageIdToTextmateGrammar(MDR_LANGUAGE_SERVER_ID, 'source.mdr');
+        registry.mapLanguageIdToTextmateGrammar(MDR_LANGUAGE_SERVER_ID, 'source.dsl');
     }
 
     protected configuration: monaco.languages.LanguageConfiguration = {

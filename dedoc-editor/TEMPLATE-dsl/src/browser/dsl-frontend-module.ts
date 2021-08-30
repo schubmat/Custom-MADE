@@ -9,12 +9,12 @@ import { LanguageGrammarDefinitionContribution } from '@theia/monaco/lib/browser
 import { ContainerModule } from "inversify";
 import { DiagramConfiguration, DiagramManager, DiagramManagerProvider, LSDiagramCommandContribution, 
     LSDiagramKeybindingContribution } from 'sprotty-theia';
-import { MdrDiagramConfiguration } from './diagram/mdr-diagram-configuration';
-import { MdrDiagramLanguageClient } from './diagram/mdr-diagram-language-client';
-import { MdrDiagramManager } from './diagram/mdr-diagram-manager';
-import { MdrDslCommandContribution, MdrDslMenuContribution } from './mdr-dsl-contribution';
-import { MdrGrammarContribution } from './mdr-dsl-grammar-contribution';
-import { MdrLanguageClientContribution } from './mdr-dsl-language-client-contribution';
+import { MdrDiagramConfiguration } from './diagram/diagram-configuration';
+import { MdrDiagramLanguageClient } from './diagram/diagram-language-client';
+import { MdrDiagramManager } from './diagram/diagram-manager';
+import { MdrDslCommandContribution, MdrDslMenuContribution } from './dsl-contribution';
+import { MdrGrammarContribution } from './dsl-grammar-contribution';
+import { MdrLanguageClientContribution } from './dsl-language-client-contribution';
 
 export default new ContainerModule(bind => {
     // add your contribution bindings here
