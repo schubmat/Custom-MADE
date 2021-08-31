@@ -1,5 +1,2 @@
 /node_modules
-*lib/
-*src-gen*
-*gen-webpack*
-package-lock.json
+/lib
