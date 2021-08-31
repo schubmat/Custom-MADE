@@ -36,7 +36,13 @@ export interface LanguageServer {
     version?: Version;
 }
 
-export class Permissions {
+export interface Comparable<T> {
+    isGreaterThan(other: T):boolean;
+    equals(other: T):boolean;
+    contains(necessary: T):boolean;
+}
+
+export class Permissions implements Comparable<Permissions> {
     public static OWNER = new Permissions(true, true, true, true, true, true, true, true);
     public static MAINTAINER = new Permissions(true, true, true, true, true, true, true,false);
     public static CONTRIBUTOR = new Permissions(true, true, true, false, false, true, false, false);
@@ -87,18 +93,6 @@ export class Permissions {
         && (this.canUseAsModel || !necessary.canUseAsModel)
         && (this.canSetGitRepo || !necessary.canSetGitRepo)
         && (this.untouchable || !necessary.untouchable);
-    }
-
-    public static isGreaterThan(sourceObject: Permissions, otherObject: Permissions): boolean {
-        return sourceObject.isGreaterThan(otherObject);
-    }
-
-    public static equals(sourceObject: Permissions, otherObject: Permissions): boolean {
-        return sourceObject.equals(otherObject);
-    }
-
-    public static contains(sourceObject: Permissions, otherObject: Permissions): boolean {
-        return sourceObject.contains(otherObject);
     }
 }
 
