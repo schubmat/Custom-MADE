@@ -20,7 +20,7 @@ export const EditableMembersPermission = () => {
         />;
     }
 
-    const permission = permissionLevels.find(permission => Permissions.equals(permission.p, membership.permissions.getEntity()));
+    const permission = permissionLevels.find(permission => permission.p.equals( membership.permissions.getEntity()));
     if (permission)
         return <span>{permission.name}</span>;
     return <span/>;

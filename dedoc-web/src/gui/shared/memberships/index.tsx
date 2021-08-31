@@ -18,7 +18,7 @@ export const MembershipsView = () => {
             <p/>
         </div>}
         <MembersTable/>
-        {!Permissions.equals(usersPermissions, Permissions.GUEST)
+        {!usersPermissions.equals(Permissions.GUEST)
             && <LeaveProjectButton/>}
     </div>
 };
