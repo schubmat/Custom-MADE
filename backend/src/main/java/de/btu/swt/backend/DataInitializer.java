@@ -19,6 +19,7 @@ import de.btu.swt.backend.version.Version;
 import de.btu.swt.backend.version.VersionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -29,22 +30,30 @@ import javax.annotation.PostConstruct;
 public class DataInitializer {
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
     private UserRepository userRepository;
-    @Autowired
     private ProjectRepository projectRepository;
-    @Autowired
     private FileRepository fileRepository;
-    @Autowired
     private LspRepository lspRepository;
-    @Autowired
     private VersionRepository versionRepository;
-    @Autowired
     private GitAccountRepository gitRepository;
 
     @Autowired
-    public DataInitializer(PasswordEncoder passwordEncoder) {
+    public DataInitializer(
+            PasswordEncoder passwordEncoder,
+            UserRepository userRepository,
+            ProjectRepository projectRepository,
+            FileRepository fileRepository,
+            LspRepository lspRepository,
+            VersionRepository versionRepository,
+            GitAccountRepository gitAccountRepository
+    ) {
         this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
+        this.projectRepository = projectRepository;
+        this.fileRepository = fileRepository;
+        this.lspRepository = lspRepository;
+        this.versionRepository = versionRepository;
+        this.gitRepository = gitAccountRepository;
     }
 
     @PostConstruct
@@ -65,6 +74,11 @@ public class DataInitializer {
                 .build();
         user = userRepository.save(user);
         admin = userRepository.save(admin);
+
+        if (user == null || admin == null) {
+            log.error(" !!! Error in the initialization! The user repository is not setup correctly !!!");
+            return;
+        }
 
         // init data for git connection
 
@@ -106,8 +120,6 @@ public class DataInitializer {
                 .owner(admin)
                 .level(ProjectLevel.M2)
                 .build();
-
-
 
         log.info("Initialized: " + projectRepository.save(mdrSimpleGrammar));
         log.info("Initialized: " + projectRepository.save(metaGrammar));
