@@ -49,8 +49,6 @@ public class DataInitializer {
 
     @PostConstruct
     void initData() {
-
-
         // init user accounts for application
 
         User user = User.builder()

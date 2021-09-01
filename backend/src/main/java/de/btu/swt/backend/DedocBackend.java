@@ -13,9 +13,4 @@ public class DedocBackend {
         SpringApplication.run(DedocBackend.class, args);
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
 }
