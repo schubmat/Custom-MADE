@@ -47,37 +47,37 @@ public class RemoteSynchronizer {
      * @throws IOException
      * @throws GitException
      */
-    public List<File> cloneSynchronize(User user, GitConfiguration newConfig, Version version) throws IOException, GitException {
+    public List<File> cloneSynchronize(User user, GitConfiguration newConfig, Version version)
+            throws IOException, GitException {
         GitOperations git = new GitOperations(newConfig);
         FileSystemOperations fileSystem = new FileSystemOperations(version);
         EntityOperations entities = new EntityOperations(version, user);
         try {
             fileSystem.createBackup();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             fileSystem.removeBackup();
             throw e;
         }
         try {
             fileSystem.deleteRemoteFiles();
-            git.clone(version.getRemoteDirectory().toFile().getAbsoluteFile(), getGitUserSettings(user, newConfig, version));
+            git.clone(version.getRemoteDirectory().toFile().getAbsoluteFile(),
+                    getGitUserSettings(user, newConfig, version));
             fileSystem.createNewFilesLink(newConfig);
-            List<File> modifiedFiles = entities.createOrUpdateFileEntities(Arrays.asList(version.getSrcFilesDirectory().toFile().listFiles()));
+            List<File> modifiedFiles = entities
+                    .createOrUpdateFileEntities(Arrays.asList(version.getSrcFilesDirectory().toFile().listFiles()));
             fileSystem.mergeExistingFiles(modifiedFiles);
             fileSystem.removeBackup();
             version.setGitConfiguration(newConfig);
             fileRepository.saveAll(modifiedFiles);
             version = versionRepository.save(version);
             return modifiedFiles;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             fileSystem.restoreBackup();
             version.setGitConfiguration(null);
             version = versionRepository.save(version);
             fileSystem.deleteRemoteFiles();
             throw e;
-        }
-        finally {
+        } finally {
             fileSystem.removeBackup();
         }
     }
@@ -89,13 +89,13 @@ public class RemoteSynchronizer {
      * @return List of modified and not deleted files
      * @throws GitException
      */
-    public List<File> pullSynchronize(User user,  Version version) {
+    public List<File> pullSynchronize(User user, Version version) {
         GitConfiguration newConfig = version.getGitConfiguration();
         if (newConfig == null)
             return new LinkedList<>();
         GitOperations git = new GitOperations(newConfig);
         EntityOperations entities = new EntityOperations(version, user);
-        //contains changed, created and deleted files
+        // contains changed, created and deleted files
         String[] changedFiles = git.pull(version.getRemoteDirectory().toFile().getAbsoluteFile());
 
         List<java.io.File> notDeleted = getStorageFiles(changedFiles, version);
@@ -110,9 +110,12 @@ public class RemoteSynchronizer {
         return modifiedFiles;
     }
 
-    public void commitPullAndPushChanges(File[] files, String commitMessage, User user, Version version) throws GitException, IOException {
-//        if (version.getFiles().stream().filter(file -> file.getStatus() == FileStatus.IN_CONFLICT).count() > 0)
-//            throw new GitException("Before you can commit your changes, you have to resolve the merge conflict");
+    public void commitPullAndPushChanges(File[] files, String commitMessage, User user, Version version)
+            throws GitException, IOException {
+        // if (version.getFiles().stream().filter(file -> file.getStatus() ==
+        // FileStatus.IN_CONFLICT).count() > 0)
+        // throw new GitException("Before you can commit your changes, you have to
+        // resolve the merge conflict");
         GitConfiguration newConfig = version.getGitConfiguration();
         EntityOperations entities = new EntityOperations(version, user);
         if (newConfig == null)
@@ -142,7 +145,7 @@ public class RemoteSynchronizer {
 
     private List<java.io.File> getStorageFiles(String[] relFilePaths, Version version) {
         List<java.io.File> result = new LinkedList<>();
-        for(String fileName : relFilePaths) {
+        for (String fileName : relFilePaths) {
             java.io.File file = version.getRemoteDirectory().resolve(fileName).toFile();
             if (file.exists())
                 result.add(file);
@@ -171,28 +174,28 @@ public class RemoteSynchronizer {
         Path indexPath = gitConfig.getPath(version);
         java.io.File index = indexPath.resolve("index.md").toFile();
         index.createNewFile();
-        FileWriter fileWriter = new FileWriter(index);
-        fileWriter.write("| file | raw | generated |\n");
-        fileWriter.write("| ------ | ------ | ------ |\n");
-        for (File file : version.getFiles()) {
-            fileWriter.write("| ");;
-            fileWriter.write(file.getName().replace("_", ""));
-            fileWriter.write(" | ");
-            fileWriter.write("[RAW-Link](");
-            fileWriter.write(indexPath.relativize(file.getPath().toFile().getCanonicalFile().toPath()).toString());
-            fileWriter.write(")");
-            fileWriter.write(" | ");
-            List<String> exports = new LinkedList<>();
-            for (java.io.File export : file.getExports()) {
-                String uri = indexPath.relativize(export.getCanonicalFile().toPath()).toString();
-                String link = getFileExtension(export.getName()).toUpperCase() + "-Link";
-                exports.add("["+link+"]("+uri+")");
+        try (FileWriter fileWriter = new FileWriter(index)) {
+            fileWriter.write("| file | raw | generated |\n");
+            fileWriter.write("| ------ | ------ | ------ |\n");
+            for (File file : version.getFiles()) {
+                fileWriter.write("| ");
+                fileWriter.write(file.getName().replace("_", ""));
+                fileWriter.write(" | ");
+                fileWriter.write("[RAW-Link](");
+                fileWriter.write(indexPath.relativize(file.getPath().toFile().getCanonicalFile().toPath()).toString());
+                fileWriter.write(")");
+                fileWriter.write(" | ");
+                List<String> exports = new LinkedList<>();
+                for (java.io.File export : file.getExports()) {
+                    String uri = indexPath.relativize(export.getCanonicalFile().toPath()).toString();
+                    String link = getFileExtension(export.getName()).toUpperCase() + "-Link";
+                    exports.add("[" + link + "](" + uri + ")");
+                }
+                fileWriter.write(String.join(" &nbsp; ", exports));
+                fileWriter.write(" |\n");
             }
-            fileWriter.write(String.join(" &nbsp; ", exports));
-            fileWriter.write(" |\n");
+            fileWriter.flush();
         }
-        fileWriter.flush();
-        fileWriter.close();
         return index;
     }
 
