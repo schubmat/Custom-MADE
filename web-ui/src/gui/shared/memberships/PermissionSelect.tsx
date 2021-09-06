@@ -25,7 +25,7 @@ class PermissionSelect extends React.Component<PermissionSelectProps> {
         const {usersPermissions, defaultValue} = this.props;
         let init = undefined;
         if (defaultValue) {
-            const level = permissionLevels.find(l => Permissions.equals(l.p, defaultValue));
+            const level = permissionLevels.find(l => l.p.equals( defaultValue));
             if (level)
                 init = level.name;
         }
@@ -35,7 +35,7 @@ class PermissionSelect extends React.Component<PermissionSelectProps> {
             style={{ width: '100%' }}
             placeholder="type"
             onSelect={this.onSelectKey}>
-            {usersPermissions && permissionLevels.filter(level => Permissions.isGreaterThan(usersPermissions, level.p)).map(level => (
+            {usersPermissions && permissionLevels.filter(level => usersPermissions.isGreaterThan(level.p)).map(level => (
                 <Option
                     key={level.name}
                     title={level.name}

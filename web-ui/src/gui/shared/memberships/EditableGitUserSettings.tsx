@@ -114,7 +114,7 @@ const useEditableGitUserSettings = () => {
         const newMembership = {...membership,
             gitSettings: newSettings,
             version: version.getEntity()};
-        version.memberships.put(newMembership).then(onSuccess).catch(onError);
+        version.memberships.put(newMembership.getEntity()).then(onSuccess).catch(onError);
     };
 
     return {

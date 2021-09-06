@@ -12,15 +12,15 @@ export const EditableMembersPermission = () => {
 
     if (canUserEdit()) {
         return <PermissionSelect
-            usersPermissions={usersPermissions}
-            defaultValue={membership.permissions}
+            usersPermissions={usersPermissions.getEntity()}
+            defaultValue={membership.permissions.getEntity()}
             onSelect={newPermissions => setPermissions(newPermissions,
                 () => message.success("Permissions are changed"),
                 error => message.error(error.message))}
         />;
     }
 
-    const permission = permissionLevels.find(permission => Permissions.equals(permission.p, membership.permissions));
+    const permission = permissionLevels.find(permission => permission.p.equals( membership.permissions.getEntity()));
     if (permission)
         return <span>{permission.name}</span>;
     return <span/>;
