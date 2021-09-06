@@ -12,7 +12,7 @@ fi
 #    |  __'.  / ___ \  | |         |  __'.    |  _| _  | |\ \| |   | |  | | 
 #   _| |__) |/ /   \ \_\ `.___.'\ _| |  \ \_ _| |__/ |_| |_\   |_ _| |_.' / 
 #  |_______/____| |____|`.____ .'|____||____|________|_____|\____|______.'  
-#                                        
+#
 # ------------------------------------------------------------
 # ------------------------------------------------------------
 #
@@ -41,8 +41,8 @@ cd ..
 
 
 # start the web front-end of Custom-MADE (react app)
-cd dedoc-web
-	screen -dmS Custom-MADE-Web-UI bash -c "npm install && npm run start"
+cd web-ui
+	screen -dmS Custom-MADE-Web-UI bash -c "npm i && npm run start"
 cd ..
 
 
@@ -54,12 +54,12 @@ cd ..
 #  | |         | |\  /| |     |  _| _  | |  | | | |     | |   | |   | | |  __ /    
 #  \ `.___.'\ _| |_\/_| |_   _| |__/ |_| |_.' /_| |_   _| |_  \  `-'  /_| |  \ \_  
 #   `.____ .'|_____||_____| |________|______.'|_____| |_____|  `.___.'|____| |___| 
-#                                                                                                                                                  
+#
 # ------------------------------------------------------------
 # ------------------------------------------------------------
 #
 
 # start monaco editor employed as LSP Client (language client)
-cd dedoc-editor
-	screen -dmS Custom-MADE-Editor bash -c "npm install && npm run start"
+cd editor
+	screen -dmS Custom-MADE-Editor bash -c "npm i && npm run start"
 cd ..
