@@ -41,7 +41,7 @@ cd ..
 
 
 # start the web front-end of Custom-MADE (react app)
-cd dedoc-web
+cd web-ui
 	screen -dmS Custom-MADE-Web-UI bash -c "npm install && npm run start"
 cd ..
 
