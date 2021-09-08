@@ -74,11 +74,6 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency>
 		<!-- for zipping folders and files -->
 		<dependency>
 			<groupId>net.lingala.zip4j</groupId>
@@ -92,18 +87,26 @@
 		</dependency>
 
 		<!--
-		Jdbc is a framework for managing db access in an abstract manner.
+		Jdbc is a framework for managing db access in an abstract oo manner.
 		The MySQL connector is necessary for the usage of a MySQL database.
+		The H2 Database Engine is used to give the possibility of using an
+		In-Memory database.
 		 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.200</version>
+			<scope>runtime</scope>
 		</dependency>
-    </dependencies>
+	</dependencies>
 
     <build>
     	<plugins>
