@@ -25,6 +25,13 @@ public class DataSourceConfiguration {
     private String password;
     private String url;
 
+    private final String[] defaultInMemoryConfiguration = {
+            "sa",
+            "password",
+            "jdbc:h2:mem:testdb"
+
+    };
+
     @Autowired
     public DataSourceConfiguration(Environment env) {
         log.info("Setting up DataSource ...");
@@ -53,17 +60,17 @@ public class DataSourceConfiguration {
 
         // Example Configuration of in-memory database.
         if (!persistentDatabase) {
-            String username = env.getProperty(PropertyNames.INMEMORYDB_USERNAME.getPropertyName());
-            String password = env.getProperty(PropertyNames.INMEMORYDB_PASSWORD.getPropertyName());
-            String url = env.getProperty(PropertyNames.INMEMORYDB_URL.getPropertyName());
+            String usernameConfig = env.getProperty(PropertyNames.INMEMORYDB_USERNAME.getPropertyName());
+            String passwordConfig = env.getProperty(PropertyNames.INMEMORYDB_PASSWORD.getPropertyName());
+            String urlConfig = env.getProperty(PropertyNames.INMEMORYDB_URL.getPropertyName());
 
-            if (username == null) username = "sa";
-            if (password == null) password = "password";
-            if (url == null) url = "jdbc:h2:mem:testdb";
+            if (username == null) username = getDefaultInMemoryUsername();
+            if (password == null) password = getDefaultInMemoryPassword();
+            if (url == null) url = getDefaultInMemoryURL();
 
-            this.username = username;
-            this.password = password;
-            this.url = url;
+            this.username = usernameConfig;
+            this.password = passwordConfig;
+            this.url = urlConfig;
         }
 
         // Some logging.
@@ -80,6 +87,18 @@ public class DataSourceConfiguration {
         if (url == null)
             log.error("Datasource: URL info not present.");
 
+    }
+
+    private String getDefaultInMemoryUsername() {
+        return this.defaultInMemoryConfiguration[0];
+    }
+
+    private String getDefaultInMemoryPassword() {
+        return this.defaultInMemoryConfiguration[1];
+    }
+
+    private String getDefaultInMemoryURL() {
+        return this.defaultInMemoryConfiguration[2];
     }
 
     private HikariDataSource hikariDataSource() {
