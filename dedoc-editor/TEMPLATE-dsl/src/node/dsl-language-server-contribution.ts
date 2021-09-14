@@ -4,7 +4,7 @@ import { injectable } from 'inversify';
 import * as net from 'net';
 import { join, resolve } from 'path';
 import { createSocketConnection } from 'vscode-ws-jsonrpc/lib/server';
-import { MDR_LANGUAGE_SERVER_ID, MDR_LANGUAGE_SERVER_NAME } from '../common';
+import { DSL_LANGUAGE_SERVER_ID, DSL_LANGUAGE_SERVER_NAME } from '../common';
 
 const TEMPLATE_LANGUAGE_NAME = 'meta_model_language-_-1.0.0-SNAPSHOT';
 const EXECUTABLE_NAME = isWindows ? 'mydsl-socket.bat' : 'mydsl-socket';
@@ -13,8 +13,8 @@ const EXECUTABLE_PATH = resolve(join(__dirname, '..', '..', '..', '..', 'backend
 @injectable()
 export class MdrLanguageServerContribution extends BaseLanguageServerContribution {
 
-    readonly id = MDR_LANGUAGE_SERVER_ID;
-    readonly name = MDR_LANGUAGE_SERVER_NAME;
+    readonly id = DSL_LANGUAGE_SERVER_ID;
+    readonly name = DSL_LANGUAGE_SERVER_NAME;
 
     getPort(): number | undefined {
         let arg = process.argv.filter(arg => arg.startsWith('--MDR_LSP='))[0];
