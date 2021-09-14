@@ -67,7 +67,7 @@ const useMembers = () => {
     const version = useProjectVersion();
     const commonGitSettings = version.gitConfiguration && version.gitConfiguration.commonGitSettings ? version.gitConfiguration.commonGitSettings.getEntity() : null;
     const membersSorted = version.memberships.items
-        .sort((a, b) => Permissions.contains(a.permissions, b.permissions) ? -1 : 1);
+        .sort((a, b) => a.permissions.getEntity().contains(b.permissions.getEntity()) ? -1 : 1);
 
     return {
         membersSorted,

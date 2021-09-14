@@ -1,8 +1,8 @@
 import {DefaultRest} from "./index";
-import {Permissions} from "../model/types";
+import {Comparable, Permissions} from "../model/types";
 
 
-export const restPermissions: DefaultRest<Permissions> = {
+export const restPermissions: DefaultRest<Exclude<Permissions,Comparable<Permissions>>> = {
     interface: {
         canBrowseFiles: true,
         canChangeFiles: true,
