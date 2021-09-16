@@ -8,15 +8,15 @@ export const LeaveProjectButton = () => {
 
     const {canLeaveProject, leaveProject} = useLeaveProject();
 
-    return  <Popconfirm
-                title={"Are you sure to leave this project?"}
-                okText="Yes" cancelText="No"
-                onConfirm={leaveProject}>
-                <p/>
-                <Button disabled={!canLeaveProject}>
-                    Leave project
-                </Button>
-            </Popconfirm>;
+    return <Popconfirm
+        title={"Are you sure to leave this project?"}
+        okText="Yes" cancelText="No"
+        onConfirm={leaveProject}>
+        <p />
+        <Button disabled={!canLeaveProject}>
+            Leave project
+        </Button>
+    </Popconfirm>;
 };
 
 
@@ -37,8 +37,8 @@ const useLeaveProject = () => {
     };
 
     return {
-        canLeaveProject: !Permissions.equals(Permissions.GUEST, usersPermissions) &&
-            !Permissions.equals(Permissions.OWNER, usersPermissions),
+        canLeaveProject: !Permissions.GUEST.equals(usersPermissions) &&
+            !Permissions.OWNER.equals(usersPermissions),
         leaveProject,
-    }
+    };
 };

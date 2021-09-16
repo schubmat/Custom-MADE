@@ -41,8 +41,8 @@ cd ..
 
 
 # start the web front-end of Custom-MADE (react app)
-cd dedoc-web
-	screen -dmS Custom-MADE-Web-UI bash -c "npm install && npm run start"
+cd web-ui
+	screen -dmS Custom-MADE-Web-UI bash -c "npm i && npm run start"
 cd ..
 
 
@@ -60,6 +60,6 @@ cd ..
 #
 
 # start monaco editor employed as LSP Client (language client)
-cd dedoc-editor
+cd editor
 	screen -dmS Custom-MADE-Editor bash -c "yarn && cd browser-app && yarn start"
 cd ..
