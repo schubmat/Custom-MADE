@@ -29,7 +29,6 @@ public class DataSourceConfiguration {
             "sa",
             "password",
             "jdbc:h2:mem:testdb"
-
     };
 
     @Autowired
@@ -64,9 +63,9 @@ public class DataSourceConfiguration {
             String passwordConfig = env.getProperty(PropertyNames.INMEMORYDB_PASSWORD.getPropertyName());
             String urlConfig = env.getProperty(PropertyNames.INMEMORYDB_URL.getPropertyName());
 
-            if (username == null) username = getDefaultInMemoryUsername();
-            if (password == null) password = getDefaultInMemoryPassword();
-            if (url == null) url = getDefaultInMemoryURL();
+            if (usernameConfig == null) usernameConfig = this.getDefaultInMemoryUsername();
+            if (passwordConfig == null) passwordConfig = this.getDefaultInMemoryPassword();
+            if (urlConfig == null) urlConfig = this.getDefaultInMemoryURL();
 
             this.username = usernameConfig;
             this.password = passwordConfig;
