@@ -30,8 +30,6 @@ The database system which is connected to the backend can be configured to use e
 
 *The in-memory database is only intended for testing purposes.*
 
-
-
 #### Configuration
 
 The file `resources/application.properties` configures the attributes of the system. The Custom-MADE database system supports the following attributes:
