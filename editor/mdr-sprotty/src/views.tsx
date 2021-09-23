@@ -1,7 +1,6 @@
 /** @jsx svg */
-import { svg } from 'snabbdom-jsx';
-
-import { VNode } from "snabbdom/vnode";
+import { svg } from 'sprotty';
+import { VNode } from 'snabbdom';
 import {
     Point,
     PolylineEdgeView,

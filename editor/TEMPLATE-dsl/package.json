@@ -13,7 +13,7 @@
   "dependencies": {
     "@theia/core": "1.0.0",
     "@theia/monaco": "1.0.0",
-    "sprotty-theia": "0.8.0",
+    "sprotty-theia": "next",
     "mdr-sprotty": "0.0.0"
   },
   "devDependencies": {
@@ -22,7 +22,7 @@
     "rimraf": "latest",
     "typescript": "latest"
   },
-  "scripts": {
+  "scripts": {  
     "prepare": "yarn run clean && yarn run build",
     "clean": "node_modules/.bin/rimraf lib",
     "build": "node_modules/.bin/tsc",

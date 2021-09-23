@@ -1,8 +1,8 @@
 /** @jsx html */
-import { html } from 'snabbdom-jsx';
+import { html } from 'sprotty';
 
 import { RenderingContext, IView, SButton } from "sprotty";
-import { VNode } from "snabbdom/vnode";
+import { VNode } from 'snabbdom';
 import { injectable } from 'inversify';
 
 @injectable()
