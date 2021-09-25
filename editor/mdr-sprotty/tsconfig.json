@@ -17,6 +17,7 @@
         "outDir": "lib",
         "skipLibCheck": true,
         "jsx": "react",
+        "jsxFactory": "jsx",
         "declaration": true,
         "declarationMap": true
     },

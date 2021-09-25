@@ -1,6 +1,4 @@
-/** @jsx svg */
-import { svg } from 'sprotty';
-import { VNode } from 'snabbdom';
+import { jsx, VNode } from 'snabbdom';
 import {
     Point,
     PolylineEdgeView,
@@ -20,9 +18,12 @@ export class PolylineClosedArrowEdgeView extends PolylineEdgeView {
     protected renderAdditionals(edge: SEdge, segments: Point[], context: RenderingContext): VNode[] {
         const p1 = segments[segments.length - 2]
         const p2 = segments[segments.length - 1]
+
         return [
-            <path class-sprotty-edge-arrow={true} d="M 6,-3 L 0,0 L 6,3 Z"
-                  transform={`rotate(${this.angle(p2, p1)} ${p2.x} ${p2.y}) translate(${p2.x} ${p2.y})`}/>
+            (
+                <path class-sprotty-edge-arrow={true} d="M 6,-3 L 0,0 L 6,3 Z"
+                      transform={`rotate(${this.angle(p2, p1)} ${p2.x} ${p2.y}) translate(${p2.x} ${p2.y})`}/>
+            )
         ]
     }
 
