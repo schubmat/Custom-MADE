@@ -1,6 +1,6 @@
 import { EditorManager } from "@theia/editor/lib/browser";
 import { inject, injectable } from "inversify";
-import { DiagramLanguageClient } from "sprotty-theia";
+import { DiagramLanguageClient } from "sprotty-vscode";
 import { MdrLanguageClientContribution } from "../dsl-language-client-contribution";
 
 @injectable()

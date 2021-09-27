@@ -3,7 +3,7 @@ import { configureCommand, configureModelElement, KeyTool, TYPES } from 'sprotty
 import { CodeActionPalettePopupProvider, CodeActionProvider, CompletionLabelEditor, 
     DeleteWithWorkspaceEditCommand, DiagramConfiguration, IRootPopupModelProvider, 
     LSTheiaDiagramServer, LSTheiaDiagramServerProvider, PaletteButton, PaletteMouseListener, 
-    RenameLabelEditor, TheiaDiagramServer, TheiaKeyTool, WorkspaceEditCommand, EditDiagramLocker } from "sprotty-theia";
+    RenameLabelEditor, TheiaDiagramServer, TheiaKeyTool, WorkspaceEditCommand, EditDiagramLocker } from "sprotty-vscode";
 import { createStateDiagramContainer } from 'mdr-sprotty/lib/di.config';
 import { PaletteButtonView } from 'mdr-sprotty/lib/html-views';
 import { MdrDiagramServer } from "./diagram-server";

@@ -2,7 +2,7 @@ import { QuickPickService, WidgetManager } from '@theia/core/lib/browser';
 import { EditorManager } from '@theia/editor/lib/browser';
 import { MonacoWorkspace } from '@theia/monaco/lib/browser/monaco-workspace';
 import { inject, injectable } from 'inversify';
-import { DiagramManager, LSTheiaSprottyConnector, TheiaFileSaver, TheiaSprottyConnector } from 'sprotty-theia';
+import { DiagramManager, LSTheiaSprottyConnector, TheiaFileSaver, TheiaSprottyConnector } from "sprotty-vscode";
 import { MDR_DIAGRAM_TYPE } from './diagram-configuration';
 import { MdrDiagramLanguageClient } from './diagram-language-client';
 
