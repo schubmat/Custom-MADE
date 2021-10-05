@@ -1,14 +1,39 @@
 {
   "private": true,
-  "scripts": {
-    "prepare": "lerna run prepare",
-    "rebuild:browser": "theia rebuild:browser",
-    "rebuild:electron": "theia rebuild:electron"
+  "dependencies": {
+    "@theia/callhierarchy": "next",
+    "@theia/file-search": "next",
+    "@theia/git": "next",
+    "@theia/markers": "next",
+    "@theia/messages": "next",
+    "@theia/navigator": "next",
+    "@theia/outline-view": "next",
+    "@theia/plugin-ext": "next",
+    "@theia/plugin-ext-vscode": "next",
+    "@theia/preferences": "next",
+    "@theia/preview": "next",
+    "@theia/search-in-workspace": "next",
+    "@theia/terminal": "next",
+    "@theia/vsx-registry": "next"
   },
   "devDependencies": {
-    "lerna": "2.4.0"
+    "@theia/cli": "next"
   },
-  "workspaces": [
-    "mdr-sprotty", "TEMPLATE-dsl", "browser-app"
+  "scripts": {
+    "prepare": "yarn run clean && yarn build && yarn run download:plugins",
+    "clean": "theia clean",
+    "build": "theia build --mode development",
+    "start": "theia start --plugins=local-dir:plugins",
+    "download:plugins": "theia download:plugins"
+  },
+  "theiaPluginsDir": "plugins",
+  "theiaPlugins": {},
+  "theiaPluginsExcludeIds": [
+    "vscode.extension-editing",
+    "vscode.git",
+    "vscode.git-ui",
+    "vscode.github",
+    "vscode.markdown-language-features",
+    "vscode.microsoft-authentication"
   ]
 }

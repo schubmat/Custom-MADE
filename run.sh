@@ -61,5 +61,5 @@ cd ..
 
 # start monaco editor employed as LSP Client (language client)
 cd editor
-	screen -dmS Custom-MADE-Editor bash -c "yarn && cd browser-app && yarn start"
+	screen -dmS Custom-MADE-Editor bash -c "yarn --cwd plugins/extension && yarn && yarn start --port 3001"
 cd ..
