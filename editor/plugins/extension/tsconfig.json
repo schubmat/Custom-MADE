@@ -1,5 +1,5 @@
 {
-	"extends": "../dsl-extension-template/tsconfig.json",
+	"extends": "../../sprotty-extension/tsconfig.json",
 	"compilerOptions": {
         "rootDir": "src",
         "outDir": "lib",
