@@ -3,14 +3,17 @@
 
 const path = require('path');
 
+const packageJson = require("./package.json");
+const name = packageJson.contributes.languages[0].id;
+
 /**@type {import('webpack').Configuration}*/
 const config = {
     target: 'node', 
 
-    entry: path.resolve(__dirname, 'src/states-extension.ts'),
+    entry: path.resolve(__dirname, 'src/extension.ts'),
     output: { 
         path: path.resolve(__dirname, 'pack'),
-        filename: 'states-extension.js',
+        filename: name + '-extension.js',
         libraryTarget: "commonjs2",
         devtoolModuleFilenameTemplate: "../[resource-path]",
     },

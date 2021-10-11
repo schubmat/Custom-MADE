@@ -1,8 +1,8 @@
 {
-    "name": "states-extension",
-    "displayName": "States Example",
-    "description": "An example Xtext-based DSL with Sprotty diagrams for statemachines",
-    "publisher": "TypeFox",
+    "name": "dsl-extension",
+    "displayName": "DSL Extension Template",
+    "description": "A template for a dsl Theia extension.",
+    "publisher": "Mathias Schubanz",
     "repository": {
         "type": "git",
         "url": "https://github.com/TypeFox/sprotty-vscode"
@@ -18,93 +18,92 @@
     "contributes": {
         "languages": [
             {
-                "id": "states",
+                "id": "dslextension",
                 "aliases": [
-                    "states",
-                    "sm"
+                    "dslextension"
                 ],
                 "extensions": [
-                    ".sm"
+                    ".mydsl"
                 ],
                 "configuration": "./language-configuration.json"
             }
         ],
         "grammars": [
             {
-                "language": "states",
-                "scopeName": "source.sm",
-                "path": "./syntaxes/states.tmLanguage.json"
+                "language": "dslextension",
+                "scopeName": "source.mydsl",
+                "path": "./syntaxes/dslextension.tmLanguage.json"
             }
         ],
         "commands": [
             {
-                "command": "states.diagram.open",
+                "command": "dslextension.diagram.open",
                 "title": "Open in Diagram",
                 "icon": "$(symbol-structure)",
-                "category": "States Diagram"
+                "category": "DSL Extension Diagram"
             },
             {
-                "command": "states.diagram.fit",
+                "command": "dslextension.diagram.fit",
                 "title": "Fit to Screen",
-                "category": "States Diagram"
+                "category": "DSL Extension Diagram"
             },
             {
-                "command": "states.diagram.center",
+                "command": "dslextension.diagram.center",
                 "title": "Center selection",
-                "category": "States Diagram"
+                "category": "DSL Extension Diagram"
             },
             {
-                "command": "states.diagram.delete",
+                "command": "dslextension.diagram.delete",
                 "title": "Delete selected element",
-                "category": "States Diagram"
+                "category": "DSL Extension Diagram"
             },
             {
-                "command": "states.diagram.export",
+                "command": "dslextension.diagram.export",
                 "title": "Export diagram to SVG",
-                "category": "States Diagram"
+                "category": "DSL Extension Diagram"
             }
         ],
         "menus": {
             "commandPalette": [
                 {
-                    "command": "states.diagram.open",
-                    "when": "editorLangId == 'states'"
+                    "command": "dslextension.diagram.open",
+                    "when": "editorLangId == 'dslextension'"
                 },
                 {
-                    "command": "states.diagram.fit",
-                    "when": "states-diagram-focused"
+                    "command": "dslextension.diagram.fit",
+                    "when": "dslextension-diagram-focused"
                 },
                 {
-                    "command": "states.diagram.center",
-                    "when": "states-diagram-focused"
+                    "command": "dslextension.diagram.center",
+                    "when": "dslextension-diagram-focused"
                 },
                 {
-                    "command": "states.diagram.delete",
-                    "when": "states-diagram-focused"
+                    "command": "dslextension.diagram.delete",
+                    "when": "dslextension-diagram-focused"
                 },
                 {
-                    "command": "states.diagram.export",
-                    "when": "states-diagram-focused"
+                    "command": "dslextension.diagram.export",
+                    "when": "dslextension-diagram-focused"
                 }
             ],
             "editor/context": [
                 {
-                    "command": "states.diagram.open",
-                    "when": "editorLangId == 'states'",
+                    "command": "dslextension.diagram.open",
+                    "when": "editorLangId == 'dslextension'",
                     "group": "navigation"
                 }
             ],
             "editor/title": [
                 {
-                    "command": "states.diagram.open",
-                    "when": "editorLangId == 'states'",
+                    "command": "dslextension.diagram.open",
+                    "when": "editorLangId == 'dslextension'",
                     "group": "navigation"
                 }
             ],
             "explorer/context": [
                 {
-                    "command": "states.diagram.open",
-                    "when": "resourceExtname == '.sm'",
+                    "command": "dslextension.diagram.open",
+                    "when": "resourceExtname == '.mydsl'",
                     "group": "navigation"
                 }
             ]
@@ -113,32 +112,32 @@
             {
                 "key": "alt+f",
                 "mac": "alt+f",
-                "command": "states.diagram.fit",
-                "when": "states-diagram-focused"
+                "command": "dslextension.diagram.fit",
+                "when": "dslextension-diagram-focused"
             },
             {
                 "key": "alt+c",
                 "mac": "alt+c",
-                "command": "states.diagram.center",
-                "when": "states-diagram-focused"
+                "command": "dslextension.diagram.center",
+                "when": "dslextension-diagram-focused"
             },
             {
                 "key": "alt+e",
                 "mac": "alt+e",
-                "command": "states.diagram.export",
-                "when": "states-diagram-focused"
+                "command": "dslextension.diagram.export",
+                "when": "dslextension-diagram-focused"
             },
             {
                 "key": "delete",
                 "mac": "delete",
-                "command": "states.diagram.delete",
-                "when": "states-diagram-focused"
+                "command": "dslextension.diagram.delete",
+                "when": "dslextension-diagram-focused"
             }
         ]
     },
     "activationEvents": [
-        "onLanguage:states",
-        "onCommand:states.diagram.open"
+        "onLanguage:dslextension",
+        "onCommand:dslextension.diagram.open"
     ],
     "files": [
         "lib",
@@ -147,7 +146,7 @@
         "syntaxes",
         "webview"
     ],
-    "main": "./pack/states-extension",
+    "main": "./pack/dslextension-extension",
     "devDependencies": {
         "@types/node": "^8.0.0",
         "@types/vscode": "1.46.0",

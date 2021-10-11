@@ -21,7 +21,7 @@ import { LspLabelEditActionHandler, WorkspaceEditActionHandler, SprottyLspEditVs
 import { SprottyDiagramIdentifier, SprottyLspWebview } from 'sprotty-vscode/lib/lsp';
 import { SprottyWebview } from 'sprotty-vscode/lib/sprotty-webview';
 
-export class StatesLspVscodeExtension extends SprottyLspEditVscodeExtension {
+export class LspVscodeExtension extends SprottyLspEditVscodeExtension {
 
     constructor(context: vscode.ExtensionContext) {
         super('states', context);
@@ -29,8 +29,8 @@ export class StatesLspVscodeExtension extends SprottyLspEditVscodeExtension {
 
     protected getDiagramType(commandArgs: any[]): string | undefined {
         if (commandArgs.length === 0
-            || commandArgs[0] instanceof vscode.Uri && commandArgs[0].path.endsWith('.sm')) {
-            return 'states-diagram';
+            || commandArgs[0] instanceof vscode.Uri && commandArgs[0].path.endsWith('.mydsl')) {
+            return 'flexdr-diagram';
         }
     }
 
@@ -65,9 +65,9 @@ export class StatesLspVscodeExtension extends SprottyLspEditVscodeExtension {
             }
         };
         const clientOptions: LanguageClientOptions = {
-            documentSelector: [{ scheme: 'file', language: 'states' }],
+            documentSelector: [{ scheme: 'file', language: 'dslextension' }],
         };
-        const languageClient = new LanguageClient('statesLanguageClient', 'States Language Server', serverOptions, clientOptions);
+        const languageClient = new LanguageClient('statesLanguageClient', 'DSL Language Server', serverOptions, clientOptions);
         languageClient.start();
         return languageClient;
     }

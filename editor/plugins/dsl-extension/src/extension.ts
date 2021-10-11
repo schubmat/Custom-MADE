@@ -15,13 +15,13 @@
  ********************************************************************************/
 
 import * as vscode from 'vscode';
-import { StatesLspVscodeExtension } from './states-lsp-extension';
+import { LspVscodeExtension } from './lsp-extension';
 import { SprottyLspVscodeExtension } from 'sprotty-vscode/lib/lsp';
 
 let extension: SprottyLspVscodeExtension;
 
 export function activate(context: vscode.ExtensionContext) {
-    extension = new StatesLspVscodeExtension(context);
+    extension = new LspVscodeExtension(context);
 }
 
 export function deactivate(): Thenable<void> {
