@@ -105,10 +105,10 @@ export interface VersionMembership {
 }
 
 export interface Version {
-    id: number;
+    versionId: number;
     owner: User;
     description: string;
-    version: string,
+    versionTag: string,
     visibility: VisibilityLevel;
     createdAt: string;
     lastEdited: string;

@@ -40,6 +40,15 @@ import java.util.stream.Collectors;
 @Entity
 public class Version {
 
+	@JsonIgnore
+	public static final String GENERAL_FILES_DIRECTORY = "files";
+	@JsonIgnore
+	public static final String RAW_FILES_DIRECTORY = "src";
+	@JsonIgnore
+	public static final String EXPORT_FILES_DIRECTORY = "gen";
+	@JsonIgnore
+	public static final String REMOTE_FILES_DIRECTORY = "remotes";
+	
     public class ModelValidationException extends Exception {
         protected ModelValidationException(String message) {
             super(message);
@@ -48,14 +57,14 @@ public class Version {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long versionId;
     @NonNull
     @ManyToOne
     @JsonIgnore
     private User owner;
     private String description;
     @NonNull
-    private String version;
+    private String versionTag;
     @NonNull
     private VisibilityLevel visibility = VisibilityLevel.PUBLIC;
     @CreationTimestamp
@@ -82,7 +91,7 @@ public class Version {
     public Long getGrammarId() {
         if (grammar == null)
             return null;
-        return grammar.getId();
+        return grammar.getVersionId();
     }
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -190,7 +199,7 @@ public class Version {
 
     @JsonIgnore
     public Path getRoot() {
-        Path path = Storage.ROOT.resolve(project.getLevel().name() + "_projects" + java.io.File.separator + id + "_" + project.getName() + java.io.File.separator + version);
+        Path path = Storage.ROOT.resolve(project.getLevel().name() + "_projects" + java.io.File.separator + versionId + "_" + project.getName() + java.io.File.separator + versionTag);
         java.io.File file = path.toFile();
         if (!file.exists())
             file.mkdirs();
@@ -202,7 +211,7 @@ public class Version {
         if (files.isEmpty())
             return null;
 
-        String subDir = project.getName() + java.io.File.separator + version;
+        String subDir = project.getName() + java.io.File.separator + versionTag;
         String srcDir = uniqueDir.getAbsolutePath() + java.io.File.separator + "src" + java.io.File.separator + subDir;
         String targetDir = uniqueDir.getAbsolutePath() + java.io.File.separator + "target" + java.io.File.separator + subDir;
         java.io.File sources = new java.io.File(srcDir);
@@ -213,7 +222,7 @@ public class Version {
         }
 
         for (File file : files) {
-            if (file.getVersion().getId() != this.id)
+            if (file.getVersion().getVersionId() != this.versionId)
                 continue;
             java.io.File m0File = new java.io.File(file.getDir().toFile(), file.getFileName()).getAbsoluteFile();
             if (!m0File.exists())
@@ -242,10 +251,10 @@ public class Version {
         final java.io.File pomDir = new java.io.File(Objects.requireNonNull(classLoader.getResource("project")).getFile());
 
         String[] scriptParams = {
-                String.valueOf(id),
+                String.valueOf(versionId),
                 pomDir.getAbsolutePath(),
                 grammar.getLanguageServer().getLanguageName(),
-                grammar.getVersion(),
+                grammar.getVersionTag(),
                 sourceDir,
                 targetDir
         };

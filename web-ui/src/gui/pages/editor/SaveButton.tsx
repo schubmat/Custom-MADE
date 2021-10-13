@@ -28,7 +28,7 @@ const SaveButton = () => {
 
     const deleteFile = () => {
         if (version && file)
-            return version.deleteFiles({versionId: version.id, files: [{id: file.id}]});
+            return version.deleteFiles({versionId: version.versionId, files: [{id: file.id}]});
         return Promise.reject();
     };
 

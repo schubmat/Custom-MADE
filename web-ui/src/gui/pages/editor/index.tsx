@@ -55,7 +55,7 @@ const useEditorPage = (initFileId: number) => {
         if (!version || !editor.state)
             return;
         if (version.files.items.length == 0) {
-            history.push(`${ROUTES.VERSIONS}/${version.id}`);
+            history.push(`${ROUTES.VERSIONS}/${version.versionId}`);
             return;
         }
         const fileId = editor.state.fileId;

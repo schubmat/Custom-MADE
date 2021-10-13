@@ -93,7 +93,7 @@ public class VersionController {
         }
         newProject.setOwner(user);
         projectRepository.save(newProject);
-        Optional<Version> optionalGrammar = versionRepository.findById(newVersion.getGrammar().getId());
+        Optional<Version> optionalGrammar = versionRepository.findById(newVersion.getGrammar().getVersionId());
         if (!optionalGrammar.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The selected grammar does not exist");
         }
@@ -104,6 +104,8 @@ public class VersionController {
         newVersion.addUser(user, Permissions.OWNER);
         newVersion.setOwner(user);
         newVersion = versionRepository.save(newVersion);
+        
+//        newVersion.configureVersionWorkspace();
         return ResponseEntity.ok(new VersionDTOBuilder(newVersion).build());
     }
 
@@ -286,7 +288,7 @@ public class VersionController {
     public ResponseEntity<?> exportVersions(@AuthenticationPrincipal User user,
             @Valid @RequestBody Version[] requestVersions) {
         List<Version> versions = Arrays.stream(requestVersions)
-                .map(version -> versionRepository.findById(version.getId()).get()).filter(Objects::nonNull)
+                .map(version -> versionRepository.findById(version.getVersionId()).get()).filter(Objects::nonNull)
                 .filter(version -> version.getPermissions(user).contains(Permissions.EXPORT_FILES))
                 .collect(Collectors.toList());
         return FileExport.export(versions, user);
@@ -392,7 +394,7 @@ public class VersionController {
         }
         String[] fileNames = modifiedFiles.stream().map(File::getName).toArray(String[]::new);
         fileRepository.saveAll(modifiedFiles);
-        version = versionRepository.getOne(version.getId());
+        version = versionRepository.getOne(version.getVersionId());
         try {
             gitService.commitPullAndPushChanges(modifiedFiles.toArray(new File[modifiedFiles.size()]),
                     "added/edited " + String.join(", ", fileNames), user, version);
@@ -477,7 +479,7 @@ public class VersionController {
 
     private File putFileContent(User user, long id, String newContent, long versionId) throws IOException {
         File file = fileRepository.getOne(id);
-        if (file.getVersion().getId() != versionId) {
+        if (file.getVersion().getVersionId() != versionId) {
             return null;
         }
         file.setFileContent(newContent);
@@ -495,7 +497,7 @@ public class VersionController {
         }
         Version version = versionRepository.getOne(versionId);
         List<File> files = Arrays.stream(requestedFiles).map(file -> fileRepository.findById(file.getId()).get())
-                .filter(Objects::nonNull).filter(file -> file.getVersion().getId() == versionId)
+                .filter(Objects::nonNull).filter(file -> file.getVersion().getVersionId() == versionId)
                 .collect(Collectors.toList());
         for (File file : files) {
             file.setStatus(FileStatus.UNCHECKED);

@@ -123,7 +123,7 @@ public class LspController {
         final ClassLoader classLoader = getClass().getClassLoader();
         final File script = new File(Objects.requireNonNull(classLoader.getResource("lsp/manageLSP.sh")).getFile());
         log.info("Killing all lsp instances: ");
-        ScriptRunner.run(script, CommandSupplements.KILL_ALL.toString());
+//        ScriptRunner.run(script, CommandSupplements.KILL_ALL.toString());
     }
 
     private boolean validate(User user, long id, Permissions actions) {

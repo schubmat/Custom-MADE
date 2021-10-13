@@ -53,7 +53,7 @@ export const useFullVersion = () => {
     const getFullTitle = (): string => {
         if (!version)
             return "";
-        return version.project.name  + " " + version.version;
+        return version.project.name  + " " + version.versionTag;
     };
 
     return {

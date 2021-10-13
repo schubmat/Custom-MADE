@@ -45,7 +45,7 @@ const useDeleteFiles = () => {
             return;
         const dto = selectedFiles.map(f => {return {id: f.id}});
         setLoading(true);
-        version.deleteFiles({versionId: version.id, files: dto}).then(newVersion => {
+        version.deleteFiles({versionId: version.versionId, files: dto}).then(newVersion => {
             const newSelectedFiles = selectedFiles.filter(file => newVersion.files.find(f => f.id == file.id));
             setSelectedFiles(newSelectedFiles);
             selectedFiles.forEach(deletedFile => {

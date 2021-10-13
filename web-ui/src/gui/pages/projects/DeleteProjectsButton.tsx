@@ -38,7 +38,7 @@ export const DeleteProjectsButton = () => {
                 return;
             }
             project.versions.remove(version.getEntity()).then((deleted: Version) => {
-                const newSelectedVersions = selectedVersions.filter(selectedVersion => selectedVersion.id != deleted.id);
+                const newSelectedVersions = selectedVersions.filter(selectedVersion => selectedVersion.versionId != deleted.versionId);
                 setSelectedVersions(newSelectedVersions);
             }).catch((error: Error) => {
                 notification['error']({
