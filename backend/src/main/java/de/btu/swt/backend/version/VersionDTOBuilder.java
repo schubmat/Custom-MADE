@@ -15,23 +15,23 @@ public class VersionDTOBuilder extends DTOBuilder<Version> {
     }
 
     private VersionDTOBuilder withProject() {
-        putSingle("project", this.obj.getProject());
+        putSingle("project", ((Version) this.obj).getProject());
         deleteField(new String[]{"project", "versions"});
         return this;
     }
 
     private VersionDTOBuilder withFiles() {
-        putCollection("files", this.obj.getFiles());
+        putCollection("files", ((Version) this.obj).getFiles());
         return this;
     }
 
     private VersionDTOBuilder withLanguageServer() {
-        putSingle("languageServer", this.obj.getLanguageServer());
+        putSingle("languageServer", ((Version) this.obj).getLanguageServer());
         return this;
     }
 
     private VersionDTOBuilder withGrammar() {
-        Version grammar = this.obj.getGrammar();
+        Version grammar = ((Version) this.obj).getGrammar();
         if (grammar != null) {
             putSingle("grammar", new VersionDTOBuilder(grammar).build());
         }
