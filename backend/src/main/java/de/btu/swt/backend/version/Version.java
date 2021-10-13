@@ -155,12 +155,6 @@ public class Version {
         return ship;
     }
 
-//    @JsonIgnore
-//    private Path createSub(String folderName) {
-//        Path directoryPath = getRoot().resolve(folderName);
-//        return this.createFolderIfNotExistent(directoryPath, false);
-//    }
-
     @JsonIgnore
     public Path getGeneralFilesDirectory() {
     	return this.provideDirectoryPath(getRoot().resolve(Constants.GENERAL_FILES_DIRECTORY));
