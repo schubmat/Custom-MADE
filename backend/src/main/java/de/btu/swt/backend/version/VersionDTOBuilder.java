@@ -12,9 +12,6 @@ public class VersionDTOBuilder extends DTOBuilder<Version> {
         withGrammar();
         
         ((Version) this.obj).configureVersionWorkspace();
-//        System.err.println("#####################");
-//        System.err.println(((Version)this.obj).toString());
-//        System.err.println("#####################");
     }
 
     private VersionDTOBuilder withProject() {
