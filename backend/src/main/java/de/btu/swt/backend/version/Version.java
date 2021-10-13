@@ -12,6 +12,7 @@ import de.btu.swt.backend.project.VisibilityLevel;
 import de.btu.swt.backend.git.GitConfiguration;
 import de.btu.swt.backend.storage.Storage;
 import de.btu.swt.backend.user.User;
+import de.btu.swt.backend.util.Constants;
 import de.btu.swt.backend.util.ScriptRunner;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,15 +43,6 @@ import java.util.stream.Collectors;
 @Table(name = "version")
 @Entity
 public class Version {
-
-	@JsonIgnore
-	public static final String GENERAL_FILES_DIRECTORY = "files";
-	@JsonIgnore
-	public static final String RAW_FILES_DIRECTORY = "src";
-	@JsonIgnore
-	public static final String EXPORT_FILES_DIRECTORY = "gen";
-	@JsonIgnore
-	public static final String REMOTE_FILES_DIRECTORY = "remotes";
 	
     public class ModelValidationException extends Exception {
         protected ModelValidationException(String message) {
@@ -160,52 +155,93 @@ public class Version {
         return ship;
     }
 
-    @JsonIgnore
-    private Path createSub(String folderName) {
-        Path result = getRoot().resolve(folderName);
-        java.io.File file = result.toFile();
-        if (!file.exists())
-            file.mkdir();
-        return result;
-    }
+//    @JsonIgnore
+//    private Path createSub(String folderName) {
+//        Path directoryPath = getRoot().resolve(folderName);
+//        return this.createFolderIfNotExistent(directoryPath, false);
+//    }
 
     @JsonIgnore
     public Path getGeneralFilesDirectory() {
-        return createSub("files");
+    	return this.provideDirectoryPath(getRoot().resolve(Constants.GENERAL_FILES_DIRECTORY));
     }
 
     @JsonIgnore
     public Path getSrcFilesDirectory() {
-        Path result = getGeneralFilesDirectory().resolve("src");
-        java.io.File asFile = result.toFile();
-        if (!asFile.exists())
-            asFile.mkdir();
-        return result;
+        Path directoryPath = getGeneralFilesDirectory().resolve(Constants.RAW_FILES_DIRECTORY);
+        return this.createFolderIfNotExistent(directoryPath, false);
     }
 
     @JsonIgnore
     public Path getExportFilesDirectory() {
-        Path result = getGeneralFilesDirectory().resolve("gen");
-        java.io.File asFile = result.toFile();
-        if (!asFile.exists())
-            asFile.mkdir();
-        return result;
+        Path directoryPath = getGeneralFilesDirectory().resolve(Constants.EXPORT_FILES_DIRECTORY);
+        return this.createFolderIfNotExistent(directoryPath, false);
     }
 
     @JsonIgnore
     public Path getRemoteDirectory() {
-        return createSub("remote");
+    	return this.provideDirectoryPath(getRoot().resolve(Constants.REMOTE_FILES_DIRECTORY));
     }
 
     @JsonIgnore
     public Path getRoot() {
-        Path path = Storage.ROOT.resolve(project.getLevel().name() + "_projects" + java.io.File.separator + versionId + "_" + project.getName() + java.io.File.separator + versionTag);
-        java.io.File file = path.toFile();
-        if (!file.exists())
-            file.mkdirs();
-        return file.getAbsoluteFile().toPath();
+        Path directoryPath = Storage.ROOT.resolve(project.getLevel().name() + "_projects" + java.io.File.separator + versionId + "_" + project.getName() + java.io.File.separator + versionTag);
+        return this.createFolderIfNotExistent(directoryPath.toFile().getAbsoluteFile().toPath(), true);
     }
 
+    
+    @JsonIgnore
+	private Path provideDirectoryPath(Path directoryPath) {
+    	return this.createFolderIfNotExistent(directoryPath, false);
+	}
+    
+	@JsonIgnore
+	public Path getTheiaConfigurationDirectory() {
+		return this.provideDirectoryPath(getGeneralFilesDirectory().resolve(Constants.THEIA_CONFIGURATION_DIRECTORY));
+	}  
+    
+    @JsonIgnore
+  	private Path createFolderIfNotExistent(Path directoryPath, boolean multipleDirectoriesAtOnce) {
+    	
+    	java.io.File folderToBeProvisioned = directoryPath.toFile();
+    	
+    	if (!folderToBeProvisioned.exists() 
+    			&& multipleDirectoriesAtOnce == true) {
+    		
+    		folderToBeProvisioned.mkdirs();
+		} 
+    	else if (!folderToBeProvisioned.exists() 
+				&& multipleDirectoriesAtOnce == false) {
+			
+			folderToBeProvisioned.mkdir();
+		}
+    	return directoryPath;
+	}
+    
+    @JsonIgnore
+    public void configureVersionWorkspace() {
+    	Path theiaConfigurationDirectory = this.provideDirectoryPath(this.getTheiaConfigurationDirectory());
+    	Path theiaConfigurationFile = theiaConfigurationDirectory
+    			.resolve(theiaConfigurationDirectory + java.io.File.separator + Constants.THEIA_SETTINGS_FILE);
+    	
+    	// check for the existence of the config directory and create if not present already
+    	if (!theiaConfigurationDirectory.toFile().exists()) {
+    		theiaConfigurationDirectory.toFile().mkdir();
+    	}
+    	// check for the existence of the config file and create if not present already
+    	if (!theiaConfigurationFile.toFile().exists()) {    		
+    		try (BufferedWriter buffWriter = new BufferedWriter(new FileWriter(theiaConfigurationFile.toFile()))) {
+    			buffWriter.write(Constants.THEIA_SETTINGS_FILE_CONTENTS);
+    			buffWriter.flush();
+    			buffWriter.close();
+    			
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+    	}
+    	
+    }
+    
     @JsonIgnore
     public java.io.File export(List<File> files, java.io.File uniqueDir) throws ModelValidationException, IOException {
         if (files.isEmpty())
