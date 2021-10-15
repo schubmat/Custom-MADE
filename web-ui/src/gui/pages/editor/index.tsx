@@ -85,18 +85,23 @@ const useEditorPage = (initFileId: number) => {
 
 const Page  = ({initFileId}: {initFileId: number}) => {
     const {fileName, openFile} = useEditorPage(initFileId);
+    const version = useFullVersion().version;
+
+    var headTitle;
+    if (version) {
+        headTitle = version.project.name;
+    } else {
+        headTitle = fileName;
+    }
 
     return (
         <Layout>
             <Sider/>
             <Layout style={{marginLeft: 200, height: '100vh', width: '100%'}}>
-                <Header title={fileName}/>
+                <Header title={headTitle}/>
                 <Layout.Content>
-                    <div style={{float: "left", width: "70%", height: "100%", padding: "10px"}}>
+                    <div style={{float: "left", width: "100%", height: "100%", padding: "10px"}}>
                         <MonacoEditor/>
-                    </div>
-                    <div style={{float: "left", width: "30%", height: "100%", padding: "10px"}}>
-                        <FileList onClickFile={openFile}/>
                     </div>
                 </Layout.Content>
             </Layout>

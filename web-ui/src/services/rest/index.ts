@@ -155,3 +155,13 @@ export const patchFileContent = (fileId: number, fileContent: string): Promise<F
         body: fileContent
     });
 };
+export const postWorkspaceUpdate = <T>(url: string, request : any) : Promise<Required<T>> => {
+
+    const content = {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),};
+    const method = "POST";
+    return fetchAuthAPI(url, request ? {...content, method} : {method});
+};

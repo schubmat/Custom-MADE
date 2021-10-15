@@ -1,7 +1,5 @@
 package de.btu.swt.backend.util;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public final class Constants {
 	
 	public static final String THEIA_SETTINGS_FILE_CONTENTS = 
@@ -23,4 +21,6 @@ public final class Constants {
 	public static final String RAW_FILES_DIRECTORY = "src";
 	public static final String EXPORT_FILES_DIRECTORY = "gen";
 	public static final String REMOTE_FILES_DIRECTORY = "remotes";
+
+	public static final String GLOBAL_THEIA_WORKSPACES_FILE = ".theia/recentworkspace.json";
 }

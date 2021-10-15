@@ -8,6 +8,7 @@ import {useHistory} from "react-router";
 import {useFullVersion} from "../../shared/contexts/FullProjectVersion";
 import {FileProvider} from "../../shared/contexts/File";
 import ActionButton from "../../shared/dumb/ActionButton";
+import TheiaWorkspaceController from "../../shared/dumb/TheiaUtils";
 import ValidateFileButton from "./ValidateFileButton";
 import DownloadFileButton from "./DownloadFileButton";
 import {useSelectedFilesContext} from "./SelectedFilesContext";
@@ -78,7 +79,13 @@ const useFileTable = () => {
     const [_, setSelectedFiles] = useSelectedFilesContext();
 
     const editFile = (file: State<File>) => {
+
+        let workspaceController = new TheiaWorkspaceController();
+        if(file) {
+            workspaceController.openWorkspace(file)
+        }
         history.push(`/editor/${file.id}`);
+
     };
 
     const onSelectionChange = (selectedKeys: string[] | number[], selectedFiles: State<File>[]) => {

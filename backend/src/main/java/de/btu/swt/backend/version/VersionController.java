@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -319,6 +320,34 @@ public class VersionController {
             return ResponseEntity.ok(fileRepository.save(request));
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File with this name already exists in project");
+        }
+    }
+    
+    @PostMapping("/openWorkspace/{id}")
+    public ResponseEntity<?> openTheiaWorkspace(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long fileId) {
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
+        if (!validate(user, fileId, Permissions.CHANGE_FILES)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Version does not exist or user does not have permission to edit this project's files");
+        }
+        Optional<File> optFile = fileRepository.findById(fileId);
+        if (optFile.isPresent()) {
+        	Version version = optFile.get().getVersion();
+        	Path workspaceDirectory = version.getGeneralFilesDirectory();
+            System.err.println("#######");
+            System.err.println(workspaceDirectory.toString());
+            System.err.println("#######");
+            return ResponseEntity.ok(new VersionDTOBuilder(version).build());
+//        }
+//        Optional<Version> optVersion = fileRepository.findById(fileId);
+//        if (optVersion.isPresent()) {
+//            Version version = optVersion.get();
+//            Path workspaceDirectory = version.getGeneralFilesDirectory();
+//            System.err.println("#######");
+//            System.err.println(workspaceDirectory.toString());
+//            System.err.println("#######");
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No Version with file id = " + fileId + " found");
         }
     }
 
