@@ -58,13 +58,6 @@ const _fetchAuthAPI = (input: RequestInfo, init?: RequestInit): Promise<any> => 
         let rest = init && init.headers;
         init && delete (init.headers);
 
-        console.log("=== input ===");
-        console.dir(input);
-        console.log("=== rest ===");
-        console.dir(rest);
-        console.log("=== init ===");
-        console.dir(init);
-
         return fetch(input, {
             headers: {
                 'Authorization': "Bearer ".concat(token),

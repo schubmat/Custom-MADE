@@ -2,11 +2,12 @@ import * as React from "react";
 
 import {Divider, Icon, Table} from "antd";
 import {User} from "../../../services/users";
-import {File, FileStatus} from "../../../model/types";
+import {Version, File, FileStatus} from "../../../model/types";
 import {State} from "../../../state/stateEntity";
 import {useHistory} from "react-router";
 import {useFullVersion} from "../../shared/contexts/FullProjectVersion";
 import {FileProvider} from "../../shared/contexts/File";
+import {usePromise} from "../../shared/usePromise";
 import ActionButton from "../../shared/dumb/ActionButton";
 import TheiaWorkspaceController from "../../shared/dumb/TheiaUtils";
 import ValidateFileButton from "./ValidateFileButton";
@@ -82,9 +83,16 @@ const useFileTable = () => {
 
         let workspaceController = new TheiaWorkspaceController();
         if(file) {
-            workspaceController.openWorkspace(file)
+            //console.dir(file.getEntity().version as Version)
+            let optWorkspaceDirectory = workspaceController.openWorkspace(file);
+            //console.dir(" === " + optWorkspaceDirectory + " ==== ");
+            optWorkspaceDirectory.then(resultString => {
+                //console.dir(resultString);
+                //console.log(resultString.answerString);
+                history.push(`/editor/${resultString.answerString}`);
+            });
         }
-        history.push(`/editor/${file.id}`);
+        //history.push(`/editor/${file.id}`);
 
     };
 

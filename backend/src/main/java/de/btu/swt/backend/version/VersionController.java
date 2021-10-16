@@ -131,11 +131,11 @@ public class VersionController {
         }
         version.addUser(addedMember, ship.getPermissions());
         version = versionRepository.save(version);
-        VersionMemberships newShip = version.getMembership(addedMember.getUsername());
-        if (newShip == null) {
+        VersionMemberships newMembership = version.getMembership(addedMember.getUsername());
+        if (newMembership == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to add user to version");
         }
-        return ResponseEntity.ok(newShip);
+        return ResponseEntity.ok(newMembership);
     }
 
     @PutMapping("/{versionId}/members/{memberId}")
@@ -172,11 +172,11 @@ public class VersionController {
         }
         version.editMember(addedMember, ship);
         version = versionRepository.save(version);
-        VersionMemberships newShip = version.getMembership(addedMember.getUsername());
-        if (newShip == null) {
+        VersionMemberships newMembership = version.getMembership(addedMember.getUsername());
+        if (newMembership == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unable to edit settings");
         }
-        return ResponseEntity.ok(newShip);
+        return ResponseEntity.ok(newMembership);
     }
 
     private ResponseEntity<?> getPermissionsEditingError(UserDetails userDetails, long versionId, long memberId,

@@ -1,11 +1,17 @@
 import React from "react";
 
 
-export const MonacoEditor = () => {
+export const MonacoEditor = ({workspaceDir}: {workspaceDir: string}) => {
+
+    
+    console.log("====")
+    console.log(workspaceDir)
+    console.log("====")
+
     return (
         <iframe
             title={"monaco-editor"}
-            src={`http://localhost:3001/`}
+            src={`http://localhost:3001/#${workspaceDir}`}
             width={"100%"}
             height={"100%"}
             id={"editor-iframe"}

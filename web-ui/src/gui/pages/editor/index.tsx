@@ -18,37 +18,44 @@ context für file-editing erstellen und editor hooks nach editor-component versc
  */
 
 interface Params {
-    fileId?: string,
+    ws?: string,
+    // file? : string,
 }
 
 export const Editor = () => {
     const params: Params = useParams();
-    const fileId = Number(params.fileId);
+    const wsDirectory: string = String(params.ws).replace(" ", "%20");
+    // const fileId = Number(params.file);
 
-    return <FullVersionFromFileProvider fileId={fileId}>
-        <FileEditProvider>
-            <GitPullLoadingIndicator>
-                <Page initFileId={fileId}/>
-            </GitPullLoadingIndicator>
-        </FileEditProvider>
-    </FullVersionFromFileProvider>
+    console.log("====")
+    console.log(wsDirectory)
+    console.log("====")
+
+    return <Page initWorkspaceDir={wsDirectory}/>;
+    // return <FullVersionFromFileProvider fileId={fileId}>
+    //     <FileEditProvider>
+    //         <GitPullLoadingIndicator>
+    //             <Page initWorkspaceDir={wsDirectory}/>
+    //         </GitPullLoadingIndicator>
+    //     </FileEditProvider>
+    // </FullVersionFromFileProvider>
 };
-
-const useEditorPage = (initFileId: number) => {
+/* 
+const useEditorPage = (workspaceDir: string) => {
     const version = useFullVersion().version;
     const lsp = useLspFromVersion(version, showError);
     const editor = useEditor(lsp);
     const history = useHistory();
 
     useEffect(() => {
-        if (editor.isLoading || !version || editor.state)
+        /* if (editor.isLoading || !version || editor.state)
             return;
         const file = version.files.items.find(file => file.id === initFileId);
         if (!file) {
             message.error("Specified file does not belong to version");
             return;
-        }
-        editor.openFile(file);
+        } 
+        editor.openFile(workspaceDir);
     }, [editor.isLoading, version]);
 
     useEffect(() => {
@@ -81,17 +88,17 @@ const useEditorPage = (initFileId: number) => {
         fileName: getFileName(),
         openFile: editor.openFile,
     }
-};
+}; */
 
-const Page  = ({initFileId}: {initFileId: number}) => {
-    const {fileName, openFile} = useEditorPage(initFileId);
+const Page = ({initWorkspaceDir}: {initWorkspaceDir: string}) => {
+    // const {fileName, openFile} = useEditorPage(initWorkspaceDir);
     const version = useFullVersion().version;
 
     var headTitle;
     if (version) {
         headTitle = version.project.name;
     } else {
-        headTitle = fileName;
+        headTitle = 'TODO';
     }
 
     return (
@@ -101,7 +108,7 @@ const Page  = ({initFileId}: {initFileId: number}) => {
                 <Header title={headTitle}/>
                 <Layout.Content>
                     <div style={{float: "left", width: "100%", height: "100%", padding: "10px"}}>
-                        <MonacoEditor/>
+                        TEST
                     </div>
                 </Layout.Content>
             </Layout>
