@@ -2,18 +2,18 @@ import * as React from "react";
 
 import {Divider, Icon, Table} from "antd";
 import {User} from "../../../services/users";
-import {Version, File, FileStatus} from "../../../model/types";
+import {StringResponse, Version, File, FileStatus} from "../../../model/types";
 import {State} from "../../../state/stateEntity";
 import {useHistory} from "react-router";
 import {useFullVersion} from "../../shared/contexts/FullProjectVersion";
 import {FileProvider} from "../../shared/contexts/File";
 import {usePromise} from "../../shared/usePromise";
 import ActionButton from "../../shared/dumb/ActionButton";
-import TheiaWorkspaceController from "../../shared/dumb/TheiaUtils";
 import ValidateFileButton from "./ValidateFileButton";
 import DownloadFileButton from "./DownloadFileButton";
 import {useSelectedFilesContext} from "./SelectedFilesContext";
-
+import {ROUTES} from "../../../constants/routes";
+import {postWorkspaceUpdate} from "../../../services/rest";
 
 const FileTable = () => {
     const {orderFilesByName, editFile, changeSelectedFiles} = useFileTable();
@@ -81,20 +81,24 @@ const useFileTable = () => {
 
     const editFile = (file: State<File>) => {
 
-        let workspaceController = new TheiaWorkspaceController();
         if(file) {
-            //console.dir(file.getEntity().version as Version)
-            let optWorkspaceDirectory = workspaceController.openWorkspace(file);
-            //console.dir(" === " + optWorkspaceDirectory + " ==== ");
-            optWorkspaceDirectory.then(resultString => {
-                //console.dir(resultString);
-                //console.log(resultString.answerString);
-                history.push(`/editor/${resultString.answerString}`);
-            });
+            openWorkspace(file.getEntity());
         }
-        //history.push(`/editor/${file.id}`);
-
     };
+
+    const openWorkspace = (file : File) => {
+        // retrieve workspace directory from backend
+        const promisedStringResponse : Promise<StringResponse> = postWorkspaceUpdate(`${ROUTES.FILES}/${file.id}/openFileInWorkspace`, file.id);
+        // resolve promise
+        promisedStringResponse.then( (res: StringResponse) => {
+
+            // open editor
+            history.push({
+                pathname: `/editor/${file.id}`,
+                state: { wsDirectory : res.answerString, fileId: file.id }
+            });
+        });
+    }  
 
     const onSelectionChange = (selectedKeys: string[] | number[], selectedFiles: State<File>[]) => {
         setSelectedFiles(selectedFiles);

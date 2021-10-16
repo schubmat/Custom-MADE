@@ -3,7 +3,7 @@ import {DeepPartial} from "../../model/types";
 import {ROUTES} from "../../constants/routes";
 import {Authentication} from "../../gui/shared/contexts/Authentication";
 import {User} from "../users";
-import {File} from "../../model/types";
+import {StringResponse, File} from "../../model/types";
 
 
 export const restSignUp = (username: string, password: string, email: string): Promise<User> => {
@@ -155,7 +155,7 @@ export const patchFileContent = (fileId: number, fileContent: string): Promise<F
         body: fileContent
     });
 };
-export const postWorkspaceUpdate = <T>(url: string, request : any) : Promise<Required<T>> => {
+export const postWorkspaceUpdate = async <T>(url: string, request : any) : Promise<StringResponse> => {
 
     const content = {
         headers: {
@@ -163,5 +163,5 @@ export const postWorkspaceUpdate = <T>(url: string, request : any) : Promise<Req
         },
         body: JSON.stringify(request),};
     const method = "POST";
-    return fetchAuthAPI(url, request ? {...content, method} : {method});
+    return await fetchAuthAPI(url, request ? {...content, method} : {method});
 };

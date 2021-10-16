@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useHistory, useParams} from 'react-router';
 import {Layout, message} from "antd";
 import Header from "../../shared/layout/Header";
@@ -11,58 +11,57 @@ import {FullVersionFromFileProvider, useFullVersion} from '../../shared/contexts
 import {FileEditProvider} from "./FileEdit";
 import GitPullLoadingIndicator from "../../shared/projects/GitPullLoadingIndicator";
 import {ROUTES} from "../../../constants/routes";
-import {MonacoEditor} from './MonacoEditor';
+import {TheiaEditor} from './Theia';
+import {StringResponse, File} from "../../../model/types";
+import {postWorkspaceUpdate} from "../../../services/rest";
+import { useLocation } from "react-router-dom";
 
 /* TODO refactoring
 context für file-editing erstellen und editor hooks nach editor-component verschieben
  */
 
-interface Params {
-    ws?: string,
-    // file? : string,
+interface stateType {
+    fileId?: string,
+    wsDirectory?: string,
 }
 
 export const Editor = () => {
-    const params: Params = useParams();
-    const wsDirectory: string = String(params.ws).replace(" ", "%20");
-    // const fileId = Number(params.file);
 
-    console.log("====")
-    console.log(wsDirectory)
-    console.log("====")
+    const currentState = useLocation<stateType>();
+    const fileId = Number(currentState.state.fileId);
+    const wsDirectory = String(currentState.state.wsDirectory);
 
-    return <Page initWorkspaceDir={wsDirectory}/>;
-    // return <FullVersionFromFileProvider fileId={fileId}>
-    //     <FileEditProvider>
-    //         <GitPullLoadingIndicator>
-    //             <Page initWorkspaceDir={wsDirectory}/>
-    //         </GitPullLoadingIndicator>
-    //     </FileEditProvider>
-    // </FullVersionFromFileProvider>
+    return <FullVersionFromFileProvider fileId={fileId}>
+        <FileEditProvider>
+            <GitPullLoadingIndicator>
+                <Page initFileId={fileId} wsDirectory={wsDirectory}/>
+            </GitPullLoadingIndicator>
+        </FileEditProvider>
+    </FullVersionFromFileProvider>
 };
-/* 
-const useEditorPage = (workspaceDir: string) => {
+
+const useEditorPage = (initFileId: number) => {
     const version = useFullVersion().version;
     const lsp = useLspFromVersion(version, showError);
     const editor = useEditor(lsp);
     const history = useHistory();
 
     useEffect(() => {
-        /* if (editor.isLoading || !version || editor.state)
+        if (editor.isLoading || !version || editor.state)
             return;
         const file = version.files.items.find(file => file.id === initFileId);
         if (!file) {
             message.error("Specified file does not belong to version");
             return;
-        } 
-        editor.openFile(workspaceDir);
+        }
+        editor.openFile(file);
     }, [editor.isLoading, version]);
 
     useEffect(() => {
         if (!version || !editor.state)
             return;
         if (version.files.items.length == 0) {
-            history.push(`${ROUTES.VERSIONS}/${version.versionId}`);
+            history.push(`${ROUTES.VERSIONS}/${version.id}`);
             return;
         }
         const fileId = editor.state.fileId;
@@ -87,28 +86,29 @@ const useEditorPage = (workspaceDir: string) => {
     return {
         fileName: getFileName(),
         openFile: editor.openFile,
+        version: version,
     }
-}; */
+};
 
-const Page = ({initWorkspaceDir}: {initWorkspaceDir: string}) => {
-    // const {fileName, openFile} = useEditorPage(initWorkspaceDir);
-    const version = useFullVersion().version;
+const Page  = ({initFileId, wsDirectory}: {initFileId: number, wsDirectory: string}) => {
+    const {fileName, openFile, version} = useEditorPage(initFileId);
 
-    var headTitle;
-    if (version) {
-        headTitle = version.project.name;
-    } else {
-        headTitle = 'TODO';
-    }
+    let pageTitle: string = fileName;
+    
+    if(version) {
+        pageTitle = version.description;
+    }   
 
+    let projectWorkspace: string = wsDirectory;
+    
     return (
         <Layout>
             <Sider/>
             <Layout style={{marginLeft: 200, height: '100vh', width: '100%'}}>
-                <Header title={headTitle}/>
+                <Header title={pageTitle}/>
                 <Layout.Content>
                     <div style={{float: "left", width: "100%", height: "100%", padding: "10px"}}>
-                        TEST
+                        <TheiaEditor workspaceDir={projectWorkspace}/>
                     </div>
                 </Layout.Content>
             </Layout>

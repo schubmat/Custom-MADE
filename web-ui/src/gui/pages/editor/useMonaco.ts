@@ -49,31 +49,31 @@ export const useMonaco = () => {
     const setMonacoState = (newState: MonacoState) => {
         if (state && newState.fileId == state.fileId && newState.content == state.content)
             return;
-        sendMessageToEditor({
+        /* sendMessageToEditor({
             action: Action.SET_CONTENT,
             data: {
                 fileId: newState.fileId,
                 fileContent: newState.content
             }
-        });
+        }); */
     };
 
-    const sendMessageToEditor = (message: any) => {
-        if (editor !== undefined) {
+    /* const sendMessageToEditor = (message: any) => {
+        if (typeof editor != "undefined") {
             editor.postMessage(message, '*');
             return;
         }
         throw new Error("Cannot connect to editor");
-    };
+    }; */
 
     const init = (lspPort: number) => {
         const initData = {
             lspPort: lspPort
         };
-        sendMessageToEditor({
+        /* sendMessageToEditor({
             action: Action.READY,
             data: initData
-        });
+        }); */
     };
 
     return {

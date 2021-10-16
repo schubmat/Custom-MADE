@@ -19,6 +19,11 @@ export interface Project {
     versions: Version[];
 }
 
+
+export interface StringResponse {
+    answerString: Required<string>,
+}
+
 export enum VisibilityLevel {
     PRIVATE = "PRIVATE",
     PUBLIC = "PUBLIC"
