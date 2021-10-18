@@ -47,9 +47,9 @@ export const restFile: FileRest = {
     getAll: () => {throw new Error("operation is not supported")},
     create: file => {
         const version = file.version;
-        if (!version || !version.id)
+        if (!version || !version.versionId)
             throw new Error("Version is not specified");
-        return createEntity<File>(file, `/versions/${version.id}/files`);
+        return createEntity<File>(file, `/versions/${version.versionId}/files`);
     },
     delete: file => {throw new Error("operation is not supported")},
     //     return deleteEntity<File>(`/files/${file.id}`);

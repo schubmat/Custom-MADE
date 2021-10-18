@@ -10,26 +10,28 @@ public class VersionDTOBuilder extends DTOBuilder<Version> {
         withFiles();
         withLanguageServer();
         withGrammar();
+        
+        ((Version) this.obj).configureVersionWorkspace();
     }
 
     private VersionDTOBuilder withProject() {
-        putSingle("project", obj.getProject());
+        putSingle("project", ((Version) this.obj).getProject());
         deleteField(new String[]{"project", "versions"});
         return this;
     }
 
     private VersionDTOBuilder withFiles() {
-        putCollection("files", obj.getFiles());
+        putCollection("files", ((Version) this.obj).getFiles());
         return this;
     }
 
     private VersionDTOBuilder withLanguageServer() {
-        putSingle("languageServer", obj.getLanguageServer());
+        putSingle("languageServer", ((Version) this.obj).getLanguageServer());
         return this;
     }
 
     private VersionDTOBuilder withGrammar() {
-        Version grammar = obj.getGrammar();
+        Version grammar = ((Version) this.obj).getGrammar();
         if (grammar != null) {
             putSingle("grammar", new VersionDTOBuilder(grammar).build());
         }

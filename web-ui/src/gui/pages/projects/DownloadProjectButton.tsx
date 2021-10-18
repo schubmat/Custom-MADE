@@ -39,9 +39,9 @@ const DownloadProjectButton = () => {
         if (versionEntity.files) {
             const uncheckedFiles = versionEntity.files.filter(file => file.status === FileStatus.UNCHECKED);
             if (uncheckedFiles.length > 0)
-                return () => version.validateFiles({id: version.id, files: uncheckedFiles.map(f=>f.id)}).then(() => version.further.getAllExports(version.id));
+                return () => version.validateFiles({versionId: version.versionId, files: uncheckedFiles.map(f=>f.id)}).then(() => version.further.getAllExports(version.versionId));
         }
-        return () => version.further.getAllExports(version.id);
+        return () => version.further.getAllExports(version.versionId);
     };
 
     const exportPromise = useFileResponsePromise(
@@ -51,7 +51,7 @@ const DownloadProjectButton = () => {
         error => message.error(error.message),
     );
     const rawPromise = useFileResponsePromise(
-        () => version.further.getAllRaws(version.id),
+        () => version.further.getAllRaws(version.versionId),
         onRawSuccess,
         onRawFail,
         error => message.error(error.message),

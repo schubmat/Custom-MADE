@@ -1,11 +1,12 @@
 import React from "react";
 
+ 
+export const TheiaEditor = ({workspaceDir}: {workspaceDir: string}) => {
 
-export const MonacoEditor = () => {
     return (
         <iframe
-            title={"monaco-editor"}
-            src={`http://localhost:3001/`}
+            title={"theia-editor"}
+            src={`http://localhost:3001/#${workspaceDir}`}
             width={"100%"}
             height={"100%"}
             id={"editor-iframe"}

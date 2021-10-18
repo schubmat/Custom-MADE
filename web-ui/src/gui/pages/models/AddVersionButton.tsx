@@ -53,12 +53,12 @@ const VersionForm = (props: FormComponentProps) => {
     const message = globalMessage(`Add version to ${projectName}`);
 
     const onSuccess = (version: Required<Version>) => {
-        message.success(`Version ${version.version} was created`);
+        message.success(`Version ${version.versionTag} was created`);
         if (version.files.length === 1) {
             history.push(`editor/${version.files[0].id}`)
         }
         else {
-            history.push(`${ROUTES.VERSIONS}/${version.id}`)
+            history.push(`${ROUTES.VERSIONS}/${version.versionId}`)
         }
     };
 

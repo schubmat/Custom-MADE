@@ -174,23 +174,15 @@
     		<plugin> 
     			<groupId>org.apache.maven.plugins</groupId> 
     			<artifactId>maven-antrun-plugin</artifactId> 
-    			<version>1.6</version> 
     			<executions> 
     				<execution> 
-    					<id>process-classes</id> 
+    					<id>chmod</id> 
     					<phase>process-classes</phase> 
     					<configuration> 
     						<target> 
-    							<chmod file="target/classes/lsp/manageLSP.sh" perm="755"/>
-							<chmod file="target/classes/project/export.sh" perm="755"/>
-							<chmod file="target/classes/git_connect/commitChanges.sh" perm="755"/>
-							<chmod file="target/classes/git_connect/getFilesInMergeConflict.sh" perm="755"/>
-							<chmod file="target/classes/git_connect/getRemoteDirs.sh" perm="755"/>
-							<chmod file="target/classes/git_connect/getStatus.sh" perm="755"/>
-							<chmod file="target/classes/git_connect/partialClone.sh" perm="755"/>
-							<chmod file="target/classes/git_connect/pull.sh" perm="755"/>
-							<chmod file="target/classes/git_connect/push.sh" perm="755"/>
-							<chmod file="target/classes/git_connect/useWithSshKey.sh" perm="755"/>
+	    						<chmod file="target/classes/lsp/manageLSP.sh" perm="755"/>
+								<chmod file="target/classes/project/export.sh" perm="755"/>
+								<chmod file="target/classes/git_connect/*.sh" perm="755"/>
     						</target> 
     					</configuration> 
     					<goals> 

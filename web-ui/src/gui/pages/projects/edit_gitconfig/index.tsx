@@ -43,7 +43,7 @@ const GitConnectionView = (props: {onSubmit?: () => void}) => {
     };
 
     const fileResponse = usePromise<ValidatedVersion>(
-        () => gitConnection.submit().then(() => version.validate(version.id)),
+        () => gitConnection.submit().then(() => version.validate(version.versionId)),
         response => responseMessage.success(<span>Synchronisation was successful.</span>),
         (error: Error) => responseMessage.error(error.message),
         hideLoadingMessage

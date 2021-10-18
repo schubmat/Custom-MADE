@@ -95,7 +95,7 @@ public class FileExport {
         Deque<ErroneousFile> result = new LinkedList<>();
         List<de.btu.swt.backend.file.File> exportList = new LinkedList<>();
         for (de.btu.swt.backend.file.File file : files) {
-            if (!file.getVersion().getId().equals(version.getId()))
+            if (!file.getVersion().getVersionId().equals(version.getVersionId()))
                 continue;
             try {
                 exportList.clear();
@@ -135,14 +135,14 @@ public class FileExport {
             String errorLog = erroneousFile.log;
             MailSender.getInstance().sendMail(
                     userDetails.getEmail(),
-                    "MDSE: " + version.getProject().getName() + ":" + version.getVersion() + ":" + erroneousFile.file.getFileName(),
+                    "MDSE: " + version.getProject().getName() + ":" + version.getVersionTag() + ":" + erroneousFile.file.getFileName(),
                     "",
                     fileName,
                     errorLog);
             return getFileResponse(errorLog, fileName, HttpStatus.CONFLICT);
         }
 
-        String fileName = version.getProject().getName() + ":" + version.getVersion();
+        String fileName = version.getProject().getName() + ":" + version.getVersionTag();
         ZipFile zip = new ZipFile(new java.io.File(uniqueSubDir, fileName + ".zip"));
         for (ErroneousFile file : erroneousFiles) {
             String errorLog = file.log;
@@ -152,7 +152,7 @@ public class FileExport {
         }
         MailSender.getInstance().sendMail(
                 userDetails.getEmail(),
-                "MDSE: " + version.getProject().getName() + ":" + version.getVersion(),
+                "MDSE: " + version.getProject().getName() + ":" + version.getVersionTag(),
                 "",
                 zip.getFile());
         return FileExport.getFileResponse(zip.getFile(), HttpStatus.CONFLICT);
@@ -169,7 +169,7 @@ public class FileExport {
                     " generated");
         if (children.size() == 1)
             return FileExport.getFileResponse(children.get(0).getAbsoluteFile(), HttpStatus.OK);
-        String fileName = version.getProject().getName() + ":" + version.getVersion();
+        String fileName = version.getProject().getName() + ":" + version.getVersionTag();
         java.io.File uniqueSubDir = FileExport.createUniqueSubDir(userDetails.getUsername(), Storage.TMP);
         try {
             ZipFile zip = new ZipFile(new java.io.File(uniqueSubDir, fileName + ".zip"));
@@ -195,7 +195,7 @@ public class FileExport {
                 try {
                     version.exportAll(uniqueSubDir);
                 } catch (Version.ModelValidationException e) {
-                    String logName = version.getProject().getName() + ":" + version.getVersion();
+                    String logName = version.getProject().getName() + ":" + version.getVersionTag();
                     //oder log stattdessen dem archiv hinzufügen?
                     return FileExport.getFileResponse(e.getMessage(), logName + ".log", HttpStatus.CONFLICT);
                 }
@@ -224,7 +224,7 @@ public class FileExport {
 
     public static ResponseEntity getRawFiles(Version version, UserDetails userDetails) {
         java.io.File uniqueSubDir = FileExport.createUniqueSubDir(userDetails.getUsername(), Storage.TMP);
-        String fileName = getUniqueName(version.getProject().getName() + "_" + version.getVersion(), ".zip");
+        String fileName = getUniqueName(version.getProject().getName() + "_" + version.getVersionTag(), ".zip");
         ZipFile zip = new ZipFile(new java.io.File(uniqueSubDir, fileName));
         try {
             for (de.btu.swt.backend.file.File file : version.getFiles()) {

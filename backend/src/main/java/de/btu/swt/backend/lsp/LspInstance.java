@@ -44,7 +44,7 @@ class LspInstance {
         String[] params = {
                 CommandSupplements.START.toString(),
                 languageServer.getLanguageName(),
-                languageServer.getVersion().getVersion(),
+                languageServer.getVersion().getVersionTag(),
                 String.valueOf(port)};
         log.info(ScriptRunner.run(script, params));
     }

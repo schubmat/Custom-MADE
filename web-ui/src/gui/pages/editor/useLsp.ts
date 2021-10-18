@@ -23,9 +23,9 @@ export const useLspFromVersion = (version: State<Required<Version>> | null, onEr
     useEffect(() => {
         if (!version)
             return;
-        if (version.id == currentVersionId)
+        if (version.versionId == currentVersionId)
             return;
-        setCurrentVersionId(version.id);
+        setCurrentVersionId(version.versionId);
     }, [version]);
 
     const destroyLsp = () => {

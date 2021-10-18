@@ -369,7 +369,7 @@ export const useEditGitConnection = () => {
     };
 
     const setVersion = (gitConfig: GitConfiguration): Promise<Required<Version>> => {
-        return version.setGitConfig({id: version.id, config: gitConfig});
+        return version.setGitConfig({versionId: version.versionId, config: gitConfig});
     };
 
 

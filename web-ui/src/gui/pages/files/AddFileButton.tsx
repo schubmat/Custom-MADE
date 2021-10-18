@@ -37,7 +37,7 @@ const useAddFile = () => {
                      onError: (error: Error) => void) => {
         if (!version || isLoading)
             return;
-        const dto = {...values, version: {id: version.id}};
+        const dto = {...values, version: {versionId: version.versionId}};
         setLoading(true);
         version.files.add(dto).then(onSuccess).catch(onError).finally(() => setLoading(false));
     };

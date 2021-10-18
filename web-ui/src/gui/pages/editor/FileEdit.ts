@@ -79,7 +79,7 @@ export const useFileEditContext = () => {
         const dtos = unsavedFiles.map(file => {return {id: file.id, content: _getLocalChange(file)}});
         rest.setFileContents({versionId: rest.id, files: dtos}).then(newVersion => {
             newVersion.files.forEach(file => localChangeFile(file.id, file.content));
-            rest.validateFiles({id: newVersion.id, files: dtos.map(dto => dto.id)})
+            rest.validateFiles({versionId: newVersion.versionId, files: dtos.map(dto => dto.id)})
                 .then(onSuccess)
                 .finally(() => definePending(files, false));
         }).catch(error => {

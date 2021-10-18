@@ -16,7 +16,7 @@ export const useProject = () => {
         throw new Error("No ProjectProvider");
 
     const orderVersionsByName = () => {
-        return context.versions.items.sort((a, b) => a.version < b.version ? -1 : 1);
+        return context.versions.items.sort((a, b) => a.versionTag < b.versionTag ? -1 : 1);
     };
 
     return {

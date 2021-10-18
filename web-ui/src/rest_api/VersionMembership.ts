@@ -12,7 +12,7 @@ export interface VersionMembershipRest extends DefaultRest<VersionMembership> {
 const checkRequest = (ship: Partial<VersionMembership>) => {
     if (!ship.permissions)
         throw new Error("Permissions are not specified");
-    if (!ship.version || !ship.version.id)
+    if (!ship.version || !ship.version.versionId)
         throw new Error("Version is not specified");
     if (!ship.user || !ship.user.id)
         throw new Error("User is not specified");
@@ -26,7 +26,7 @@ const checkRequest = (ship: Partial<VersionMembership>) => {
 };
 
 const getIdData = (ship: Partial<VersionMembership>) => {
-    if (!ship.version || !ship.version.id)
+    if (!ship.version || !ship.version.versionId)
         throw new Error("Version is not specified");
     if (!ship.user || !ship.user.id)
         throw new Error("User is not specified");
@@ -50,7 +50,7 @@ export const restVersionMembership: VersionMembershipRest = {
         // @ts-ignore
         const idData = getIdData(request);
         const ship = {...request, ...idData};
-        return createEntity<VersionMembership>(ship, `${ROUTES.VERSIONS}/${ship.version.id}/members`);
+        return createEntity<VersionMembership>(ship, `${ROUTES.VERSIONS}/${ship.version.versionId}/members`);
     },
     delete: request => {
         const idData = getIdData(request);
@@ -58,14 +58,14 @@ export const restVersionMembership: VersionMembershipRest = {
         if (!ship.id)
             throw new Error("Id has to be specified");
         const id = ship.id;
-        return deleteEntity<VersionMembership>(`${ROUTES.VERSIONS}/${ship.version.id}/members/${ship.user.id}`).then(deleted => {
+        return deleteEntity<VersionMembership>(`${ROUTES.VERSIONS}/${ship.version.versionId}/members/${ship.user.id}`).then(deleted => {
             return {...deleted, id: id};
         });
     },
     put: request => {
         const idData = getIdData(request);
         const ship = {...request, ...idData};
-        return updateEntity<VersionMembership>(ship, `${ROUTES.VERSIONS}/${ship.version.id}/members/${ship.user.id}`);
+        return updateEntity<VersionMembership>(ship, `${ROUTES.VERSIONS}/${ship.version.versionId}/members/${ship.user.id}`);
     },
     further: {
         deleteUser: versionId => deleteEntity<VersionMembership>(`${ROUTES.VERSIONS}/${versionId}/members/user`)

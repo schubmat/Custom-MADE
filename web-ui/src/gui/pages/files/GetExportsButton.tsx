@@ -42,7 +42,7 @@ const useGetExports = () => {
         if (!version || isLoading || selectedFiles.length == 0)
             return;
         setLoading(true);
-        version.further.getExports(version.id, selectedFiles.map(f => f.id)).then((result : FetchFileResponse) => {
+        version.further.getExports(version.versionId, selectedFiles.map(f => f.id)).then((result : FetchFileResponse) => {
             if (result.wasSuccessful && result.hasFile)
                 onSuccess(result.startDownload);
             else if (result.hasFile)

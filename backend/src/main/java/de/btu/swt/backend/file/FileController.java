@@ -2,8 +2,10 @@ package de.btu.swt.backend.file;
 
 import de.btu.swt.backend.user.User;
 import de.btu.swt.backend.user.UserRepository;
+import de.btu.swt.backend.util.Constants;
 import de.btu.swt.backend.util.ErroneousFile;
 import de.btu.swt.backend.util.FileExport;
+import de.btu.swt.backend.util.StringResponse;
 import de.btu.swt.backend.version.Permissions;
 import de.btu.swt.backend.version.Version;
 import de.btu.swt.backend.version.VersionDTOBuilder;
@@ -12,11 +14,20 @@ import de.btu.swt.backend.version.git_sync.RemoteSynchronizer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityNotFoundException;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Deque;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/files")
@@ -104,6 +115,55 @@ public class FileController {
         }
 
         return file.getVersion().getPermissions(user).contains(actions);
+    }
+    
+    @PostMapping("/{id}/openFileInWorkspace")
+    public ResponseEntity<?> openFileinTheiaWorkspace(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElse(new User());
+        
+        Optional<File> optFile = fileRepository.findById(id);
+        Version version; 
+        if (!optFile.isPresent()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No Version with file id = " + id + " found");
+        }
+        
+    	version = optFile.get().getVersion();
+        
+        Path fileWorkspaceDirectory = version.getGeneralFilesDirectory();
+//        Path globalTheiaSettingsFile = Paths.get( System.getProperty("user.home"), Constants.GLOBAL_THEIA_WORKSPACES_FILE);
+        
+        
+//        try {
+//            FileInputStream fInputStream = new FileInputStream(globalTheiaSettingsFile.toFile());
+//            BufferedReader buffReaderOldFileContent = new BufferedReader(new InputStreamReader(fInputStream));
+//            String currentLine;
+//            StringBuilder newFileContent = new StringBuilder();
+//            //Read File Line By Line
+//            while ((currentLine = buffReaderOldFileContent.readLine()) != null) {
+//            	if (currentLine.contains("recentRoots")) {
+//	                newFileContent.append("{\"recentRoots\":[\"file://");
+//	                System.err.print("{\"recentRoots\":[\"file://" + fileWorkspaceDirectory.toString().replace(" ","%20") + "\"]}" + System.lineSeparator());
+//	                newFileContent.append(fileWorkspaceDirectory.toString().replace(" ","%20") + "\"]}" + System.lineSeparator());
+////	                System.err.print(currentLine.substring(currentLine.indexOf("\":[\"") + 3));
+////	                newFileContent.append(currentLine.substring(currentLine.indexOf("\":[\"") + 3));
+////	                newFileContent.append(System.lineSeparator());
+//            	} else {
+//            		newFileContent.append(currentLine + System.lineSeparator());
+//            	}
+//            }
+//            // Close the input stream
+//            fInputStream.close();
+//            // Now fileContent will have updated content , which you can override into file
+//            FileWriter fStreamWriter = new FileWriter(globalTheiaSettingsFile.toFile());
+//            BufferedWriter buffOut = new BufferedWriter(fStreamWriter);
+//            buffOut.write(newFileContent.toString());
+//            buffOut.close();
+//            
+//        } catch (Exception e) {//Catch exception if any
+//            System.err.println("Error: " + e.getMessage());
+//        }
+        StringResponse result = new StringResponse(fileWorkspaceDirectory.toString());
+        return ResponseEntity.ok().body(result);
     }
 
 }

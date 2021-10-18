@@ -88,7 +88,7 @@ public class ProjectController {
         }
         Project project = projectOptional.get();
         if (!project.getVersions().stream()
-                .noneMatch(version -> version.getVersion().equals(request.getVersion()))) {
+                .noneMatch(version -> version.getVersionTag().equals(request.getVersionTag()))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Version name has already been taken.");
         }
@@ -97,7 +97,7 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("No grammar referenced.");
         }
-        Optional<Version> optionalGrammar = versionRepository.findById(request.getGrammar().getId());
+        Optional<Version> optionalGrammar = versionRepository.findById(request.getGrammar().getVersionId());
         if (!optionalGrammar.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("The referenced grammar does not exist.");

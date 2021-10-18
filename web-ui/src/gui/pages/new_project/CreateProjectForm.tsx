@@ -21,7 +21,7 @@ class CreateProjectForm extends React.Component<NewM0ProjectFormProps & FormComp
     private getGrammar = (versionId: number): Version | undefined => {
         return this.props.models.getEntityArray().map(model => model.versions)
             .reduce((old, next) => old.concat(next), [])
-            .find((version: Version) => version.id == versionId);
+            .find((version: Version) => version.versionId == versionId);
     };
 
     private handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -44,7 +44,7 @@ class CreateProjectForm extends React.Component<NewM0ProjectFormProps & FormComp
                 };
                 this.props.versions.add(newVersion).then((version: Required<Version>) => {
                     message.success(`Project ${version.project.name} was created`);
-                    this.props.history.push(`${ROUTES.VERSIONS}/${version.id}`);
+                    this.props.history.push(`${ROUTES.VERSIONS}/${version.versionId}`);
                 }).catch((error: Error) => {
                     message.error(error.toString());
                 });
