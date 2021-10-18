@@ -1,0 +1,63 @@
+{
+  "name": "sprotty-extension",
+  "displayName": "Sprotty Diagram for FlexDR Languages",
+  "version": "0.0.0",
+  "description": "Diagrams for FlexDR based languages with Sprotty framework.",
+  "categories": [
+    "Diagrams"
+  ],
+  "engines": {
+    "vscode": "^1.46.0"
+  },
+  "keywords": [
+    "vscode",
+    "graph",
+    "diagram",
+    "layout",
+    "sprotty",
+    "flexdr"
+  ],
+  "files": [
+    "lib",
+    "src",
+    "css"
+  ],
+  "author": {
+    "name": "Robert Richter"
+  },
+  "contributors": [
+    {
+      "name": "Robert Richter",
+      "email": "robert.richter@rrcomtech.com"
+    },
+    {
+      "name": "Mathias Schubanz",
+      "email": "schubmat@b-tu.de"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/schubmat/Custom-MADE"
+  },
+  "dependencies": {
+    "sprotty": "next",
+    "sprotty-vscode-webview": "^0.1.2",
+    "sprotty-vscode-protocol": "^0.0.5"
+  },
+  "devDependencies": {
+    "css-loader": "^4.2.1",
+    "rimraf": "latest",
+    "source-map-loader": "^1.0.2",
+    "style-loader": "^1.2.1",
+    "ts-loader": "^8.0.3",
+    "typescript": "3.8.3",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  },
+  "scripts": {
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "rimraf lib",
+    "build": "tsc && webpack --mode=development",
+    "watch": "tsc -w"
+  }
+}
