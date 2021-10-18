@@ -19,6 +19,11 @@ export interface Project {
     versions: Version[];
 }
 
+
+export interface StringResponse {
+    answerString: Required<string>,
+}
+
 export enum VisibilityLevel {
     PRIVATE = "PRIVATE",
     PUBLIC = "PUBLIC"
@@ -105,10 +110,10 @@ export interface VersionMembership {
 }
 
 export interface Version {
-    id: number;
+    versionId: number;
     owner: User;
     description: string;
-    version: string,
+    versionTag: string,
     visibility: VisibilityLevel;
     createdAt: string;
     lastEdited: string;

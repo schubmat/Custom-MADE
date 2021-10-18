@@ -1,0 +1,22 @@
+{
+  "name": "sprotty-extension",
+  "version": "0.0.0",
+  "files": [
+    "lib",
+    "src",
+    "css"
+  ],
+  "dependencies": {
+    "sprotty": "next"
+  },
+  "devDependencies": {
+    "rimraf": "latest",
+    "typescript": "latest"
+  },
+  "scripts": {
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "node_modules/.bin/rimraf lib",
+    "build": "node_modules/.bin/tsc",
+    "watch": "node_modules/.bin/tsc -w"
+  }
+}

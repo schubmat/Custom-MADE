@@ -34,7 +34,7 @@ const useAbstractProjects = (level: ProjectLevel) => {
         throw new Error("No ProjectsProvider");
 
     const getProjectFromVersion = (version: State<Version> | Version): State<Project> | undefined => {
-        const fullProject = context.items.find(fullProject => fullProject.versions.items.find(v => v.id == version.id));
+        const fullProject = context.items.find(fullProject => fullProject.versions.items.find(currVersion => currVersion.versionId == version.versionId));
         if (fullProject === undefined)
             return undefined;
         return fullProject;
@@ -53,7 +53,7 @@ const useAbstractProjects = (level: ProjectLevel) => {
 
     const getFullTitle = (version: State<Version>): string => {
           const project = getProjectFromVersion(version);
-          return (project ? project.name : "") + " " + version.version;
+          return (project ? project.name : "") + " " + version.versionTag;
     };
 
     const orderVersionsByTitle = () => {
@@ -68,7 +68,7 @@ const useAbstractProjects = (level: ProjectLevel) => {
     };
 
     const getVersionById = (versionId: number) => {
-        return orderVersionsByTitle().find(version => version.id == versionId);
+        return orderVersionsByTitle().find(version => version.versionId == versionId);
     };
 
     return {

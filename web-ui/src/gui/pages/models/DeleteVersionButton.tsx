@@ -18,7 +18,7 @@ export const DeleteVersionButton = () => {
             title: "Do you really want to delete the following versions?",
             content: <ul>{selectedVersions.map(version => {
                 const project = getProject(version);
-                return <li>{project && project.name} {version.version}</li>})}
+                return <li>{project && project.name} {version.versionTag}</li>})}
             </ul>,
             onOk: () => deleteSelectedVersions(),
             onCancel() {}});
@@ -40,14 +40,14 @@ const useDeleteVersion = () => {
             const project = models.getProjectFromVersion(version);
             if (!project) {
                 notification['error']({
-                    message: `Error while deleting "${version.version}"`,
+                    message: `Error while deleting "${version.versionTag}"`,
                     description: "No response from server"
                 });
                 return;
             }
             project.versions.remove(version.getEntity()).catch((error: Error) => {
                 notification['error']({
-                    message: `Error while deleting version "${project && project.name} ${version.version}"`,
+                    message: `Error while deleting version "${project && project.name} ${version.versionTag}"`,
                     description: error.message
                 });
             });

@@ -73,12 +73,12 @@ class GrammarSelectionFormItems extends React.Component<GrammarSelectionFormItem
                         option.props.title !== undefined && option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
                     }
                 >
-                    {versions.sort((a, b) => a.version < b.version ? -1 : 1).map((d: Version) => (
+                    {versions.sort((a, b) => a.versionTag < b.versionTag ? -1 : 1).map((d: Version) => (
                         <Option
-                            key={d.id}
-                            title={d.version}
+                            key={d.versionId}
+                            title={d.versionTag}
                         >
-                            {d.version}
+                            {d.versionTag}
                         </Option>
                     ))}
                 </Select>

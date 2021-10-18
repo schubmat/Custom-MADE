@@ -52,10 +52,12 @@ export const fetchAuthGetFile = (input: RequestInfo, init?: RequestInit): Promis
 };
 
 const _fetchAuthAPI = (input: RequestInfo, init?: RequestInit): Promise<any> => {
+
     let token = localStorage.getItem('id_token');
     if (token) {
         let rest = init && init.headers;
         init && delete (init.headers);
+
         return fetch(input, {
             headers: {
                 'Authorization': "Bearer ".concat(token),

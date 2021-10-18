@@ -18,7 +18,7 @@ export const VersionSelectionProvider = (props: {projectLevel: ProjectLevel, chi
 
     useEffect(() => {
         const versions = projects.orderVersionsByTitle();
-        const newSelectedVersions = selectedVersions.filter(selected => versions.find(version => version.id == selected.id));
+        const newSelectedVersions = selectedVersions.filter(selected => versions.find(version => version.versionId == selected.id));
         if (newSelectedVersions.length != selectedVersions.length)
             setSelectedVersions(newSelectedVersions);
     }, [projects.raw, selectedVersions]);

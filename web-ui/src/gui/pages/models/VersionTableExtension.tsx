@@ -26,7 +26,7 @@ const versionColumns = () => [
     {
         title: "", key: "actions", render: (record: State<Version>) => <ProjectVersionProvider value={record}>
             <span onClick={event => event.stopPropagation()}>
-                <GenericModal title={record.version} width={1000} content={<MembershipsView />}>
+                <GenericModal title={record.versionTag} width={1000} content={<MembershipsView />}>
                   <Icon type="team"/>
                 </GenericModal>
             </span>
@@ -42,7 +42,7 @@ const VersionTableExtension = () => {
     const onVersionRow = (record: State<Version>) => {
         return {
             onClick: () => {
-                history.push(`${ROUTES.VERSIONS}/${record.id}`);
+                history.push(`${ROUTES.VERSIONS}/${record.versionId}`);
             }
         };
     };

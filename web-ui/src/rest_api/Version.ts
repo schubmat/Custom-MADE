@@ -35,21 +35,21 @@ export interface VersionRest extends DefaultRest<Version> {
         getAllRaws: (id: number) => Promise<FetchFileResponse>,
     }
     modifiers: {
-        validate: (id: number) => Promise<ValidatedVersion>,
-        validateFiles: (arg: {id: number, files: number[]}) => Promise<ValidatedVersion>,
-        uploadFiles: (arg: {id: number, files: RcFile[]}) => Promise<Required<Version>>,
+        validate: (versionId: number) => Promise<ValidatedVersion>,
+        validateFiles: (arg: {versionId: number, files: number[]}) => Promise<ValidatedVersion>,
+        uploadFiles: (arg: {versionId: number, files: RcFile[]}) => Promise<Required<Version>>,
         setFileContents: (args: {versionId: number, files: {id: number, content: string}[]}) => Promise<Required<Version>>,
         deleteFiles: (args: {versionId: number, files: {id: number}[]}) => Promise<Required<Version>>,
-        setGitConfig: (args: {id: number, config: GitConfiguration}) => Promise<Required<Version>>,
+        setGitConfig: (args: {versionId: number, config: GitConfiguration}) => Promise<Required<Version>>,
     }
 }
 
 export const restVersion: VersionRest = {
     interface: {
-        id: true,
+        versionId: true,
         owner: true,
         description: true,
-        version: true,
+        versionTag: true,
         visibility: true,
         createdAt: true,
         lastEdited: true,
@@ -77,7 +77,7 @@ export const restVersion: VersionRest = {
         return createEntity<Version>(omitKeys<Version>(v, ["project"]), `/projects/${v.project.id}/versions`);
     },
     delete: v => {
-        return deleteEntity<Version>(`/versions/${v.id}`);
+        return deleteEntity<Version>(`/versions/${v.versionId}`);
     },
     put: v => {throw new Error("operation is not supported")},
     further: {
@@ -88,14 +88,14 @@ export const restVersion: VersionRest = {
         // setGitConfig: (id, config) => patchField<Version, GitConfiguration>(config, `${ROUTES.VERSIONS}/${id}/git`)
     },
     modifiers: {
-        uploadFiles: args => uploadFiles<Required<Version>>(`${ROUTES.VERSIONS}/${args.id}/files/upload`, args.files),
+        uploadFiles: args => uploadFiles<Required<Version>>(`${ROUTES.VERSIONS}/${args.versionId}/files/upload`, args.files),
         validate: (id) => patchEntity<VersionValidationDTO>(`${ROUTES.VERSIONS}/${id}/validate`).then((dto: VersionValidationDTO) => {
             return {
                 ...dto.version,
                 files: dto.fileLogs.map(fileLog => {return {...fileLog.file, log: fileLog.log}}),
             };
         }),
-        validateFiles: args => postEntity<VersionValidationDTO>(`${ROUTES.VERSIONS}/${args.id}/validate`, args.files.map(id => {return {id: id};})).then((dto: VersionValidationDTO) => {
+        validateFiles: args => postEntity<VersionValidationDTO>(`${ROUTES.VERSIONS}/${args.versionId}/validate`, args.files.map(id => {return {id: id};})).then((dto: VersionValidationDTO) => {
             return {
                 ...dto.version,
                 files: dto.fileLogs.map(fileLog => {return {...fileLog.file, log: fileLog.log}}),
@@ -103,7 +103,7 @@ export const restVersion: VersionRest = {
         }),
         setFileContents: args => patchEntity(`${ROUTES.VERSIONS}/${args.versionId}/files`, args.files),
         deleteFiles: args => deleteEntities(`${ROUTES.VERSIONS}/${args.versionId}/files`, args.files),
-        setGitConfig: args => patchEntity<Required<Version>>(`${ROUTES.VERSIONS}/${args.id}/git`, args.config),
+        setGitConfig: args => patchEntity<Required<Version>>(`${ROUTES.VERSIONS}/${args.versionId}/git`, args.config),
     },
 };
 

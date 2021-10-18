@@ -104,9 +104,6 @@ coverage
 .nyc_output
 /legacy.js
 
-# yarn
-*.lock
-
 # php files
 index.php
 

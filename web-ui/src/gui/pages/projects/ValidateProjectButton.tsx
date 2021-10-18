@@ -17,7 +17,7 @@ const ValidateProjectButton = () => {
     };
 
     const call = () => {
-        return version.validate(version.id);
+        return version.validate(version.versionId);
     };
 
     const promise = usePromise(

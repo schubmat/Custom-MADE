@@ -31,7 +31,7 @@ export const ProjectsTable = () => {
     const onRow = (record: State<Version>) => {
         return {
             onClick: () => {
-                history.push(`${ROUTES.VERSIONS}/${record.id}`);
+                history.push(`${ROUTES.VERSIONS}/${record.versionId}`);
             },
         };
     };
@@ -80,7 +80,7 @@ export const ProjectsTable = () => {
 
     return <Table<State<Version>> columns={versionColumns()}
                                   dataSource={projects.orderVersionsByTitle()}
-                                  rowKey={(record: State<Version>) => record.id.toString()}
+                                  rowKey={(record: State<Version>) => record.versionId.toString()}
                                   rowSelection={rowSelection}
                                   onRow={onRow}
                                   size={"small"}

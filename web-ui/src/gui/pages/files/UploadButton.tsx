@@ -49,13 +49,13 @@ const useUpload = () => {
         if (!version || isUploading)
             return;
         setUploading(true);
-        return version.uploadFiles({id: version.id, files: uploadList}).then((updatedVersion: Required<Version>) => {
+        return version.uploadFiles({versionId: version.versionId, files: uploadList}).then((updatedVersion: Required<Version>) => {
             const newFiles = updatedVersion.files.filter(updatedFile => version.files.items.filter(oldFile => oldFile.id == updatedFile.id).length == 0);
             if (newFiles.length == 0) {
                 setUploading(false);
                 return;
             }
-            version.validateFiles({id: version.id, files: newFiles.map(f=>f.id)}).then((validatedVersion: ValidatedVersion) => {
+            version.validateFiles({versionId: version.versionId, files: newFiles.map(f=>f.id)}).then((validatedVersion: ValidatedVersion) => {
                 if (validatedVersion.valid)
                     return onSuccess();
                 const conflictFiles = validatedVersion.files.filter(file => file.status === FileStatus.IN_CONFLICT);

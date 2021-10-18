@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useHistory, useParams} from 'react-router';
 import {Layout, message} from "antd";
 import Header from "../../shared/layout/Header";
@@ -11,24 +11,30 @@ import {FullVersionFromFileProvider, useFullVersion} from '../../shared/contexts
 import {FileEditProvider} from "./FileEdit";
 import GitPullLoadingIndicator from "../../shared/projects/GitPullLoadingIndicator";
 import {ROUTES} from "../../../constants/routes";
-import {MonacoEditor} from './MonacoEditor';
+import {TheiaEditor} from './Theia';
+import {StringResponse, File} from "../../../model/types";
+import {postWorkspaceUpdate} from "../../../services/rest";
+import { useLocation } from "react-router-dom";
 
 /* TODO refactoring
 context für file-editing erstellen und editor hooks nach editor-component verschieben
  */
 
-interface Params {
+interface stateType {
     fileId?: string,
+    wsDirectory?: string,
 }
 
 export const Editor = () => {
-    const params: Params = useParams();
-    const fileId = Number(params.fileId);
+
+    const currentState = useLocation<stateType>();
+    const fileId = Number(currentState.state.fileId);
+    const wsDirectory = String(currentState.state.wsDirectory);
 
     return <FullVersionFromFileProvider fileId={fileId}>
         <FileEditProvider>
             <GitPullLoadingIndicator>
-                <Page initFileId={fileId}/>
+                <Page initFileId={fileId} wsDirectory={wsDirectory}/>
             </GitPullLoadingIndicator>
         </FileEditProvider>
     </FullVersionFromFileProvider>
@@ -80,23 +86,29 @@ const useEditorPage = (initFileId: number) => {
     return {
         fileName: getFileName(),
         openFile: editor.openFile,
+        version: version,
     }
 };
 
-const Page  = ({initFileId}: {initFileId: number}) => {
-    const {fileName, openFile} = useEditorPage(initFileId);
+const Page  = ({initFileId, wsDirectory}: {initFileId: number, wsDirectory: string}) => {
+    const {fileName, openFile, version} = useEditorPage(initFileId);
 
+    let pageTitle: string = fileName;
+    
+    if(version) {
+        pageTitle = version.description;
+    }   
+
+    let projectWorkspace: string = wsDirectory;
+    
     return (
         <Layout>
             <Sider/>
             <Layout style={{marginLeft: 200, height: '100vh', width: '100%'}}>
-                <Header title={fileName}/>
+                <Header title={pageTitle}/>
                 <Layout.Content>
-                    <div style={{float: "left", width: "70%", height: "100%", padding: "10px"}}>
-                        <MonacoEditor/>
-                    </div>
-                    <div style={{float: "left", width: "30%", height: "100%", padding: "10px"}}>
-                        <FileList onClickFile={openFile}/>
+                    <div style={{float: "left", width: "100%", height: "100%", padding: "10px"}}>
+                        <TheiaEditor workspaceDir={projectWorkspace}/>
                     </div>
                 </Layout.Content>
             </Layout>

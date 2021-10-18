@@ -12,6 +12,7 @@ import de.btu.swt.backend.project.VisibilityLevel;
 import de.btu.swt.backend.git.GitConfiguration;
 import de.btu.swt.backend.storage.Storage;
 import de.btu.swt.backend.user.User;
+import de.btu.swt.backend.util.Constants;
 import de.btu.swt.backend.util.ScriptRunner;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,7 +43,7 @@ import java.util.stream.Collectors;
 @Table(name = "version")
 @Entity
 public class Version {
-
+	
     public class ModelValidationException extends Exception {
         protected ModelValidationException(String message) {
             super(message);
@@ -48,14 +52,14 @@ public class Version {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long versionId;
     @NonNull
     @ManyToOne
     @JsonIgnore
     private User owner;
     private String description;
     @NonNull
-    private String version;
+    private String versionTag;
     @NonNull
     private VisibilityLevel visibility = VisibilityLevel.PUBLIC;
     @CreationTimestamp
@@ -82,7 +86,7 @@ public class Version {
     public Long getGrammarId() {
         if (grammar == null)
             return null;
-        return grammar.getId();
+        return grammar.getVersionId();
     }
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -152,57 +156,92 @@ public class Version {
     }
 
     @JsonIgnore
-    private Path createSub(String folderName) {
-        Path result = getRoot().resolve(folderName);
-        java.io.File file = result.toFile();
-        if (!file.exists())
-            file.mkdir();
-        return result;
-    }
-
-    @JsonIgnore
     public Path getGeneralFilesDirectory() {
-        return createSub("files");
+    	return this.provideDirectoryPath(getRoot().resolve(Constants.GENERAL_FILES_DIRECTORY));
     }
 
     @JsonIgnore
     public Path getSrcFilesDirectory() {
-        Path result = getGeneralFilesDirectory().resolve("src");
-        java.io.File asFile = result.toFile();
-        if (!asFile.exists())
-            asFile.mkdir();
-        return result;
+        Path directoryPath = getGeneralFilesDirectory().resolve(Constants.RAW_FILES_DIRECTORY);
+        return this.createFolderIfNotExistent(directoryPath, false);
     }
 
     @JsonIgnore
     public Path getExportFilesDirectory() {
-        Path result = getGeneralFilesDirectory().resolve("gen");
-        java.io.File asFile = result.toFile();
-        if (!asFile.exists())
-            asFile.mkdir();
-        return result;
+        Path directoryPath = getGeneralFilesDirectory().resolve(Constants.EXPORT_FILES_DIRECTORY);
+        return this.createFolderIfNotExistent(directoryPath, false);
     }
 
     @JsonIgnore
     public Path getRemoteDirectory() {
-        return createSub("remote");
+    	return this.provideDirectoryPath(getRoot().resolve(Constants.REMOTE_FILES_DIRECTORY));
     }
 
     @JsonIgnore
     public Path getRoot() {
-        Path path = Storage.ROOT.resolve(project.getLevel().name() + "_projects" + java.io.File.separator + id + "_" + project.getName() + java.io.File.separator + version);
-        java.io.File file = path.toFile();
-        if (!file.exists())
-            file.mkdirs();
-        return file.getAbsoluteFile().toPath();
+        Path directoryPath = Storage.ROOT.resolve(project.getLevel().name() + "_projects" + java.io.File.separator + versionId + "_" + project.getName() + java.io.File.separator + versionTag);
+        return this.createFolderIfNotExistent(directoryPath.toFile().getAbsoluteFile().toPath(), true);
     }
 
+    
+    @JsonIgnore
+	private Path provideDirectoryPath(Path directoryPath) {
+    	return this.createFolderIfNotExistent(directoryPath, false);
+	}
+    
+	@JsonIgnore
+	public Path getTheiaConfigurationDirectory() {
+		return this.provideDirectoryPath(getGeneralFilesDirectory().resolve(Constants.THEIA_CONFIGURATION_DIRECTORY));
+	}  
+    
+    @JsonIgnore
+  	private Path createFolderIfNotExistent(Path directoryPath, boolean multipleDirectoriesAtOnce) {
+    	
+    	java.io.File folderToBeProvisioned = directoryPath.toFile();
+    	
+    	if (!folderToBeProvisioned.exists() 
+    			&& multipleDirectoriesAtOnce == true) {
+    		
+    		folderToBeProvisioned.mkdirs();
+		} 
+    	else if (!folderToBeProvisioned.exists() 
+				&& multipleDirectoriesAtOnce == false) {
+			
+			folderToBeProvisioned.mkdir();
+		}
+    	return directoryPath;
+	}
+    
+    @JsonIgnore
+    public void configureVersionWorkspace() {
+    	Path theiaConfigurationDirectory = this.provideDirectoryPath(this.getTheiaConfigurationDirectory());
+    	Path theiaConfigurationFile = theiaConfigurationDirectory
+    			.resolve(theiaConfigurationDirectory + java.io.File.separator + Constants.THEIA_SETTINGS_FILE);
+    	
+    	// check for the existence of the config directory and create if not present already
+    	if (!theiaConfigurationDirectory.toFile().exists()) {
+    		theiaConfigurationDirectory.toFile().mkdir();
+    	}
+    	// check for the existence of the config file and create if not present already
+    	if (!theiaConfigurationFile.toFile().exists()) {    		
+    		try (BufferedWriter buffWriter = new BufferedWriter(new FileWriter(theiaConfigurationFile.toFile()))) {
+    			buffWriter.write(Constants.THEIA_SETTINGS_FILE_CONTENTS);
+    			buffWriter.flush();
+    			buffWriter.close();
+    			
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+    	}
+    	
+    }
+    
     @JsonIgnore
     public java.io.File export(List<File> files, java.io.File uniqueDir) throws ModelValidationException, IOException {
         if (files.isEmpty())
             return null;
 
-        String subDir = project.getName() + java.io.File.separator + version;
+        String subDir = project.getName() + java.io.File.separator + versionTag;
         String srcDir = uniqueDir.getAbsolutePath() + java.io.File.separator + "src" + java.io.File.separator + subDir;
         String targetDir = uniqueDir.getAbsolutePath() + java.io.File.separator + "target" + java.io.File.separator + subDir;
         java.io.File sources = new java.io.File(srcDir);
@@ -213,7 +252,7 @@ public class Version {
         }
 
         for (File file : files) {
-            if (file.getVersion().getId() != this.id)
+            if (file.getVersion().getVersionId() != this.versionId)
                 continue;
             java.io.File m0File = new java.io.File(file.getDir().toFile(), file.getFileName()).getAbsoluteFile();
             if (!m0File.exists())
@@ -242,10 +281,10 @@ public class Version {
         final java.io.File pomDir = new java.io.File(Objects.requireNonNull(classLoader.getResource("project")).getFile());
 
         String[] scriptParams = {
-                String.valueOf(id),
+                String.valueOf(versionId),
                 pomDir.getAbsolutePath(),
                 grammar.getLanguageServer().getLanguageName(),
-                grammar.getVersion(),
+                grammar.getVersionTag(),
                 sourceDir,
                 targetDir
         };
