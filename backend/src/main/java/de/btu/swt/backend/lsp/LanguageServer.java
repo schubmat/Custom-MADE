@@ -41,13 +41,13 @@ public class LanguageServer {
     @OneToOne(mappedBy = "languageServer")
     private Version version;
 
-    @OneToMany(mappedBy = "languageServer", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private final List<LspInstance> lspInstances = new LinkedList<>();
+//    @OneToMany(mappedBy = "languageServer", cascade = CascadeType.ALL)
+//    @JsonIgnore
+//    private final List<LspInstance> lspInstances = new LinkedList<>();
 
-    @JsonIgnore
-    public List<LspInstance> getFreeInstances() {
-        return lspInstances.stream().filter(instance -> instance.isFree()).collect(Collectors.toList());
-
-    }
+//    @JsonIgnore
+//    public List<LspInstance> getFreeInstances() {
+//        return lspInstances.stream().filter(instance -> instance.isFree()).collect(Collectors.toList());
+//
+//    }
 }
