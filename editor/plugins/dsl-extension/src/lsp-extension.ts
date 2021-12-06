@@ -24,12 +24,22 @@ import { SprottyWebview } from 'sprotty-vscode/lib/sprotty-webview';
 export class LspVscodeExtension extends SprottyLspEditVscodeExtension {
 
     constructor(context: vscode.ExtensionContext) {
+        /*
+         The name of the extension.
+         It is necessary to perform calls on the IDE, e.g., dslextension.diagram.open.
+         These calls will not work if this name is not confirming to the calls in package.json.
+         */
         super('dslextension', context);
     }
 
     protected getDiagramType(commandArgs: any[]): string | undefined {
         if (commandArgs.length === 0
             || commandArgs[0] instanceof vscode.Uri && commandArgs[0].path.endsWith('.mydsl')) {
+            /*
+             This name MUST match those in sprotty-extension & the diagram server. Otherwise
+             Otherwise one of those will not process diagrams, because it does not recognize
+             the extension.
+             */
             return 'flexdr-diagram';
         }
     }
@@ -50,6 +60,10 @@ export class LspVscodeExtension extends SprottyLspEditVscodeExtension {
     }
 
     protected activateLanguageClient(context: vscode.ExtensionContext): LanguageClient {
+        /**
+         * Path to language server. To use diagrams it has to support the graphical
+         * Sprotty LSP.
+         */
         const executable = process.platform === 'win32' ? 'mydsl-socket.bat' : 'mydsl-socket';
         const languageServerPath =  path.join('..', '..', '..', 'backend', 'target', 'xtext-lsp', 'LSP_BUILDS',
             'simple_decision_record_language-_-1.0.0-SNAPSHOT', 'bin',  executable);
@@ -67,6 +81,7 @@ export class LspVscodeExtension extends SprottyLspEditVscodeExtension {
         const clientOptions: LanguageClientOptions = {
             documentSelector: [{ scheme: 'file', language: 'dslextension' }],
         };
+        // The name will be displayed in the IDE.
         const languageClient = new LanguageClient('statesLanguageClient', 'DSL Language Server', serverOptions, clientOptions);
         languageClient.start();
         return languageClient;
