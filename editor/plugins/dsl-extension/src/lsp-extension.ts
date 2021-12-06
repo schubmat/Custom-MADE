@@ -24,7 +24,7 @@ import { SprottyWebview } from 'sprotty-vscode/lib/sprotty-webview';
 export class LspVscodeExtension extends SprottyLspEditVscodeExtension {
 
     constructor(context: vscode.ExtensionContext) {
-        super('states', context);
+        super('dslextension', context);
     }
 
     protected getDiagramType(commandArgs: any[]): string | undefined {
