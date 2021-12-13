@@ -39,7 +39,7 @@ public class LspController {
     @Bean
     CommandLineRunner afterDataInitialize(LspRepository lspRepository) {
         return null;
-//        buildLspBinaries();
+        buildLspBinaries();
     }
 
     private void buildLspBinaries() {
