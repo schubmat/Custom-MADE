@@ -38,8 +38,8 @@ public class LspController {
 
     @Bean
     CommandLineRunner afterDataInitialize(LspRepository lspRepository) {
-        return null;
-        buildLspBinaries();
+    	buildLspBinaries();
+    	return null;        
     }
 
     private void buildLspBinaries() {
@@ -48,18 +48,6 @@ public class LspController {
         final File script = new File(Objects.requireNonNull(classLoader.getResource("lsp/manageLSP.sh")).getFile());
         log.info(ScriptRunner.run(script, CommandSupplements.INIT.toString()));
     }
-
-//    @GetMapping("/{lspId}")
-//    public ResponseEntity getLspInstance(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long lspId) {
-//
-//        return null; // ResponseEntity.ok(LspInstanceDTOUtils.lspInstanceToDTO(lspInstance));
-//    }
-
-//    @PostMapping(value = "/instances/{instanceId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity removeLspInstance(@AuthenticationPrincipal User userDetails, @PathVariable long instanceId) {
-//
-//    	return ResponseEntity.ok("Stopped lsp instance.");
-//    }
     
     private boolean validate(User user, long id, Permissions actions) {
         LanguageServer lsp = lspRepository.getOne(id);

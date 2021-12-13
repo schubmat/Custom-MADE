@@ -125,7 +125,7 @@ public class DataInitializer {
         log.info("Initialized: " + projectRepository.save(metaGrammar));
         log.info("Initialized: " + projectRepository.save(dummyGrammar));
 
-        // create language server objects for which language server instances will be built and started later
+        // create language server objects which are necessary to build 
 
         LanguageServer metaServer = LanguageServer.builder()
                 .languageName("meta_model_language")
