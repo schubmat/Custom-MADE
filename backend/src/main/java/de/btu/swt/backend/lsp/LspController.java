@@ -49,17 +49,17 @@ public class LspController {
         log.info(ScriptRunner.run(script, CommandSupplements.INIT.toString()));
     }
 
-    @GetMapping("/{lspId}")
-    public ResponseEntity getLspInstance(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long lspId) {
+//    @GetMapping("/{lspId}")
+//    public ResponseEntity getLspInstance(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long lspId) {
+//
+//        return null; // ResponseEntity.ok(LspInstanceDTOUtils.lspInstanceToDTO(lspInstance));
+//    }
 
-        return null; // ResponseEntity.ok(LspInstanceDTOUtils.lspInstanceToDTO(lspInstance));
-    }
-
-    @PostMapping(value = "/instances/{instanceId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity removeLspInstance(@AuthenticationPrincipal User userDetails, @PathVariable long instanceId) {
-
-    	return ResponseEntity.ok("Stopped lsp instance.");
-    }
+//    @PostMapping(value = "/instances/{instanceId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity removeLspInstance(@AuthenticationPrincipal User userDetails, @PathVariable long instanceId) {
+//
+//    	return ResponseEntity.ok("Stopped lsp instance.");
+//    }
     
     private boolean validate(User user, long id, Permissions actions) {
         LanguageServer lsp = lspRepository.getOne(id);
