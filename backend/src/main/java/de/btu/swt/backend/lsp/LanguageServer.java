@@ -1,20 +1,12 @@
 package de.btu.swt.backend.lsp;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.btu.swt.backend.util.ScriptRunner;
 import de.btu.swt.backend.version.Version;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 
 @Slf4j
 @Getter
@@ -22,8 +14,8 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"version", "lspInstances"})
-@ToString(exclude = {"version", "lspInstances"})
+@EqualsAndHashCode(exclude = {"version"})
+@ToString(exclude = {"version"})
 @Table(name = "languageserver")
 @Entity
 public class LanguageServer {
@@ -41,13 +33,4 @@ public class LanguageServer {
     @OneToOne(mappedBy = "languageServer")
     private Version version;
 
-    @OneToMany(mappedBy = "languageServer", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private final List<LspInstance> lspInstances = new LinkedList<>();
-
-    @JsonIgnore
-    public List<LspInstance> getFreeInstances() {
-        return lspInstances.stream().filter(instance -> instance.isFree()).collect(Collectors.toList());
-
-    }
 }
