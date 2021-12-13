@@ -14,8 +14,8 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"version", "lspInstances"})
-@ToString(exclude = {"version", "lspInstances"})
+@EqualsAndHashCode(exclude = {"version"})
+@ToString(exclude = {"version"})
 @Table(name = "languageserver")
 @Entity
 public class LanguageServer {
