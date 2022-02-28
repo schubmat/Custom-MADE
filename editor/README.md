@@ -5,85 +5,35 @@ for putting up the IDE (with Theia) and add visual support (with Sprotty).
 ## Software Versions
 The following versions were used while developing this solution.
 ```
-node 11.15.0
-npm 7.16.0
-yarn 1.22.5
-nvm 0.35.1
+node 12.22.5
+npm 7.16.0 (and newer)
+yarn 1.22.5 (and newer)
+nvm 0.35.1 (and newer)
 ```
 
 ## Getting started
 
-Install [nvm](https://github.com/creationix/nvm#install-script).
+Install [nvm](https://github.com/creationix/nvm#install-script). E.g., write:
 
     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.5/install.sh | bash
 
 Install npm and node.
 
-    nvm install 11.15.0
-    nvm use 11.15.0
+    nvm install 12.22.5
+    nvm use 12.22.5
 
 Install yarn.
 
     npm install -g yarn
 
-## Quickstart
-To run the software, simply execute
-```shell
-bash ./build_and_run_theia.sh
-```
-The shell file uses the commands below.
+Install the VSCode dependencies. See [VSCode Prequisites](https://github.com/Microsoft/vscode/wiki/How-to-Contribute#prerequisites).
 
-### Adding a custom language server
-For using a language, Theia needs a language server file, it can start (typically a .jar file). The file `àssemble_custommade.sh` is
-responsible for copying a freshly compiled language server to Theia. To do so, **have a look in the file and
-configure its variables**. Afterwards, one can run:
-```shell
-bash ./assemble_custommade.sh
-```
-The language server, which is used for development is referenced [in this repository](https://github.com/rrcomtech/Visualization_of_DSL_Families).
+## Running the Editor
 
-## Running the browser example
+From the root directory, compile the plugins:
 
-    yarn rebuild:browser
-    cd browser-app
-    yarn start
+    yarn --cwd plugins/dsl-extension
 
-Open http://localhost:3001 in the browser.
+Then, compile the editor and run it on port 3001:
 
-## Running the Electron example
-
-    yarn rebuild:electron
-    cd electron-app
-    yarn start
-
-## Developing with the browser example
-
-Start watching of mdr-dsl.
-
-    cd mdr-dsl
-    yarn watch
-
-Start watching of the browser example.
-
-    yarn rebuild:browser
-    cd browser-app
-    yarn watch
-
-Launch `Start Browser Backend` configuration from VS code.
-
-Open http://localhost:3000 in the browser.
-
-## Developing with the Electron example
-
-Start watching of mdr-dsl.
-
-    cd mdr-dsl
-    yarn watch
-
-Start watching of the electron example.
-
-    yarn rebuild:electron
-    cd electron-app
-    yarn watch
-
-Launch `Start Electron Backend` configuration from VS code.
+    yarn && yarn start --port 3001
