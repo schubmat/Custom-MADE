@@ -48,6 +48,8 @@ For successful compilation and execution, the following software is required:
   * Custom-MADE employs _git_ to manage the available languages and allows for connecting projects to existing git repositories
 * `mysql` -- **MySQL Server**
   * Used to store data persistently. Tested for version 8.0.26. _The database data has to match the values given in `backend/src/main/resources/application.properties`._
+* `yarn` -- Yarn Package Manager
+  * Used to run the Theia IDE.
 <!-- * `node.js` -- **Node Package Manager**
   * Used to compile the ReactJS front-end
  -->
