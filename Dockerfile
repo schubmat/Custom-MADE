@@ -8,6 +8,9 @@ RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.5/install.sh
 RUN curl -fsSL https://deb.nodesource.com/setup_12.22.5 | bash -
 RUN apt install -y nodejs
 RUN npm install yarn -g
+RUN mkdir /home/CM
+RUN git clone https://github.com/schubmat/Custom-MADE.git /home/CM/Custom-MADE
+RUN bash /home/CM/Custom-MADE/run.sh
 
 # Frontend
 EXPOSE 3000
