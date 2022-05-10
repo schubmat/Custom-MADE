@@ -10,7 +10,8 @@ RUN apt install -y nodejs
 RUN npm install yarn -g
 RUN mkdir /home/CM
 RUN git clone https://github.com/schubmat/Custom-MADE.git /home/CM/Custom-MADE
-RUN bash /home/CM/Custom-MADE/run.sh
+RUN cd /home/CM/Custom-MADE
+RUN bash -x run.sh
 
 # Frontend
 EXPOSE 3000
