@@ -189,7 +189,7 @@ public class DataInitializer {
         log.info("Initialized: " + versionRepository.save(dummyGrammarVersion));
         log.info("Initialized: " + lspRepository.save(dummyLSP_Server));
 
-        // finally, create user space projects and connect them to their langauge / LSP objects
+        // finally, create user space projects and connect them to their language / LSP objects
 
         Project project_mdrDsl = Project.builder()
                 .name("Project A")
