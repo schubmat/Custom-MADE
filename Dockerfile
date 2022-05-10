@@ -10,7 +10,11 @@ RUN apt install -y nodejs
 RUN npm install yarn -g
 RUN mkdir /home/CM
 RUN git clone https://github.com/schubmat/Custom-MADE.git /home/CM/Custom-MADE
-RUN cd /home/CM/Custom-MADE
+#RUN ls /home/
+#RUN ls /home/CM/
+RUN ls /home/CM/Custom-MADE
+WORKDIR "/home/CM/Custom-MADE/"
+RUN pwd
 RUN bash -x run.sh
 
 # Frontend
