@@ -1,7 +1,7 @@
 #!/bin/bash
 
-sudo docker build -t Custom-Made .
-sudo docker run -p 3000:3000 -p 3001:3001 -it Custom-Made
+sudo docker build -t custom-Made .
+sudo docker run -p 3000:3000 -p 3001:3001 -it custom-Made
 
 #### once the tty has started, type in:
 #
